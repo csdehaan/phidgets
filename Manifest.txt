@@ -2,7 +2,7 @@ GNU_GPL.txt
 History.txt
 Manifest.txt
 PostInstall.txt
-README.rdoc
+README.txt
 Rakefile
 lib/phidgets.rb
 lib/phidgets/common.rb
