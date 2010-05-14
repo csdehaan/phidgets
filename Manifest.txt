@@ -3,6 +3,7 @@ History.txt
 Manifest.txt
 PostInstall.txt
 README.txt
+README.rdoc
 Rakefile
 lib/phidgets.rb
 lib/phidgets/common.rb

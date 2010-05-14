@@ -6,5 +6,5 @@ require File.dirname(__FILE__) + '/phidgets/interfacekit.rb'
 require File.dirname(__FILE__) + '/phidgets/rfid.rb'
 
 module Phidgets
-  VERSION = '0.0.1'
+  VERSION = '0.0.2'
 end

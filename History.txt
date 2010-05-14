@@ -1,4 +1,6 @@
+== 0.0.2 2010-05-12
+  * Rewrote using DL/Importable
+  * Added some documentation
+  
 == 0.0.1 2009-03-27
-
-* 1 major enhancement:
   * Initial release

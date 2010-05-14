@@ -1,21 +1,22 @@
 
-#require 'phidgets/common'
 
 module Phidgets
 
+  extern "int CPhidgetRFID_create(void *)"
+  extern "int CPhidgetRFID_getOutputCount(void *, int *)"
+  extern "int CPhidgetRFID_getOutputState(void *, int, int *)"
+  extern "int CPhidgetRFID_setOutputState(void *, int *)"
+  extern "int CPhidgetRFID_getAntennaOn(void *, int, int *)"
+  extern "int CPhidgetRFID_setAntennaOn(void *, int, int)"
+  extern "int CPhidgetRFID_getLEDOn(void *, int *)"
+  extern "int CPhidgetRFID_setLEDOn(void *, int, int *)"
+  extern "int CPhidgetRFID_getLastTag(void *, int, int *)"
+  extern "int CPhidgetRFID_getTagStatus(void *, int *)"
+  extern "int CPhidgetRFID_set_OnTag_Handler(void *, int)"
+  extern "int CPhidgetRFID_set_OnTagLost_Handler(void *, int)"
+  
+  
   class RFID < Common
-    @@create = nil
-    @@output_count = nil
-    @@get_output_state = nil
-    @@set_output_state = nil
-    @@get_antenna_on = nil
-    @@set_antenna_on = nil
-    @@get_led_on = nil
-    @@set_led_on = nil
-    @@get_last_tag = nil
-    @@get_tag_status = nil
-    @@on_tag_handler = nil
-    @@tag_lost_handler = nil
 
     def initialize(serial_number=-1, timeout=0)
       super()
@@ -23,58 +24,84 @@ module Phidgets
       open(serial_number, timeout) if timeout > 0
     end
 
-    private
+    # Gets the number of outputs supported by this board.
+    def getOutputCount
+      cnt = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetRFID_getOutputCount(@handle, cnt.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      cnt.free = nil
+      cnt.to_i
+    end
 
-    def create
-      @@create = sym('CPhidgetRFID_create', 'Ip') if @@create == nil
-      r,rs = @@create.call(@handle.ref)
+    # Gets the state of an output.
+    def getOutputState(index)
+      state = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetRFID_getOutputState(@handle, index, state.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      state.free = nil
+      state.to_i
+    end
+
+    # Sets the state of an output.
+    def setOutputState(index, state)
+      r = Phidgets.cPhidgetRFID_setOutputState(@handle, index, state)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
-    public
-
-    def getOutputCount
-      call_IPi(@@output_count, 'CPhidgetRFID_getOutputCount', @handle)
-    end
-
-    def getOutputState(index)
-      call_IPIi(@@get_output_state, 'CPhidgetRFID_getOutputState', @handle, index)
-    end
-
-    def setOutputState(index, state)
-      call_IXXX(@@set_output_state, 'CPhidgetRFID_setOutputState', 'IPII', @handle, index, state)
-    end
-
+    # Gets the state of the antenna.
     def getAntennaOn
-      call_IPi(@@get_antenna_on, 'CPhidgetRFID_getAntennaOn', @handle)
+      state = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetRFID_getAntennaOn(@handle, state.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      state.free = nil
+      state.to_i
     end
 
+    # Sets the state of the antenna. Note that the antenna must be enabled before tags will be read.
     def setAntennaOn(state)
-      call_IPX(@@set_antenna_on, 'CPhidgetRFID_setAntennaOn', 'IPI', @handle, state)
+      r = Phidgets.cPhidgetRFID_setAntennaOn(@handle, state)
+      raise Phidgets::Exception.new(r) if r != 0
     end
 
+    # Gets the state of the onboard LED.
     def getLedOn
-      call_IPi(@@get_led_on, 'CPhidgetRFID_getLEDOn', @handle)
+      state = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetRFID_getLEDOn(@handle, state.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      state.free = nil
+      state.to_i
     end
 
+    # Sets the state of the onboard LED.
     def setLedOn(state)
-      call_IPX(@@set_led_on, 'CPhidgetRFID_setLEDOn', 'IPI', @handle, state)
+      r = Phidgets.cPhidgetRFID_setLEDOn(@handle, state)
+      raise Phidgets::Exception.new(r) if r != 0
     end
 
+    # Gets the last tag read by the reader. This tag may or may not still be on the reader.
     def getLastTag
-      call_IPs(@@get_last_tag, 'CPhidgetRFID_getLastTag', @handle)
+      tag = DL.malloc(5)
+      r = Phidgets.cPhidgetRFID_getLastTag(@handle, tag)
+      raise Phidgets::Exception.new(r) if r != 0
+      tag
     end
 
+    # Gets the tag present status. This is whether or not a tag is being read by the reader.
     def getTagStatus
-      call_IPi(@@get_tag_status, 'CPhidgetRFID_getTagStatus', @handle)
+      stat = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetRFID_getTagStatus(@handle, stat.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      stat.free = nil
+      stat.to_i
     end
 
-    def setOnTagHandler(callback, data)
-      call_IXXX(@@on_tag_handler, 'CPhidgetRFID_set_OnTag_Handler', 'IPPP', @handle, createCallback(callback), DL::PtrData.new(data.object_id))
-    end
 
-    def setOnTagLostHandler(callback, data)
-      call_IXXX(@@tag_lost_handler, 'CPhidgetRFID_set_OnTagLost_Handler', 'IPPP', @handle, createCallback(callback), DL::PtrData.new(data.object_id))
+    private
+
+    # Creates a Phidget RFID handle.
+    def create
+      r = Phidgets.cPhidgetRFID_create(@handle.ref)
+      raise Phidgets::Exception.new(r) if r != 0
     end
 
   end

@@ -3,7 +3,6 @@ require File.dirname(__FILE__) + '/test_helper.rb'
 class TestPhidgetsInterfaceKit < Test::Unit::TestCase
 
   def setup
-    sleep 1
   end
   
   def test_001_create
@@ -22,10 +21,10 @@ class TestPhidgetsInterfaceKit < Test::Unit::TestCase
   end
   
   def test_003_fail_attach
-    assert_raises (Phidgets::Exception) {
+    assert_raise Phidgets::Exception do
       ik = Phidgets::InterfaceKit.new(1, 2000)
       ik.delete
-    }
+    end
   end
   
   def test_004_get_device_name

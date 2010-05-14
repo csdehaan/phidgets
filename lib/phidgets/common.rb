@@ -1,97 +1,156 @@
 
 require 'dl'
+require 'dl/import'
 require 'rbconfig'
 
+
 module Phidgets
+  extend DL::Importable
 
-  NOTATTACHED                 = 0
-  ATTACHED                    = 1
+  NOTATTACHED                      = 0
+  ATTACHED                         = 1
 
-  CLASS_NOTHING               = 1
-  CLASS_ACCELEROMETER         = 2
-  CLASS_ADVANCEDSERVO         = 3
-  CLASS_ENCODER               = 4
-  CLASS_GPS                   = 5
-  CLASS_GYROSCOPE             = 6
-  CLASS_INTERFACEKIT          = 7
-  CLASS_LED                   = 8
-  CLASS_MOTORCONTROL          = 9
-  CLASS_PHSENSOR              = 10
-  CLASS_RFID                  = 11
-  CLASS_SERVO                 = 12
-  CLASS_STEPPER               = 13
-  CLASS_TEMPERATURESENSOR     = 14 
-  CLASS_TEXTLCD               = 15
-  CLASS_TEXTLED               = 16
-  CLASS_WEIGHTSENSOR          = 17
+  CLASS_NOTHING                    = 1
+  CLASS_ACCELEROMETER              = 2
+  CLASS_ADVANCEDSERVO              = 3
+  CLASS_ENCODER                    = 4
+  CLASS_GPS                        = 5
+  CLASS_GYROSCOPE                  = 6
+  CLASS_INTERFACEKIT               = 7
+  CLASS_LED                        = 8
+  CLASS_MOTORCONTROL               = 9
+  CLASS_PHSENSOR                   = 10
+  CLASS_RFID                       = 11
+  CLASS_SERVO                      = 12
+  CLASS_STEPPER                    = 13
+  CLASS_TEMPERATURESENSOR          = 14 
+  CLASS_TEXTLCD                    = 15
+  CLASS_TEXTLED                    = 16
+  CLASS_WEIGHTSENSOR               = 17
 
-  ID_ACCELEROMETER_2AXIS      = 0x071
-  ID_ACCELEROMETER_3AXIS      = 0x07E
-  ID_ADVANCEDSERVO_8MOTOR     = 0x03A
-  ID_BIPOLAR_STEPPER_1MOTOR   = 0x07B
-  ID_ENCODER_1ENCODER_1INPUT  = 0x04B
-  ID_ENCODER_HS_1ENCODER      = 0x080
-  ID_INTERFACEKIT_0_0_4       = 0x040
-  ID_INTERFACEKIT_0_0_8       = 0x081
-  ID_INTERFACEKIT_0_16_16     = 0x044
-  ID_INTERFACEKIT_8_8_8       = 0x045
-  ID_INTERFACEKIT_8_8_8_w_LCD = 0x07D
-  ID_LED_64                   = 0x04A
-  ID_LINEAR_TOUCH             = 0x076
-  ID_MOTORCONTROL_HC_2MOTOR   = 0x059
+  ID_ACCELEROMETER_2AXIS           = 0x071
+  ID_ACCELEROMETER_3AXIS           = 0x07E
+  ID_ADVANCEDSERVO_8MOTOR          = 0x03A
+  ID_BIPOLAR_STEPPER_1MOTOR        = 0x07B
+  ID_ENCODER_1ENCODER_1INPUT       = 0x04B
+  ID_ENCODER_HS_1ENCODER           = 0x080
+  ID_INTERFACEKIT_0_0_4            = 0x040
+  ID_INTERFACEKIT_0_0_8            = 0x081
+  ID_INTERFACEKIT_0_16_16          = 0x044
+  ID_INTERFACEKIT_8_8_8            = 0x045
+  ID_INTERFACEKIT_8_8_8_w_LCD      = 0x07D
+  ID_LED_64                        = 0x04A
+  ID_LINEAR_TOUCH                  = 0x076
+  ID_MOTORCONTROL_HC_2MOTOR        = 0x059
   ID_MOTORCONTROL_LV_2MOTOR_4INPUT = 0x058
-  ID_PHSENSOR                 = 0x074
-  ID_RFID_2OUTPUT             = 0x031
-  ID_ROTARY_TOUCH             = 0x077
-  ID_SERVO_1MOTOR             = 0x039
-  ID_TEMPERATURESENSOR        = 0x070
-  ID_TEXTLCD_2x20_w_8_8_8     = 0x17D
-  ID_UNIPOLAR_STEPPER_4MOTOR  = 0x07A
-  ID_INTERFACEKIT_0_8_8_w_LCD = 0x053
-  ID_INTERFACEKIT_4_8_8       = 0x004
-  ID_RFID                     = 0x030
-  ID_SERVO_1MOTOR_OLD         = 0x002
-  ID_SERVO_4MOTOR             = 0x038
-  ID_SERVO_4MOTOR_OLD         = 0x003
-  ID_TEXTLCD_2x20             = 0x052
-  ID_TEXTLCD_2x20_w_0_8_8     = 0x153
-  ID_TEXTLED_1x8              = 0x049
-  ID_TEXTLED_4x8              = 0x048
-  ID_WEIGHTSENSOR             = 0x072 
+  ID_PHSENSOR                      = 0x074
+  ID_RFID_2OUTPUT                  = 0x031
+  ID_ROTARY_TOUCH                  = 0x077
+  ID_SERVO_1MOTOR                  = 0x039
+  ID_TEMPERATURESENSOR             = 0x070
+  ID_TEXTLCD_2x20_w_8_8_8          = 0x17D
+  ID_UNIPOLAR_STEPPER_4MOTOR       = 0x07A
+  ID_INTERFACEKIT_0_8_8_w_LCD      = 0x053
+  ID_INTERFACEKIT_4_8_8            = 0x004
+  ID_RFID                          = 0x030
+  ID_SERVO_1MOTOR_OLD              = 0x002
+  ID_SERVO_4MOTOR                  = 0x038
+  ID_SERVO_4MOTOR_OLD              = 0x003
+  ID_TEXTLCD_2x20                  = 0x052
+  ID_TEXTLCD_2x20_w_0_8_8          = 0x153
+  ID_TEXTLED_1x8                   = 0x049
+  ID_TEXTLED_4x8                   = 0x048
+  ID_WEIGHTSENSOR                  = 0x072
 
-  def Phidgets.setLibName(name)
-    Common.setLibName(name)
+  begin
+    case Config::CONFIG['target_os']
+      when 'linux'
+        dlload 'libphidget21.so'
+      when 'mswin32'
+        dlload 'phidget21.dll'
+      else
+        raise Phidgets::Exception.new(Exception::EPHIDGET_LIBNAME)
+    end
+  rescue
+    raise Phidgets::Exception.new(Exception::EPHIDGET_LOAD_LIB_FAIL)
   end
+
+  extern "int CPhidget_openRemote(void *, int, void *, void *)"
+  extern "int CPhidget_openRemoteIP(void *, int, void *, int, void *)"
+  extern "int CPhidget_open(void *, int)"
+  extern "int CPhidget_close(void *)"
+  extern "int CPhidget_delete(void *)"
+  extern "int CPhidget_set_OnDetach_Handler(void *, void *, void *)"
+  extern "int CPhidget_set_OnAttach_Handler(void *, void *, void *)"
+  extern "int CPhidget_set_OnServerConnect_Handler(void *, void *, void *)"
+  extern "int CPhidget_set_OnServerDisconnect_Handler(void *, void *, void *)"
+  extern "int CPhidget_set_OnError_Handler(void *, void *, void *)"
+  extern "int CPhidget_getDeviceName(void *, void *)"
+  extern "int CPhidget_getSerialNumber(void *, int *)"
+  extern "int CPhidget_getDeviceVersion(void *, int *)"
+  extern "int CPhidget_getDeviceStatus(void *, int *)"
+  extern "int CPhidget_getLibraryVersion(void *)"
+  extern "int CPhidget_getDeviceType(void *, void *)"
+  extern "int CPhidget_getDeviceLabel(void *, void *)"
+  extern "int CPhidget_setDeviceLabel(void *, void *)"
+  extern "int CPhidget_getErrorDescription(int, void *)"
+  extern "int CPhidget_waitForAttachment(void *, int)"
+  extern "int CPhidget_getServerID(void *, void *)"
+  extern "int CPhidget_getServerAddress(void *, void *, int *)"
+  extern "int CPhidget_getServerStatus(void *, int *)"
+  extern "int CPhidget_getDeviceID(void *, int *)"
+  extern "int CPhidget_getDeviceClass(void *, int *)"
+
+  # Gets the library version. This contains a version number and a build date.
+  def Phidgets.getLibraryVersion
+    ptr = DL.malloc(DL.sizeof('P'))
+    r = cPhidget_getLibraryVersion(ptr.ref)
+    raise Phidgets::Exception.new(r) if r != 0
+    ptr.free = nil
+    ptr.to_s
+  end
+
+  # Gets the description for an error code.
+  def Phidgets.getErrorDescription(error_code)
+    ptr = DL.malloc(DL.sizeof('P'))
+    r = cPhidget_getErrorDescription(error_code, ptr.ref)
+    raise Phidgets::Exception.new(r) if r != 0
+    ptr.free = nil
+    ptr.to_s
+  end
+
 
   class Exception < RuntimeError
     attr_reader :code
 
-    EPHIDGET_NOTFOUND    = 1
-    EPHIDGET_NOMEMORY    = 2
-    EPHIDGET_UNEXPECTED  = 3
-    EPHIDGET_INVALIDARG  = 4
-    EPHIDGET_NOTATTACHED = 5
-    EPHIDGET_INTERRUPTED = 6
-    EPHIDGET_INVALID     = 7
-    EPHIDGET_NETWORK     = 8
-    EPHIDGET_UNKNOWNVAL  = 9
-    EPHIDGET_BADPASSWORD = 10
-    EPHIDGET_UNSUPPORTED = 11
-    EPHIDGET_DUPLICATE   = 12
-    EPHIDGET_TIMEOUT     = 13
-    EPHIDGET_OUTOFBOUNDS = 14
-    EPHIDGET_EVENT       = 15
-    EPHIDGET_NETWORK_NOTCONNECTED = 16
-    EPHIDGET_WRONGDEVICE = 17
-    EPHIDGET_CLOSED      = 18
-    EPHIDGET_BADVERSION  = 19
+    EPHIDGET_LOAD_LIB_FAIL         = -2
+    EPHIDGET_LIBNAME               = -1
+    EPHIDGET_NOTFOUND              = 1
+    EPHIDGET_NOMEMORY              = 2
+    EPHIDGET_UNEXPECTED            = 3
+    EPHIDGET_INVALIDARG            = 4
+    EPHIDGET_NOTATTACHED           = 5
+    EPHIDGET_INTERRUPTED           = 6
+    EPHIDGET_INVALID               = 7
+    EPHIDGET_NETWORK               = 8
+    EPHIDGET_UNKNOWNVAL            = 9
+    EPHIDGET_BADPASSWORD           = 10
+    EPHIDGET_UNSUPPORTED           = 11
+    EPHIDGET_DUPLICATE             = 12
+    EPHIDGET_TIMEOUT               = 13
+    EPHIDGET_OUTOFBOUNDS           = 14
+    EPHIDGET_EVENT                 = 15
+    EPHIDGET_NETWORK_NOTCONNECTED  = 16
+    EPHIDGET_WRONGDEVICE           = 17
+    EPHIDGET_CLOSED                = 18
+    EPHIDGET_BADVERSION            = 19
 
     def initialize(code)
       @code = code
       case code
-        when -2
+        when EPHIDGET_LOAD_LIB_FAIL
           super('Failed to load Phidgets Library')
-        when -1
+        when EPHIDGET_LIBNAME
           super('Unable to determine Phidgets Library name.')
         when EPHIDGET_NOTFOUND
           super('A Phidget matching the type and or serial number could not be found.')
@@ -136,117 +195,191 @@ module Phidgets
 
   end
 
+
   class Common
-    @@libname = nil
-    @@lib = nil
-    @@open_remote = nil
-    @@open_remote_ip = nil
-    @@open = nil
-    @@close = nil
-    @@delete = nil
-    @@detach_handler = nil
-    @@attach_handler = nil
-    @@connect_handler = nil
-    @@disconnect_handler = nil
-    @@error_handler = nil
-    @@name = nil
-    @@serial = nil
-    @@version = nil
-    @@status = nil
-    @@lib_version = nil
-    @@type = nil
-    @@get_label = nil
-    @@set_label = nil
-    @@error_description = nil
-    @@wait = nil
-    @@server_id = nil
-    @@server_addr = nil
-    @@server_status = nil
-    @@device_id = nil
-    @@device_class = nil
-
     def initialize
-      if @@libname == nil
-        case Config::CONFIG['target_os']
-          when 'linux'
-            @@libname = 'libphidget21.so'
-          when 'mswin32'
-            @@libname = 'phidget21.dll'
-          else
-            raise Phidgets::Exception.new(-1)
-        end
-      end
-
-      begin
-        @@lib = DL.dlopen(@@libname)
-      rescue
-        raise Phidgets::Exception.new(-2)
-      end
-
       @handle = DL.malloc(DL.sizeof('P'))
-      
     end
+
+    # Opens a Phidget remotely by ServerID. Note that this requires Bonjour (mDNS) to be running on both the host and the server.
+    def openRemote(serial_number=-1, server=nil, password=nil, timeout=0)
+      r = cPhidget_openRemote(@handle, serial_number, server, password)
+      raise Phidgets::Exception.new(r) if r != 0
+      waitForAttachment(timeout) if timeout > 0
+    end
+
+    # Opens a Phidget remotely by address and port.
+    def openRemoteIP(serial_number, address, port=5001, password=nil, timeout=0)
+      r = cPhidget_openRemoteIP(@handle, serial_number, address, port, password)
+      raise Phidgets::Exception.new(r) if r != 0
+      waitForAttachment(timeout) if timeout > 0
+    end
+
+    # Opens a Phidget.
+    def open(serial_number=-1, timeout=0)
+      r = Phidgets.cPhidget_open(@handle, serial_number)
+      raise Phidgets::Exception.new(r) if r != 0
+      waitForAttachment(timeout) if timeout > 0
+    end
+
+    # Closes a Phidget.
+    def close
+      r = Phidgets.cPhidget_close(@handle)
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Frees a Phidget handle.
+    def delete
+      @handle.free = nil
+      r = Phidgets.cPhidget_delete(@handle)
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Sets a detach handler callback function. This is called when this Phidget is unplugged from the system.
+    def setOnDetachHandler(callback, data)
+      r = Phidgets.cPhidget_set_OnDetach_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Sets an attach handler callback function. This is called when this Phidget is plugged into the system, and is ready for use.
+    def setOnAttachHandler(callback, data)
+      r = Phidgets.cPhidget_set_OnAttach_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Sets a server connect handler callback function. This is used for opening Phidgets remotely, and is called when a connection to the sever has been made.
+    def setOnConnectHandler(callback, data)
+      r = Phidgets.cPhidget_set_OnServerConnect_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Sets a server disconnect handler callback function. This is used for opening Phidgets remotely, and is called when a connection to the server has been lost.
+    def setOnDisconnectHandler(callback, data)
+      r = Phidgets.cPhidget_set_OnServerDisconnect_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Sets the error handler callback function. This is called when an asynchronous error occurs.
+    def setOnErrorHandler(callback, data)
+      r = Phidgets.cPhidget_set_OnError_Handler(@handle, createErrorCallback(callback), DL::PtrData.new(data.object_id))
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Gets the specific name of a Phidget.
+    def getDeviceName
+      ptr = DL.malloc(DL.sizeof('P'))
+      r = Phidgets.cPhidget_getDeviceName(@handle, ptr.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      ptr.free = nil
+      ptr.to_s
+    end
+
+    # Gets the serial number of a Phidget.
+    def getSerialNumber
+      sn = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidget_getSerialNumber(@handle, sn.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      sn.free = nil
+      sn.to_i
+    end
+
+    # Gets the firmware version of a Phidget.
+    def getDeviceVersion
+      ver = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidget_getDeviceVersion(@handle, ver.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      ver.free = nil
+      ver.to_i
+    end
+
+    # Gets the attached status of a Phidget.
+    def getDeviceStatus
+      stat = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidget_getDeviceStatus(@handle, stat.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      stat.free = nil
+      stat.to_i
+    end
+
+    # Gets the type (class) of a Phidget.
+    def getDeviceType
+      ptr = DL.malloc(DL.sizeof('P'))
+      r = Phidgets.cPhidget_getDeviceType(@handle, ptr.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      ptr.free = nil
+      ptr.to_s
+    end
+
+    # Gets the label of a Phidget.
+    def getDeviceLabel
+      ptr = DL.malloc(DL.sizeof('P'))
+      r = Phidgets.cPhidget_getDeviceLabel(@handle, ptr.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      ptr.free = nil
+      ptr.to_s
+    end
+
+    # Sets the label of a Phidget. Note that this is nut supported on very old Phidgets, and not yet supported in Windows.
+    def setDeviceLabel(label)
+      r = Phidgets.cPhidget_setDeviceLabel(@handle, label)
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Waits for attachment to happen. This can be called wirght after calling CPhidget_open, as an alternative to using the attach handler.
+    def waitForAttachment(timeout)
+      r = Phidgets.cPhidget_waitForAttachment(@handle, timeout)
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Gets the server ID of a remotely opened Phidget. This will fail if the Phidget was opened locally.
+    def getServerID
+      ptr = DL.malloc(DL.sizeof('P'))
+      r = Phidgets.cPhidget_getServerID(@handle, ptr.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      ptr.free = nil
+      ptr.to_s
+    end
+
+    # Gets the address and port of a remotely opened Phidget. This will fail if the Phidget was opened locally.
+    def getServerAddress
+      ptr = DL.malloc(DL.sizeof('P'))
+      port = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidget_getServerAddress(@handle, ptr.ref, port.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      ptr.free = nil
+      port.free = nil
+      [ptr.to_s, port.to_i]
+    end
+
+    # Gets the connected to server status of a remotely opened Phidget. This will fail if the Phidget was opened locally.
+    def getServerStatus
+      stat = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidget_getServerStatus(@handle, stat.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      stat.free = nil
+      stat.to_i
+    end
+
+    # Gets the device ID of a Phidget.
+    def getDeviceID
+      dev = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidget_getDeviceID(@handle, dev.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      dev.free = nil
+      dev.to_i
+    end
+
+    # Gets the class of a Phidget.
+    def getDeviceClass
+      dev = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidget_getDeviceClass(@handle, dev.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      dev.free = nil
+      dev.to_i
+    end
+
 
     private
-
-    def sym(name, interface)
-      @@lib[name, interface]
-    end
-
-    def call_IX(sym_name, func_name, format, arg1)
-      sym_name = sym(func_name, format) if sym_name == nil
-      r,rs = sym_name.call(arg1)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    def call_IXX(sym_name, func_name, format, arg1, arg2)
-      sym_name = sym(func_name, format) if sym_name == nil
-      r,rs = sym_name.call(arg1, arg2)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    def call_IXXX(sym_name, func_name, format, arg1, arg2, arg3)
-      sym_name = sym(func_name, format) if sym_name == nil
-      r,rs = sym_name.call(arg1, arg2, arg3)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    def call_IXXXX(sym_name, func_name, format, arg1, arg2, arg3, arg4)
-      sym_name = sym(func_name, format) if sym_name == nil
-      r,rs = sym_name.call(arg1, arg2, arg3, arg4)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    def call_IXXXXX(sym_name, func_name, format, arg1, arg2, arg3, arg4, arg5)
-      sym_name = sym(func_name, format) if sym_name == nil
-      r,rs = sym_name.call(arg1, arg2, arg3, arg4, arg5)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    def call_IPi(sym_name, func_name, arg1)
-      sym_name = sym(func_name, 'IPi') if sym_name == nil
-      return_arg = 0
-      r,rs = sym_name.call(arg1, return_arg)
-      raise Phidgets::Exception.new(r) if r != 0
-      rs[1]
-    end
-
-    def call_IPIi(sym_name, func_name, arg1, arg2)
-      sym_name = sym(func_name, 'IPIi') if sym_name == nil
-      return_arg = 0
-      r,rs = sym_name.call(arg1, arg2, return_arg)
-      raise Phidgets::Exception.new(r) if r != 0
-      rs[2]
-    end
-
-    def call_IPs(sym_name, func_name, arg1)
-      sym_name = sym(func_name, 'IPp') if sym_name == nil
-      arg_ptr = DL.malloc(DL.sizeof('P'))
-      r,rs = sym_name.call(arg1, arg_ptr.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      arg_ptr.free = nil
-      arg_ptr.to_s
-    end
 
     def createCallback(callback)
       DL.callback('IPP') {|handle,data|
@@ -260,133 +393,6 @@ module Phidgets
         data = ObjectSpace._id2ref(data.to_i)
         eval("#{callback}(data,error_code,error_string)")
       }
-    end
-
-    public
-
-    def Common.setLibName(name)
-      @@libname = name
-    end
-
-    def openRemote(serial_number=-1, server=nil, password=nil, timeout=0)
-      call_IXXXX(@@open_remote, 'CPhidget_openRemote', 'IPISS', @handle, serial_number, server, password)
-      waitForAttachment(timeout) if timeout > 0
-    end
-
-    def openRemoteIP(serial_number, address, port=5001, password=nil, timeout=0)
-      call_IXXXXX(@@open_remote_ip, 'CPhidget_openRemoteIP', 'IPISIS', @handle, serial_number, address, port, password)
-      waitForAttachment(timeout) if timeout > 0
-    end
-
-    def open(serial_number=-1, timeout=0)
-      call_IXX(@@open, 'CPhidget_open', 'IPI', @handle, serial_number)
-      waitForAttachment(timeout) if timeout > 0
-    end
-
-    def close
-      call_IX(@@close, 'CPhidget_close', 'IP', @handle)
-    end
-
-    def delete
-      @handle.free = nil
-      call_IX(@@delete, 'CPhidget_delete', 'IP', @handle)
-    end
-
-    def setOnDetachHandler(callback, data)
-      call_IXXX(@@detach_handler, 'CPhidget_set_OnDetach_Handler', 'IPPP', @handle, createCallback(callback), DL::PtrData.new(data.object_id))
-    end
-
-    def setOnAttachHandler(callback, data)
-      call_IXXX(@@attach_handler, 'CPhidget_set_OnAttach_Handler', 'IPPP', @handle, createCallback(callback), DL::PtrData.new(data.object_id))
-    end
-
-    def setOnConnectHandler(callback, data)
-      call_IXXX(@@connect_handler, 'CPhidget_set_OnServerConnect_Handler', 'IPPP', @handle, createCallback(callback), DL::PtrData.new(data.object_id))
-    end
-
-    def setOnDisconnectHandler(callback, data)
-      call_IXXX(@@disconnect_handler, 'CPhidget_set_OnServerDisconnect_Handler', 'IPPP', @handle, createCallback(callback), DL::PtrData.new(data.object_id))
-    end
-
-    def setOnErrorHandler(callback, data)
-      call_IXXX(@@error_handler, 'CPhidget_set_OnError_Handler', 'IPPP', @handle, createErrorCallback(callback), DL::PtrData.new(data.object_id))
-    end
-
-    def getDeviceName
-      call_IPs(@@name, 'CPhidget_getDeviceName', @handle)
-    end
-
-    def getSerialNumber
-      call_IPi(@@serial, 'CPhidget_getSerialNumber', @handle)
-    end
-
-    def getDeviceVersion
-      call_IPi(@@version, 'CPhidget_getDeviceVersion', @handle)
-    end
-
-    def getDeviceStatus
-      call_IPi(@@status, 'CPhidget_getDeviceStatus', @handle)
-    end
-
-    def getLibraryVersion
-      @@lib_version = sym('CPhidget_getLibraryVersion', 'Ip') if @@lib_version == nil
-      lib_version_ptr = DL.malloc(DL.sizeof('P'))
-      r,rs = @@lib_version.call(lib_version_ptr.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      lib_version_ptr.free = nil
-      lib_version_ptr.to_s
-    end
-
-    def getDeviceType
-      call_IPs(@@type, 'CPhidget_getDeviceType', @handle)
-    end
-
-    def getDeviceLabel
-      call_IPs(@@get_label, 'CPhidget_getDeviceLabel', @handle)
-    end
-
-    def setDeviceLabel(label)
-      call_IXX(@@set_label, 'CPhidget_setDeviceLabel', 'IPS', @handle, label)
-    end
-
-    def getErrorDescription(error_code)
-      @@error_description = sym('CPhidget_getErrorDescription', 'IIp') if @@error_description == nil
-      error_description_ptr = DL.malloc(DL.sizeof('P'))
-      r,rs = @@error_description.call(error_code, error_description_ptr.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      error_description_ptr.free = nil
-      error_description_ptr.to_s
-    end
-
-    def waitForAttachment(timeout)
-      call_IXX(@@wait, 'CPhidget_waitForAttachment', 'IPI', @handle, timeout)
-    end
-
-    def getServerID
-      call_IPs(@@server_id, 'CPhidget_getServerID', @handle)
-    end
-
-    def getServerAddress
-      @@server_addr = sym('CPhidget_getServerAddress', 'IPpi') if @@server_addr == nil
-      server_addr_ptr = DL.malloc(DL.sizeof('P'))
-      server_port = 0
-      r,rs = @@server_addr.call(@handle, server_addr_ptr.ref, server_port)
-      raise Phidgets::Exception.new(r) if r != 0
-      server_addr_ptr.free = nil
-      a = [server_addr_ptr.to_s, rs[2]]
-      a
-    end
-
-    def getServerStatus
-      call_IPi(@@server_status, 'CPhidget_getServerStatus', @handle)
-    end
-
-    def getDeviceID
-      call_IPi(@@device_id, 'CPhidget_getDeviceID', @handle)
-    end
-
-    def getDeviceClass
-      call_IPi(@@device_class, 'CPhidget_getDeviceClass', @handle)
     end
 
   end

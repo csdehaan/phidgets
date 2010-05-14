@@ -1,20 +1,21 @@
 
-#require 'phidgets/common'
 
 module Phidgets
 
+  extern "int CPhidgetInterfaceKit_create(void *)"
+  extern "int CPhidgetInterfaceKit_getInputCount(void *, int *)"
+  extern "int CPhidgetInterfaceKit_getInputState(void *, int, int *)"
+  extern "int CPhidgetInterfaceKit_getOutputCount(void *, int *)"
+  extern "int CPhidgetInterfaceKit_getOutputState(void *, int, int *)"
+  extern "int CPhidgetInterfaceKit_setOutputState(void *, int, int)"
+  extern "int CPhidgetInterfaceKit_getSensorCount(void *, int *)"
+  extern "int CPhidgetInterfaceKit_getSensorValue(void *, int, int *)"
+  extern "int CPhidgetInterfaceKit_getSensorRawValue(void *, int, int *)"
+  extern "int CPhidgetInterfaceKit_getRatiometric(void *, int *)"
+  extern "int CPhidgetInterfaceKit_setRatiometric(void *, int)"
+  
+  
   class InterfaceKit < Common
-    @@create = nil
-    @@input_count = nil
-    @@input_state = nil
-    @@output_count = nil
-    @@get_output_state = nil
-    @@set_output_state = nil
-    @@sensor_count = nil
-    @@sensor_value = nil
-    @@sensor_raw_value = nil
-    @@get_ratiometric = nil
-    @@set_ratiometric = nil
 
     def initialize(serial_number=-1, timeout=0)
       super()
@@ -22,54 +23,97 @@ module Phidgets
       open(serial_number, timeout) if timeout > 0
     end
 
-    private
+    # Gets the number of digital inputs supported by this board.
+    def getInputCount
+      cnt = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetInterfaceKit_getInputCount(@handle, cnt.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      cnt.free = nil
+      cnt.to_i
+    end
 
-    def create
-      @@create = sym('CPhidgetInterfaceKit_create', 'Ip') if @@create == nil
-      r,rs = @@create.call(@handle.ref)
+    # Gets the state of a digital input.
+    def getInputState(index)
+      state = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetInterfaceKit_getInputState(@handle, index, state.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      state.free = nil
+      state.to_i
+    end
+
+    # Gets the number of digital outputs supported by this board.
+    def getOutputCount
+      cnt = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetInterfaceKit_getOutputCount(@handle, cnt.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      cnt.free = nil
+      cnt.to_i
+    end
+
+    # Gets the state of a digital output.
+    def getOutputState(index)
+      state = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetInterfaceKit_getOutputState(@handle, index, state.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      state.free = nil
+      state.to_i
+    end
+
+    # Sets the state of a digital output.
+    def setOutputState(index, state)
+      r = Phidgets.cPhidgetInterfaceKit_setOutputState(@handle, index, state)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
-    public
-
-    def getInputCount
-      call_IPi(@@input_count, 'CPhidgetInterfaceKit_getInputCount', @handle)
-    end
-
-    def getInputState(index)
-      call_IPIi(@@input_state, 'CPhidgetInterfaceKit_getInputState', @handle, index)
-    end
-
-    def getOutputCount
-      call_IPi(@@output_count, 'CPhidgetInterfaceKit_getOutputCount', @handle)
-    end
-
-    def getOutputState(index)
-      call_IPIi(@@get_output_state, 'CPhidgetInterfaceKit_getOutputState', @handle, index)
-    end
-
-    def setOutputState(index, state)
-      call_IXXX(@@set_output_state, 'CPhidgetInterfaceKit_setOutputState', 'IPII', @handle, index, state)
-    end
-
+    # Gets the number of sensor (analog) inputs supported by this board.
     def getSensorCount
-      call_IPi(@@sensor_count, 'CPhidgetInterfaceKit_getSensorCount', @handle)
+      cnt = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetInterfaceKit_getSensorCount(@handle, cnt.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      cnt.free = nil
+      cnt.to_i
     end
 
+    # Gets a sensor value (0-1000).
     def getSensorValue(index)
-      call_IPIi(@@sensor_value, 'CPhidgetInterfaceKit_getSensorValue', @handle, index)
+      state = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetInterfaceKit_getSensorValue(@handle, index, state.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      state.free = nil
+      state.to_i
     end
 
+    # Gets a sensor raw value (12-bit).
     def getSensorRawValue(index)
-      call_IPIi(@@sensor_raw_value, 'CPhidgetInterfaceKit_getSensorRawValue', @handle, index)
+      state = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetInterfaceKit_getSensorRawValue(@handle, index, state.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      state.free = nil
+      state.to_i
     end
 
+    # Gets the ratiometric state for this board.
     def getRatiometric
-      call_IPi(@@get_ratiometric, 'CPhidgetInterfaceKit_getRatiometric', @handle)
+      ratio = DL.malloc(DL.sizeof('I'))
+      r = Phidgets.cPhidgetInterfaceKit_getRatiometric(@handle, ratio.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      ratio.free = nil
+      ratio.to_i
     end
 
+    # Sets the ratiometric state for this board.
     def setRatiometric(ratiometric)
-      call_IXX(@@set_ratiometric, 'CPhidgetInterfaceKit_setRatiometric', 'IPI', @handle, ratiometric)
+      r = Phidgets.cPhidgetInterfaceKit_setRatiometric(@handle, ratiometric)
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+
+    private
+    
+    # Creates a Phidget InterfaceKit handle.
+    def create
+      r = Phidgets.cPhidgetInterfaceKit_create(@handle.ref)
+      raise Phidgets::Exception.new(r) if r != 0
     end
 
   end
