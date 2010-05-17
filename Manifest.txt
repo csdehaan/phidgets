@@ -9,6 +9,7 @@ lib/phidgets.rb
 lib/phidgets/common.rb
 lib/phidgets/interfacekit.rb
 lib/phidgets/rfid.rb
+lib/phidgets/servo.rb
 script/console
 script/destroy
 script/generate

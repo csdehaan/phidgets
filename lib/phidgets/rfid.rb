@@ -34,6 +34,8 @@ module Phidgets
     end
 
     # Gets the state of an output.
+    # === Parameters
+    # * _index_ = The output index.
     def getOutputState(index)
       state = DL.malloc(DL.sizeof('I'))
       r = Phidgets.cPhidgetRFID_getOutputState(@handle, index, state.ref)
@@ -43,6 +45,9 @@ module Phidgets
     end
 
     # Sets the state of an output.
+    # === Parameters
+    # * _index_ = The output index.
+    # * _state_ = The output state. Possible values are PTRUE  and PFALSE.
     def setOutputState(index, state)
       r = Phidgets.cPhidgetRFID_setOutputState(@handle, index, state)
       raise Phidgets::Exception.new(r) if r != 0
@@ -58,6 +63,8 @@ module Phidgets
     end
 
     # Sets the state of the antenna. Note that the antenna must be enabled before tags will be read.
+    # === Parameters
+    # * _state_ = The antenna state. Possible values are PTRUE  and PFALSE.
     def setAntennaOn(state)
       r = Phidgets.cPhidgetRFID_setAntennaOn(@handle, state)
       raise Phidgets::Exception.new(r) if r != 0
@@ -73,6 +80,8 @@ module Phidgets
     end
 
     # Sets the state of the onboard LED.
+    # === Parameters
+    # * _state_ = The LED state. Possible values are PTRUE  and PFALSE.
     def setLedOn(state)
       r = Phidgets.cPhidgetRFID_setLEDOn(@handle, state)
       raise Phidgets::Exception.new(r) if r != 0

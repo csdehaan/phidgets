@@ -7,6 +7,9 @@ require 'rbconfig'
 module Phidgets
   extend DL::Importable
 
+  PFALSE                           = 0
+  PTRUE                            = 1
+
   NOTATTACHED                      = 0
   ATTACHED                         = 1
 
@@ -64,10 +67,12 @@ module Phidgets
 
   begin
     case Config::CONFIG['target_os']
-      when 'linux'
+      when /linux/
         dlload 'libphidget21.so'
-      when 'mswin32'
+      when /mswin/
         dlload 'phidget21.dll'
+      when /darwin/
+        dlload '/Library/Frameworks/Phidget21.framework/Versions/Current/Phidget21'
       else
         raise Phidgets::Exception.new(Exception::EPHIDGET_LIBNAME)
     end
@@ -202,6 +207,11 @@ module Phidgets
     end
 
     # Opens a Phidget remotely by ServerID. Note that this requires Bonjour (mDNS) to be running on both the host and the server.
+    # === Parameters
+    # * _serial_number_ = Serial number. Specify -1 to open any.
+    # * _server_        = Server ID. Specify nil to open any.
+    # * _password_      = Password. Can be nil if the server is running unsecured.
+    # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
     def openRemote(serial_number=-1, server=nil, password=nil, timeout=0)
       r = cPhidget_openRemote(@handle, serial_number, server, password)
       raise Phidgets::Exception.new(r) if r != 0
@@ -209,6 +219,12 @@ module Phidgets
     end
 
     # Opens a Phidget remotely by address and port.
+    # === Parameters
+    # * _serial_number_ = Serial number. Specify -1 to open any.
+    # * _address_       = Address. This can be a hostname or IP address.
+    # * _port_          = Port number. Default is 5001.
+    # * _password_      = Password. Can be nil if the server is running unsecured.
+    # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
     def openRemoteIP(serial_number, address, port=5001, password=nil, timeout=0)
       r = cPhidget_openRemoteIP(@handle, serial_number, address, port, password)
       raise Phidgets::Exception.new(r) if r != 0
@@ -216,6 +232,9 @@ module Phidgets
     end
 
     # Opens a Phidget.
+    # === Parameters
+    # * _serial_number_ = Serial number. Specify -1 to open any.
+    # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
     def open(serial_number=-1, timeout=0)
       r = Phidgets.cPhidget_open(@handle, serial_number)
       raise Phidgets::Exception.new(r) if r != 0
@@ -236,30 +255,45 @@ module Phidgets
     end
 
     # Sets a detach handler callback function. This is called when this Phidget is unplugged from the system.
+    # === Parameters
+    # * _callback_ = Callback function.
+    # * _data_     = Data for use by the user - this object is passed back into the callback function.
     def setOnDetachHandler(callback, data)
       r = Phidgets.cPhidget_set_OnDetach_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Sets an attach handler callback function. This is called when this Phidget is plugged into the system, and is ready for use.
+    # === Parameters
+    # * _callback_ = Callback function.
+    # * _data_     = Data for use by the user - this object is passed back into the callback function.
     def setOnAttachHandler(callback, data)
       r = Phidgets.cPhidget_set_OnAttach_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Sets a server connect handler callback function. This is used for opening Phidgets remotely, and is called when a connection to the sever has been made.
+    # === Parameters
+    # * _callback_ = Callback function.
+    # * _data_     = Data for use by the user - this object is passed back into the callback function.
     def setOnConnectHandler(callback, data)
       r = Phidgets.cPhidget_set_OnServerConnect_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Sets a server disconnect handler callback function. This is used for opening Phidgets remotely, and is called when a connection to the server has been lost.
+    # === Parameters
+    # * _callback_ = Callback function.
+    # * _data_     = Data for use by the user - this object is passed back into the callback function.
     def setOnDisconnectHandler(callback, data)
       r = Phidgets.cPhidget_set_OnServerDisconnect_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Sets the error handler callback function. This is called when an asynchronous error occurs.
+    # === Parameters
+    # * _callback_ = Callback function.
+    # * _data_     = Data for use by the user - this object is passed back into the callback function.
     def setOnErrorHandler(callback, data)
       r = Phidgets.cPhidget_set_OnError_Handler(@handle, createErrorCallback(callback), DL::PtrData.new(data.object_id))
       raise Phidgets::Exception.new(r) if r != 0
@@ -319,13 +353,17 @@ module Phidgets
       ptr.to_s
     end
 
-    # Sets the label of a Phidget. Note that this is nut supported on very old Phidgets, and not yet supported in Windows.
+    # Sets the label of a Phidget. Note that this is not supported on very old Phidgets, and not yet supported in Windows.
+    # === Parameters
+    # * _label_ = A string containing the label to be set.
     def setDeviceLabel(label)
       r = Phidgets.cPhidget_setDeviceLabel(@handle, label)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
-    # Waits for attachment to happen. This can be called wirght after calling CPhidget_open, as an alternative to using the attach handler.
+    # Waits for attachment to happen. This can be called right after calling open, as an alternative to using the attach handler.
+    # === Parameters
+    # * _timeout_ = Time to wait for the attachment. Specify 0 to wait forever.
     def waitForAttachment(timeout)
       r = Phidgets.cPhidget_waitForAttachment(@handle, timeout)
       raise Phidgets::Exception.new(r) if r != 0

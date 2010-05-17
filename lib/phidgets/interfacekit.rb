@@ -33,6 +33,8 @@ module Phidgets
     end
 
     # Gets the state of a digital input.
+    # === Parameters
+    # * _index_ = The input index.
     def getInputState(index)
       state = DL.malloc(DL.sizeof('I'))
       r = Phidgets.cPhidgetInterfaceKit_getInputState(@handle, index, state.ref)
@@ -51,6 +53,8 @@ module Phidgets
     end
 
     # Gets the state of a digital output.
+    # === Parameters
+    # * _index_ = The output index.
     def getOutputState(index)
       state = DL.malloc(DL.sizeof('I'))
       r = Phidgets.cPhidgetInterfaceKit_getOutputState(@handle, index, state.ref)
@@ -60,6 +64,9 @@ module Phidgets
     end
 
     # Sets the state of a digital output.
+    # === Parameters
+    # * _index_ = The output index.
+    # * _state_ = The output state. Possible values are PTRUE  and PFALSE.
     def setOutputState(index, state)
       r = Phidgets.cPhidgetInterfaceKit_setOutputState(@handle, index, state)
       raise Phidgets::Exception.new(r) if r != 0
@@ -75,6 +82,8 @@ module Phidgets
     end
 
     # Gets a sensor value (0-1000).
+    # === Parameters
+    # * _index_ = The sensor index.
     def getSensorValue(index)
       state = DL.malloc(DL.sizeof('I'))
       r = Phidgets.cPhidgetInterfaceKit_getSensorValue(@handle, index, state.ref)
@@ -84,6 +93,8 @@ module Phidgets
     end
 
     # Gets a sensor raw value (12-bit).
+    # === Parameters
+    # * _index_ = The sensor index.
     def getSensorRawValue(index)
       state = DL.malloc(DL.sizeof('I'))
       r = Phidgets.cPhidgetInterfaceKit_getSensorRawValue(@handle, index, state.ref)
@@ -102,6 +113,8 @@ module Phidgets
     end
 
     # Sets the ratiometric state for this board.
+    # === Parameters
+    # * _ratiometric_ = The ratiometric state. Possible values are PTRUE  and PFALSE.
     def setRatiometric(ratiometric)
       r = Phidgets.cPhidgetInterfaceKit_setRatiometric(@handle, ratiometric)
       raise Phidgets::Exception.new(r) if r != 0
