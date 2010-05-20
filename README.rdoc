@@ -12,29 +12,52 @@ This gem provides a ruby interface to the phidgets library.
 * This gem uses DL to call the c functions in the Phidgets shared library, so the library must be installed and working.
 * The gem has been tested to work on both Linux and Windows.
 * Not all the devices have been implemented, and not all of the devices that have been implemented have been fully tested.
-* The callback functionality of the Phidgets library is not working very well. Making multiple calls to the phidgets library from
-  within a callback will cause an exception.
-* The gem will attempt to guess the name of the phidgets library based on the platform it is run on (Linux or Windows). If it guesses
-  incorrectly, the library name can be set manually with Phidgets::setLibName(lib)
+* The callback functionality of the Phidgets library is working but should be used with caution. I have found that the callback
+  will cause a stack overflow exception if it is too big (not sure exactly what the limit is, but it isn't much).
+* The gem will attempt to guess the name of the phidgets library based on the platform it is run on (Linux, Windows or OS X).
+  If it guessesincorrectly please leave a message to let me know what your platform sets for Config::CONFIG['target_os'] and
+  what is the name of the phidgets library.
 
 == SYNOPSIS:
 
-require 'phidgets'
+  require 'phidgets'
 
-begin
-  ik = Phidgets::InterfaceKit.new(-1,2000)
+  begin
+    ik = Phidgets::InterfaceKit.new(-1,2000)
 
-  puts "Device Name     = #{ik.getDeviceName}"
-  puts "Serial Number   = #{ik.getSerialNumber}"
-  puts "Device Version  = #{ik.getDeviceVersion}"
+    puts "Device Name     = #{ik.getDeviceName}"
+    puts "Serial Number   = #{ik.getSerialNumber}"
+    puts "Device Version  = #{ik.getDeviceVersion}"
 
-  ik.close
+    ik.close
 
-rescue Phidgets::Exception => e
-  puts "Phidgets Error (#{e.code}). #{e}"
+  rescue Phidgets::Exception => e
+    puts "Phidgets Error (#{e.code}). #{e}"
+  end
 
-end
+=== <b>or to use a callback:</b>
 
+  require 'phidgets'
+
+  def onConnect(handle, data)
+    # the ruby object passed in to the callback is converted to an object id.
+    # Now convert it back to an object reference
+    ik = ObjectSpace._id2ref(data.to_i)
+    puts ik.getDeviceName
+    return 0
+  end
+
+  begin
+    ik = Phidgets::InterfaceKit.new
+    ik.setOnAttachHandler("onConnect", ik)
+    ik.open
+
+    # do something else
+    sleep 4
+
+  rescue Phidgets::Exception => e
+    puts "Phidgets Error (#{e.code}). #{e}"
+  end
 
 
 == REQUIREMENTS:

@@ -124,7 +124,6 @@ module Phidgets
     ptr.to_s
   end
 
-
   class Exception < RuntimeError
     attr_reader :code
 
@@ -202,9 +201,6 @@ module Phidgets
 
 
   class Common
-    def initialize
-      @handle = DL.malloc(DL.sizeof('P'))
-    end
 
     # Opens a Phidget remotely by ServerID. Note that this requires Bonjour (mDNS) to be running on both the host and the server.
     # === Parameters
@@ -256,46 +252,46 @@ module Phidgets
 
     # Sets a detach handler callback function. This is called when this Phidget is unplugged from the system.
     # === Parameters
-    # * _callback_ = Callback function.
-    # * _data_     = Data for use by the user - this object is passed back into the callback function.
-    def setOnDetachHandler(callback, data)
-      r = Phidgets.cPhidget_set_OnDetach_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
+    # * _callback_func_ = Callback function.
+    # * _data_          = Data for use by the user - this object is passed back into the callback function.
+    def setOnDetachHandler(callback_func, data)
+      r = Phidgets.cPhidget_set_OnDetach_Handler(@handle, Phidgets.callback("int #{callback_func}(void *, void *)"), DL::PtrData.new(data.object_id))
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Sets an attach handler callback function. This is called when this Phidget is plugged into the system, and is ready for use.
     # === Parameters
-    # * _callback_ = Callback function.
-    # * _data_     = Data for use by the user - this object is passed back into the callback function.
-    def setOnAttachHandler(callback, data)
-      r = Phidgets.cPhidget_set_OnAttach_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
+    # * _callback_func_ = Callback function.
+    # * _data_          = Data for use by the user - this object is passed back into the callback function.
+    def setOnAttachHandler(callback_func, data)
+      r = Phidgets.cPhidget_set_OnAttach_Handler(@handle, Phidgets.callback("int #{callback_func}(void *, void *)"), DL::PtrData.new(data.object_id))
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Sets a server connect handler callback function. This is used for opening Phidgets remotely, and is called when a connection to the sever has been made.
     # === Parameters
-    # * _callback_ = Callback function.
-    # * _data_     = Data for use by the user - this object is passed back into the callback function.
-    def setOnConnectHandler(callback, data)
-      r = Phidgets.cPhidget_set_OnServerConnect_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
+    # * _callback_func_ = Callback function.
+    # * _data_          = Data for use by the user - this object is passed back into the callback function.
+    def setOnConnectHandler(callback_func, data)
+      r = Phidgets.cPhidget_set_OnServerConnect_Handler(@handle, Phidgets.callback("int #{callback_func}(void *, void *)"), DL::PtrData.new(data.object_id))
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Sets a server disconnect handler callback function. This is used for opening Phidgets remotely, and is called when a connection to the server has been lost.
     # === Parameters
-    # * _callback_ = Callback function.
-    # * _data_     = Data for use by the user - this object is passed back into the callback function.
-    def setOnDisconnectHandler(callback, data)
-      r = Phidgets.cPhidget_set_OnServerDisconnect_Handler(@handle, createCallback(callback), DL::PtrData.new(data.object_id))
+    # * _callback_func_ = Callback function.
+    # * _data_          = Data for use by the user - this object is passed back into the callback function.
+    def setOnDisconnectHandler(callback_func, data)
+      r = Phidgets.cPhidget_set_OnServerDisconnect_Handler(@handle, Phidgets.callback("int #{callback_func}(void *, void *)"), DL::PtrData.new(data.object_id))
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Sets the error handler callback function. This is called when an asynchronous error occurs.
     # === Parameters
-    # * _callback_ = Callback function.
-    # * _data_     = Data for use by the user - this object is passed back into the callback function.
-    def setOnErrorHandler(callback, data)
-      r = Phidgets.cPhidget_set_OnError_Handler(@handle, createErrorCallback(callback), DL::PtrData.new(data.object_id))
+    # * _callback_func_ = Callback function.
+    # * _data_          = Data for use by the user - this object is passed back into the callback function.
+    def setOnErrorHandler(callback_func, data)
+      r = Phidgets.cPhidget_set_OnError_Handler(@handle, Phidgets.callback("int #{callback_func}(void *, void *, int, const char *)"), DL::PtrData.new(data.object_id))
       raise Phidgets::Exception.new(r) if r != 0
     end
 
@@ -419,18 +415,8 @@ module Phidgets
 
     private
 
-    def createCallback(callback)
-      DL.callback('IPP') {|handle,data|
-        data = ObjectSpace._id2ref(data.to_i)
-        eval("#{callback}(data)")
-      }
-    end
-
-    def createErrorCallback(callback)
-      DL.callback('IPPIS') {|handle,data,error_code,error_string|
-        data = ObjectSpace._id2ref(data.to_i)
-        eval("#{callback}(data,error_code,error_string)")
-      }
+    def initialize
+      @handle = DL.malloc(DL.sizeof('P'))
     end
 
   end
