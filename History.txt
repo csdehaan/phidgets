@@ -1,3 +1,8 @@
+== 0.0.3 2010-08-09
+  * Moved the Phidgets::Exception class before the initialization code so that the init code can throw an exception
+  * Fixed bugs in Common::openRemote and Common::openRemoteIP that prevented them from being called
+  * Add ability to turn on/off logging in the C library (for debugging)
+
 == 0.0.2 2010-05-12
   * Rewrote using DL/Importable
   * Added some documentation
