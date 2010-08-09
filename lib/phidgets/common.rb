@@ -65,64 +65,12 @@ module Phidgets
   ID_TEXTLED_4x8                   = 0x048
   ID_WEIGHTSENSOR                  = 0x072
 
-  begin
-    case Config::CONFIG['target_os']
-      when /linux/
-        dlload 'libphidget21.so'
-      when /mswin/
-        dlload 'phidget21.dll'
-      when /darwin/
-        dlload '/Library/Frameworks/Phidget21.framework/Versions/Current/Phidget21'
-      else
-        raise Phidgets::Exception.new(Exception::EPHIDGET_LIBNAME)
-    end
-  rescue
-    raise Phidgets::Exception.new(Exception::EPHIDGET_LOAD_LIB_FAIL)
-  end
-
-  extern "int CPhidget_openRemote(void *, int, void *, void *)"
-  extern "int CPhidget_openRemoteIP(void *, int, void *, int, void *)"
-  extern "int CPhidget_open(void *, int)"
-  extern "int CPhidget_close(void *)"
-  extern "int CPhidget_delete(void *)"
-  extern "int CPhidget_set_OnDetach_Handler(void *, void *, void *)"
-  extern "int CPhidget_set_OnAttach_Handler(void *, void *, void *)"
-  extern "int CPhidget_set_OnServerConnect_Handler(void *, void *, void *)"
-  extern "int CPhidget_set_OnServerDisconnect_Handler(void *, void *, void *)"
-  extern "int CPhidget_set_OnError_Handler(void *, void *, void *)"
-  extern "int CPhidget_getDeviceName(void *, void *)"
-  extern "int CPhidget_getSerialNumber(void *, int *)"
-  extern "int CPhidget_getDeviceVersion(void *, int *)"
-  extern "int CPhidget_getDeviceStatus(void *, int *)"
-  extern "int CPhidget_getLibraryVersion(void *)"
-  extern "int CPhidget_getDeviceType(void *, void *)"
-  extern "int CPhidget_getDeviceLabel(void *, void *)"
-  extern "int CPhidget_setDeviceLabel(void *, void *)"
-  extern "int CPhidget_getErrorDescription(int, void *)"
-  extern "int CPhidget_waitForAttachment(void *, int)"
-  extern "int CPhidget_getServerID(void *, void *)"
-  extern "int CPhidget_getServerAddress(void *, void *, int *)"
-  extern "int CPhidget_getServerStatus(void *, int *)"
-  extern "int CPhidget_getDeviceID(void *, int *)"
-  extern "int CPhidget_getDeviceClass(void *, int *)"
-
-  # Gets the library version. This contains a version number and a build date.
-  def Phidgets.getLibraryVersion
-    ptr = DL.malloc(DL.sizeof('P'))
-    r = cPhidget_getLibraryVersion(ptr.ref)
-    raise Phidgets::Exception.new(r) if r != 0
-    ptr.free = nil
-    ptr.to_s
-  end
-
-  # Gets the description for an error code.
-  def Phidgets.getErrorDescription(error_code)
-    ptr = DL.malloc(DL.sizeof('P'))
-    r = cPhidget_getErrorDescription(error_code, ptr.ref)
-    raise Phidgets::Exception.new(r) if r != 0
-    ptr.free = nil
-    ptr.to_s
-  end
+  PHIDGET_LOG_CRITICAL             = 1
+  PHIDGET_LOG_ERROR                = 2
+  PHIDGET_LOG_WARNING              = 3
+  PHIDGET_LOG_DEBUG                = 4
+  PHIDGET_LOG_INFO                 = 5
+  PHIDGET_LOG_VERBOSE              = 6
 
   class Exception < RuntimeError
     attr_reader :code
@@ -199,6 +147,84 @@ module Phidgets
 
   end
 
+  begin
+    case Config::CONFIG['target_os']
+      when /linux/
+        dlload 'libphidget21.so'
+      when /mswin/
+        dlload 'phidget21.dll'
+      when /darwin/
+        dlload '/Library/Frameworks/Phidget21.framework/Versions/Current/Phidget21'
+      else
+        raise Phidgets::Exception.new(Exception::EPHIDGET_LIBNAME)
+    end
+  rescue
+    raise Phidgets::Exception.new(Exception::EPHIDGET_LOAD_LIB_FAIL)
+  end
+
+  extern "int CPhidget_openRemote(void *, int, void *, void *)"
+  extern "int CPhidget_openRemoteIP(void *, int, void *, int, void *)"
+  extern "int CPhidget_open(void *, int)"
+  extern "int CPhidget_close(void *)"
+  extern "int CPhidget_delete(void *)"
+  extern "int CPhidget_set_OnDetach_Handler(void *, void *, void *)"
+  extern "int CPhidget_set_OnAttach_Handler(void *, void *, void *)"
+  extern "int CPhidget_set_OnServerConnect_Handler(void *, void *, void *)"
+  extern "int CPhidget_set_OnServerDisconnect_Handler(void *, void *, void *)"
+  extern "int CPhidget_set_OnError_Handler(void *, void *, void *)"
+  extern "int CPhidget_getDeviceName(void *, void *)"
+  extern "int CPhidget_getSerialNumber(void *, int *)"
+  extern "int CPhidget_getDeviceVersion(void *, int *)"
+  extern "int CPhidget_getDeviceStatus(void *, int *)"
+  extern "int CPhidget_getLibraryVersion(void *)"
+  extern "int CPhidget_getDeviceType(void *, void *)"
+  extern "int CPhidget_getDeviceLabel(void *, void *)"
+  extern "int CPhidget_setDeviceLabel(void *, void *)"
+  extern "int CPhidget_getErrorDescription(int, void *)"
+  extern "int CPhidget_waitForAttachment(void *, int)"
+  extern "int CPhidget_getServerID(void *, void *)"
+  extern "int CPhidget_getServerAddress(void *, void *, int *)"
+  extern "int CPhidget_getServerStatus(void *, int *)"
+  extern "int CPhidget_getDeviceID(void *, int *)"
+  extern "int CPhidget_getDeviceClass(void *, int *)"
+  extern "int CPhidget_enableLogging(int, char *)"
+  extern "int CPhidget_disableLogging()"
+
+  # Gets the library version. This contains a version number and a build date.
+  def Phidgets.getLibraryVersion
+    ptr = DL.malloc(DL.sizeof('P'))
+    r = cPhidget_getLibraryVersion(ptr.ref)
+    raise Phidgets::Exception.new(r) if r != 0
+    ptr.free = nil
+    ptr.to_s
+  end
+
+  # Gets the description for an error code.
+  def Phidgets.getErrorDescription(error_code)
+    ptr = DL.malloc(DL.sizeof('P'))
+    r = cPhidget_getErrorDescription(error_code, ptr.ref)
+    raise Phidgets::Exception.new(r) if r != 0
+    ptr.free = nil
+    ptr.to_s
+  end
+
+  # Enables logging. Logging is provided mainly for debugging purposes. Enabling logging will output internal library
+  # information that can be used to find bugs with the help of Phidgetd Inc. Alternatively, the user can enable
+  # and write to the log for their own uses.
+  # === Parameters
+  # * _level_ = The highest level of logging to output. All lower levels will also be output.
+  # * _file_  = File to output log to. This should be a full pathname, not a relative pathname.
+  def Phidgets.enableLogging(level, file)
+    r = cPhidget_enableLogging(level, file)
+    raise Phidgets::Exception.new(r) if r != 0
+  end
+
+  # Disables logging.
+  def Phidgets.disableLogging
+    r = cPhidget_disableLogging
+    raise Phidgets::Exception.new(r) if r != 0
+  end
+
 
   class Common
 
@@ -209,7 +235,7 @@ module Phidgets
     # * _password_      = Password. Can be nil if the server is running unsecured.
     # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
     def openRemote(serial_number=-1, server=nil, password=nil, timeout=0)
-      r = cPhidget_openRemote(@handle, serial_number, server, password)
+      r = Phidgets.cPhidget_openRemote(@handle, serial_number, server, password)
       raise Phidgets::Exception.new(r) if r != 0
       waitForAttachment(timeout) if timeout > 0
     end
@@ -222,7 +248,7 @@ module Phidgets
     # * _password_      = Password. Can be nil if the server is running unsecured.
     # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
     def openRemoteIP(serial_number, address, port=5001, password=nil, timeout=0)
-      r = cPhidget_openRemoteIP(@handle, serial_number, address, port, password)
+      r = Phidgets.cPhidget_openRemoteIP(@handle, serial_number, address, port, password)
       raise Phidgets::Exception.new(r) if r != 0
       waitForAttachment(timeout) if timeout > 0
     end
