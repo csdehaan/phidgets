@@ -5,7 +5,26 @@ require 'rbconfig'
 
 
 module Phidgets
-  extend DL::Importable
+
+  if RUBY_VERSION < "1.9"
+    extend DL::Importable
+    SIZEOF_INT      = DL.sizeof('I')
+    SIZEOF_VOIDP    = DL.sizeof('P')
+    SIZEOF_DOUBLE   = DL.sizeof('D')
+    FUNCTION_PREFIX = 'c'
+    def Phidgets.malloc size
+      DL.malloc(size)
+    end
+  else
+    extend DL::Importer
+    SIZEOF_INT      = DL::SIZEOF_INT
+    SIZEOF_VOIDP    = DL::SIZEOF_VOIDP
+    SIZEOF_DOUBLE   = DL::SIZEOF_DOUBLE
+    FUNCTION_PREFIX = 'C'
+    def Phidgets.malloc size
+      DL::CPtr.malloc(size)
+    end
+  end
 
   PFALSE                           = 0
   PTRUE                            = 1
@@ -141,7 +160,7 @@ module Phidgets
         when EPHIDGET_CLOSED
           super('Phidget handle was closed.')
         when EPHIDGET_BADVERSION
-          super('Webservice and Client protocol versions don’t match. Update to newest release.')
+          super("Webservice and Client protocol versions don't match. Update to newest release.")
       end
     end
 
@@ -151,7 +170,7 @@ module Phidgets
     case Config::CONFIG['target_os']
       when /linux/
         dlload 'libphidget21.so'
-      when /mswin/
+      when /mswin/, /mingw/
         dlload 'phidget21.dll'
       when /darwin/
         dlload '/Library/Frameworks/Phidget21.framework/Versions/Current/Phidget21'
@@ -167,11 +186,6 @@ module Phidgets
   extern "int CPhidget_open(void *, int)"
   extern "int CPhidget_close(void *)"
   extern "int CPhidget_delete(void *)"
-  extern "int CPhidget_set_OnDetach_Handler(void *, void *, void *)"
-  extern "int CPhidget_set_OnAttach_Handler(void *, void *, void *)"
-  extern "int CPhidget_set_OnServerConnect_Handler(void *, void *, void *)"
-  extern "int CPhidget_set_OnServerDisconnect_Handler(void *, void *, void *)"
-  extern "int CPhidget_set_OnError_Handler(void *, void *, void *)"
   extern "int CPhidget_getDeviceName(void *, void *)"
   extern "int CPhidget_getSerialNumber(void *, int *)"
   extern "int CPhidget_getDeviceVersion(void *, int *)"
@@ -192,8 +206,8 @@ module Phidgets
 
   # Gets the library version. This contains a version number and a build date.
   def Phidgets.getLibraryVersion
-    ptr = DL.malloc(DL.sizeof('P'))
-    r = cPhidget_getLibraryVersion(ptr.ref)
+    ptr = malloc(SIZEOF_VOIDP)
+    r = self.send(FUNCTION_PREFIX + 'Phidget_getLibraryVersion', ptr.ref)
     raise Phidgets::Exception.new(r) if r != 0
     ptr.free = nil
     ptr.to_s
@@ -201,8 +215,8 @@ module Phidgets
 
   # Gets the description for an error code.
   def Phidgets.getErrorDescription(error_code)
-    ptr = DL.malloc(DL.sizeof('P'))
-    r = cPhidget_getErrorDescription(error_code, ptr.ref)
+    ptr = malloc(SIZEOF_VOIDP)
+    r = self.send(FUNCTION_PREFIX + 'Phidget_getErrorDescription', error_code, ptr.ref)
     raise Phidgets::Exception.new(r) if r != 0
     ptr.free = nil
     ptr.to_s
@@ -215,13 +229,13 @@ module Phidgets
   # * _level_ = The highest level of logging to output. All lower levels will also be output.
   # * _file_  = File to output log to. This should be a full pathname, not a relative pathname.
   def Phidgets.enableLogging(level, file)
-    r = cPhidget_enableLogging(level, file)
+    r = self.send(FUNCTION_PREFIX + 'Phidget_enableLogging', level, file)
     raise Phidgets::Exception.new(r) if r != 0
   end
 
   # Disables logging.
   def Phidgets.disableLogging
-    r = cPhidget_disableLogging
+    r = self.send(FUNCTION_PREFIX + 'Phidget_disableLogging')
     raise Phidgets::Exception.new(r) if r != 0
   end
 
@@ -235,7 +249,7 @@ module Phidgets
     # * _password_      = Password. Can be nil if the server is running unsecured.
     # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
     def openRemote(serial_number=-1, server=nil, password=nil, timeout=0)
-      r = Phidgets.cPhidget_openRemote(@handle, serial_number, server, password)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_openRemote', @handle, serial_number, server, password)
       raise Phidgets::Exception.new(r) if r != 0
       waitForAttachment(timeout) if timeout > 0
     end
@@ -248,7 +262,7 @@ module Phidgets
     # * _password_      = Password. Can be nil if the server is running unsecured.
     # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
     def openRemoteIP(serial_number, address, port=5001, password=nil, timeout=0)
-      r = Phidgets.cPhidget_openRemoteIP(@handle, serial_number, address, port, password)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_openRemoteIP', @handle, serial_number, address, port, password)
       raise Phidgets::Exception.new(r) if r != 0
       waitForAttachment(timeout) if timeout > 0
     end
@@ -258,73 +272,28 @@ module Phidgets
     # * _serial_number_ = Serial number. Specify -1 to open any.
     # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
     def open(serial_number=-1, timeout=0)
-      r = Phidgets.cPhidget_open(@handle, serial_number)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_open', @handle, serial_number)
       raise Phidgets::Exception.new(r) if r != 0
       waitForAttachment(timeout) if timeout > 0
     end
 
     # Closes a Phidget.
     def close
-      r = Phidgets.cPhidget_close(@handle)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_close', @handle)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Frees a Phidget handle.
     def delete
       @handle.free = nil
-      r = Phidgets.cPhidget_delete(@handle)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Sets a detach handler callback function. This is called when this Phidget is unplugged from the system.
-    # === Parameters
-    # * _callback_func_ = Callback function.
-    # * _data_          = Data for use by the user - this object is passed back into the callback function.
-    def setOnDetachHandler(callback_func, data)
-      r = Phidgets.cPhidget_set_OnDetach_Handler(@handle, Phidgets.callback("int #{callback_func}(void *, void *)"), DL::PtrData.new(data.object_id))
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Sets an attach handler callback function. This is called when this Phidget is plugged into the system, and is ready for use.
-    # === Parameters
-    # * _callback_func_ = Callback function.
-    # * _data_          = Data for use by the user - this object is passed back into the callback function.
-    def setOnAttachHandler(callback_func, data)
-      r = Phidgets.cPhidget_set_OnAttach_Handler(@handle, Phidgets.callback("int #{callback_func}(void *, void *)"), DL::PtrData.new(data.object_id))
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Sets a server connect handler callback function. This is used for opening Phidgets remotely, and is called when a connection to the sever has been made.
-    # === Parameters
-    # * _callback_func_ = Callback function.
-    # * _data_          = Data for use by the user - this object is passed back into the callback function.
-    def setOnConnectHandler(callback_func, data)
-      r = Phidgets.cPhidget_set_OnServerConnect_Handler(@handle, Phidgets.callback("int #{callback_func}(void *, void *)"), DL::PtrData.new(data.object_id))
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Sets a server disconnect handler callback function. This is used for opening Phidgets remotely, and is called when a connection to the server has been lost.
-    # === Parameters
-    # * _callback_func_ = Callback function.
-    # * _data_          = Data for use by the user - this object is passed back into the callback function.
-    def setOnDisconnectHandler(callback_func, data)
-      r = Phidgets.cPhidget_set_OnServerDisconnect_Handler(@handle, Phidgets.callback("int #{callback_func}(void *, void *)"), DL::PtrData.new(data.object_id))
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Sets the error handler callback function. This is called when an asynchronous error occurs.
-    # === Parameters
-    # * _callback_func_ = Callback function.
-    # * _data_          = Data for use by the user - this object is passed back into the callback function.
-    def setOnErrorHandler(callback_func, data)
-      r = Phidgets.cPhidget_set_OnError_Handler(@handle, Phidgets.callback("int #{callback_func}(void *, void *, int, const char *)"), DL::PtrData.new(data.object_id))
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_delete', @handle)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Gets the specific name of a Phidget.
     def getDeviceName
-      ptr = DL.malloc(DL.sizeof('P'))
-      r = Phidgets.cPhidget_getDeviceName(@handle, ptr.ref)
+      ptr = Phidgets.malloc(SIZEOF_VOIDP)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceName', @handle, ptr.ref)
       raise Phidgets::Exception.new(r) if r != 0
       ptr.free = nil
       ptr.to_s
@@ -332,8 +301,8 @@ module Phidgets
 
     # Gets the serial number of a Phidget.
     def getSerialNumber
-      sn = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidget_getSerialNumber(@handle, sn.ref)
+      sn = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getSerialNumber', @handle, sn.ref)
       raise Phidgets::Exception.new(r) if r != 0
       sn.free = nil
       sn.to_i
@@ -341,8 +310,8 @@ module Phidgets
 
     # Gets the firmware version of a Phidget.
     def getDeviceVersion
-      ver = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidget_getDeviceVersion(@handle, ver.ref)
+      ver = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceVersion', @handle, ver.ref)
       raise Phidgets::Exception.new(r) if r != 0
       ver.free = nil
       ver.to_i
@@ -350,8 +319,8 @@ module Phidgets
 
     # Gets the attached status of a Phidget.
     def getDeviceStatus
-      stat = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidget_getDeviceStatus(@handle, stat.ref)
+      stat = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceStatus', @handle, stat.ref)
       raise Phidgets::Exception.new(r) if r != 0
       stat.free = nil
       stat.to_i
@@ -359,8 +328,8 @@ module Phidgets
 
     # Gets the type (class) of a Phidget.
     def getDeviceType
-      ptr = DL.malloc(DL.sizeof('P'))
-      r = Phidgets.cPhidget_getDeviceType(@handle, ptr.ref)
+      ptr = Phidgets.malloc(SIZEOF_VOIDP)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceType', @handle, ptr.ref)
       raise Phidgets::Exception.new(r) if r != 0
       ptr.free = nil
       ptr.to_s
@@ -368,8 +337,8 @@ module Phidgets
 
     # Gets the label of a Phidget.
     def getDeviceLabel
-      ptr = DL.malloc(DL.sizeof('P'))
-      r = Phidgets.cPhidget_getDeviceLabel(@handle, ptr.ref)
+      ptr = Phidgets.malloc(SIZEOF_VOIDP)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceLabel', @handle, ptr.ref)
       raise Phidgets::Exception.new(r) if r != 0
       ptr.free = nil
       ptr.to_s
@@ -379,7 +348,7 @@ module Phidgets
     # === Parameters
     # * _label_ = A string containing the label to be set.
     def setDeviceLabel(label)
-      r = Phidgets.cPhidget_setDeviceLabel(@handle, label)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_setDeviceLabel', @handle, label)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
@@ -387,14 +356,14 @@ module Phidgets
     # === Parameters
     # * _timeout_ = Time to wait for the attachment. Specify 0 to wait forever.
     def waitForAttachment(timeout)
-      r = Phidgets.cPhidget_waitForAttachment(@handle, timeout)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_waitForAttachment', @handle, timeout)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Gets the server ID of a remotely opened Phidget. This will fail if the Phidget was opened locally.
     def getServerID
-      ptr = DL.malloc(DL.sizeof('P'))
-      r = Phidgets.cPhidget_getServerID(@handle, ptr.ref)
+      ptr = Phidgets.malloc(SIZEOF_VOIDP)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getServerID', @handle, ptr.ref)
       raise Phidgets::Exception.new(r) if r != 0
       ptr.free = nil
       ptr.to_s
@@ -402,9 +371,9 @@ module Phidgets
 
     # Gets the address and port of a remotely opened Phidget. This will fail if the Phidget was opened locally.
     def getServerAddress
-      ptr = DL.malloc(DL.sizeof('P'))
-      port = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidget_getServerAddress(@handle, ptr.ref, port.ref)
+      ptr = Phidgets.malloc(SIZEOF_VOIDP)
+      port = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getServerAddress', @handle, ptr.ref, port.ref)
       raise Phidgets::Exception.new(r) if r != 0
       ptr.free = nil
       port.free = nil
@@ -413,8 +382,8 @@ module Phidgets
 
     # Gets the connected to server status of a remotely opened Phidget. This will fail if the Phidget was opened locally.
     def getServerStatus
-      stat = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidget_getServerStatus(@handle, stat.ref)
+      stat = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getServerStatus', @handle, stat.ref)
       raise Phidgets::Exception.new(r) if r != 0
       stat.free = nil
       stat.to_i
@@ -422,8 +391,8 @@ module Phidgets
 
     # Gets the device ID of a Phidget.
     def getDeviceID
-      dev = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidget_getDeviceID(@handle, dev.ref)
+      dev = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceID', @handle, dev.ref)
       raise Phidgets::Exception.new(r) if r != 0
       dev.free = nil
       dev.to_i
@@ -431,8 +400,8 @@ module Phidgets
 
     # Gets the class of a Phidget.
     def getDeviceClass
-      dev = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidget_getDeviceClass(@handle, dev.ref)
+      dev = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceClass', @handle, dev.ref)
       raise Phidgets::Exception.new(r) if r != 0
       dev.free = nil
       dev.to_i
@@ -442,7 +411,7 @@ module Phidgets
     private
 
     def initialize
-      @handle = DL.malloc(DL.sizeof('P'))
+      @handle = Phidgets.malloc(SIZEOF_VOIDP)
     end
 
   end

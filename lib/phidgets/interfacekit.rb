@@ -29,8 +29,8 @@ module Phidgets
 
     # Gets the number of digital inputs supported by this board.
     def getInputCount
-      cnt = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidgetInterfaceKit_getInputCount(@handle, cnt.ref)
+      cnt = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getInputCount', @handle, cnt.ref)
       raise Phidgets::Exception.new(r) if r != 0
       cnt.free = nil
       cnt.to_i
@@ -40,8 +40,8 @@ module Phidgets
     # === Parameters
     # * _index_ = The input index.
     def getInputState(index)
-      state = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidgetInterfaceKit_getInputState(@handle, index, state.ref)
+      state = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getInputState', @handle, index, state.ref)
       raise Phidgets::Exception.new(r) if r != 0
       state.free = nil
       state.to_i
@@ -49,8 +49,8 @@ module Phidgets
 
     # Gets the number of digital outputs supported by this board.
     def getOutputCount
-      cnt = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidgetInterfaceKit_getOutputCount(@handle, cnt.ref)
+      cnt = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getOutputCount', @handle, cnt.ref)
       raise Phidgets::Exception.new(r) if r != 0
       cnt.free = nil
       cnt.to_i
@@ -60,8 +60,8 @@ module Phidgets
     # === Parameters
     # * _index_ = The output index.
     def getOutputState(index)
-      state = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidgetInterfaceKit_getOutputState(@handle, index, state.ref)
+      state = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getOutputState', @handle, index, state.ref)
       raise Phidgets::Exception.new(r) if r != 0
       state.free = nil
       state.to_i
@@ -72,14 +72,14 @@ module Phidgets
     # * _index_ = The output index.
     # * _state_ = The output state. Possible values are PTRUE  and PFALSE.
     def setOutputState(index, state)
-      r = Phidgets.cPhidgetInterfaceKit_setOutputState(@handle, index, state)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_setOutputState', @handle, index, state)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Gets the number of sensor (analog) inputs supported by this board.
     def getSensorCount
-      cnt = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidgetInterfaceKit_getSensorCount(@handle, cnt.ref)
+      cnt = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getSensorCount', @handle, cnt.ref)
       raise Phidgets::Exception.new(r) if r != 0
       cnt.free = nil
       cnt.to_i
@@ -89,8 +89,8 @@ module Phidgets
     # === Parameters
     # * _index_ = The sensor index.
     def getSensorValue(index)
-      state = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidgetInterfaceKit_getSensorValue(@handle, index, state.ref)
+      state = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getSensorValue', @handle, index, state.ref)
       raise Phidgets::Exception.new(r) if r != 0
       state.free = nil
       state.to_i
@@ -100,8 +100,8 @@ module Phidgets
     # === Parameters
     # * _index_ = The sensor index.
     def getSensorRawValue(index)
-      state = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidgetInterfaceKit_getSensorRawValue(@handle, index, state.ref)
+      state = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getSensorRawValue', @handle, index, state.ref)
       raise Phidgets::Exception.new(r) if r != 0
       state.free = nil
       state.to_i
@@ -109,8 +109,8 @@ module Phidgets
 
     # Gets the ratiometric state for this board.
     def getRatiometric
-      ratio = DL.malloc(DL.sizeof('I'))
-      r = Phidgets.cPhidgetInterfaceKit_getRatiometric(@handle, ratio.ref)
+      ratio = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getRatiometric', @handle, ratio.ref)
       raise Phidgets::Exception.new(r) if r != 0
       ratio.free = nil
       ratio.to_i
@@ -120,7 +120,7 @@ module Phidgets
     # === Parameters
     # * _ratiometric_ = The ratiometric state. Possible values are PTRUE  and PFALSE.
     def setRatiometric(ratiometric)
-      r = Phidgets.cPhidgetInterfaceKit_setRatiometric(@handle, ratiometric)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_setRatiometric', @handle, ratiometric)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
@@ -129,7 +129,7 @@ module Phidgets
     
     # Creates a Phidget InterfaceKit handle.
     def create
-      r = Phidgets.cPhidgetInterfaceKit_create(@handle.ref)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_create', @handle.ref)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
