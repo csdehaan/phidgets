@@ -1,0 +1,98 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'phidgets'
+
+def usage
+  $stdout.puts 'phidget [[host:]id] cmd [args]'
+  $stdout.puts '    host  = host name if connecting through web service'
+  $stdout.puts '    id    = serial # of phidget board (-1 for any)'
+  $stdout.puts '    cmd   = list | method'
+  $stdout.puts '    args  = arguments are dependent on the command'
+  $stdout.puts
+  $stdout.puts '  Examples:'
+  $stdout.puts '    phidget list'
+  $stdout.puts '    phidget -1 setOutputState 0 1'
+  $stdout.puts '    phidget 34619 getDeviceName'
+end
+
+begin
+  list = false
+  host = nil
+  id = nil
+
+  case ARGV[0]
+  when /^(-1|\d+)$/
+    id = $1.to_i
+  when /^(\w|.+):(-1|\d+)$/
+    host = $1
+    id = $2.to_i
+  when /^list$/i
+    list = true
+  when /^(\w|.+)$/
+    if ARGV[1].downcase == 'list'
+      list = true
+      host = $1
+    else
+      raise "Invalid Arguments."
+    end
+  else
+    raise "Invalid Arguments."
+  end
+
+  manager = Phidgets::Manager.new
+
+  if host
+    manager.openRemoteIP(host)
+  else
+    manager.open
+  end
+
+  devices = manager.getAttachedDevices
+  manager.close
+
+  if devices.count == 0
+    $stdout.puts
+    $stdout.puts 'There are no phidgets attached.'
+    $stdout.puts
+    exit
+  end
+
+  if list
+    $stdout.puts
+    $stdout.puts "----------------------------------------------------------------------"
+    $stdout.puts "| SerialNumber          | Device Name                                |"
+    $stdout.puts "----------------------------------------------------------------------"
+    devices.each_pair { |serial,phidget|
+      d_str = "| #{serial}"
+      d_str += " " * (24 - d_str.length)
+      d_str += "| #{phidget.getDeviceName}"
+      d_str += " " * (69 - d_str.length) + "|"
+      $stdout.puts d_str
+    }
+    $stdout.puts "----------------------------------------------------------------------"
+    $stdout.puts
+  
+  else
+    phidget = id==-1 ? devices.first[1] :  devices[id]
+
+    $stdout.puts case ARGV.count
+    when 2
+      phidget.send(ARGV[1])
+    when 3
+      phidget.send(ARGV[1], ARGV[2])
+    when 4
+      phidget.send(ARGV[1], ARGV[2], ARGV[3])
+    else
+      raise "Invalid Arguments."
+    end
+  end
+
+rescue SystemExit
+rescue Exception => e
+  $stdout.puts "#{e}\n#{e.backtrace.join("\n")}"
+  $stdout.puts
+  usage
+  $stdout.puts
+end
+
