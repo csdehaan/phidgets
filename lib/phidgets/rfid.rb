@@ -5,18 +5,18 @@ module Phidgets
   extern "int CPhidgetRFID_create(void *)"
   extern "int CPhidgetRFID_getOutputCount(void *, int *)"
   extern "int CPhidgetRFID_getOutputState(void *, int, int *)"
-  extern "int CPhidgetRFID_setOutputState(void *, int *)"
-  extern "int CPhidgetRFID_getAntennaOn(void *, int, int *)"
-  extern "int CPhidgetRFID_setAntennaOn(void *, int, int)"
+  extern "int CPhidgetRFID_setOutputState(void *, int, int)"
+  extern "int CPhidgetRFID_getAntennaOn(void *, int *)"
+  extern "int CPhidgetRFID_setAntennaOn(void *, int)"
   extern "int CPhidgetRFID_getLEDOn(void *, int *)"
-  extern "int CPhidgetRFID_setLEDOn(void *, int, int *)"
-  extern "int CPhidgetRFID_getLastTag(void *, int, int *)"
+  extern "int CPhidgetRFID_setLEDOn(void *, int)"
+  extern "int CPhidgetRFID_getLastTag(void *, void *)"
   extern "int CPhidgetRFID_getTagStatus(void *, int *)"
   
   
   class RFID < Common
 
-    # Create a new rfid object.
+    # Create a new RFID object.
     # === Parameters
     # * _serial_number_ = Serial number of the phidget board to open. Specify -1 to open any.
     # * _timeout_       = Time to wait for attachment. Specify 0 to not call open.
@@ -40,7 +40,7 @@ module Phidgets
     # * _index_ = The output index.
     def getOutputState(index)
       state = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_getOutputState', @handle, index, state.ref)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_getOutputState', @handle, index.to_i, state.ref)
       raise Phidgets::Exception.new(r) if r != 0
       state.free = nil
       state.to_i
@@ -51,7 +51,7 @@ module Phidgets
     # * _index_ = The output index.
     # * _state_ = The output state. Possible values are PTRUE  and PFALSE.
     def setOutputState(index, state)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_setOutputState', @handle, index, state)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_setOutputState', @handle, index.to_i, state.to_i)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
@@ -68,7 +68,7 @@ module Phidgets
     # === Parameters
     # * _state_ = The antenna state. Possible values are PTRUE  and PFALSE.
     def setAntennaOn(state)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_setAntennaOn', @handle, state)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_setAntennaOn', @handle, state.to_i)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
@@ -85,16 +85,17 @@ module Phidgets
     # === Parameters
     # * _state_ = The LED state. Possible values are PTRUE  and PFALSE.
     def setLedOn(state)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_setLEDOn', @handle, state)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_setLEDOn', @handle, state.to_i)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
     # Gets the last tag read by the reader. This tag may or may not still be on the reader.
     def getLastTag
-      tag = Phidgets.malloc(5)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_getLastTag', @handle, tag)
+      tag = Phidgets.malloc(SIZEOF_VOIDP)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_getLastTag', @handle, tag.ref)
       raise Phidgets::Exception.new(r) if r != 0
-      tag
+      tag.free = nil
+      tag.to_s
     end
 
     # Gets the tag present status. This is whether or not a tag is being read by the reader.

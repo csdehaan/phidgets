@@ -12,7 +12,7 @@ module Phidgets
 
   class Servo < Common
 
-    # Create a new servo object.
+    # Create a new Servo object.
     # === Parameters
     # * _serial_number_ = Serial number of the phidget board to open. Specify -1 to open any.
     # * _timeout_       = Time to wait for attachment. Specify 0 to not call open.
@@ -36,7 +36,7 @@ module Phidgets
     # * _index_ = The motor index.
     def getPosition(index)
       pos = Phidgets.malloc(SIZEOF_DOUBLE)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_getPosition', @handle, index, pos.ref)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_getPosition', @handle, index.to_i, pos.ref)
       raise Phidgets::Exception.new(r) if r != 0
       pos.free = nil
       pos.to_f
@@ -47,7 +47,7 @@ module Phidgets
     # * _index_   = The motor index.
     # * _position = The motor position.
     def setPosition(index, position)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_setPosition', @handle, index, position)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_setPosition', @handle, index.to_i, position.to_f)
       raise Phidgets::Exception.new(r) if r != 0
     end
     
@@ -56,7 +56,7 @@ module Phidgets
     # * _index_ = The motor index.
     def getPositionMax(index)
       pos = Phidgets.malloc(SIZEOF_DOUBLE)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_getPositionMax', @handle, index, pos.ref)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_getPositionMax', @handle, index.to_i, pos.ref)
       raise Phidgets::Exception.new(r) if r != 0
       pos.free = nil
       pos.to_f
@@ -67,7 +67,7 @@ module Phidgets
     # * _index_ = The motor index.
     def getPositionMin(index)
       pos = Phidgets.malloc(SIZEOF_DOUBLE)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_getPositionMin', @handle, index, pos.ref)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_getPositionMin', @handle, index.to_i, pos.ref)
       raise Phidgets::Exception.new(r) if r != 0
       pos.free = nil
       pos.to_f
@@ -78,7 +78,7 @@ module Phidgets
     # * _index_ = The motor index.
     def getEngaged(index)
       eng = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_getEngaged', @handle, index, eng.ref)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_getEngaged', @handle, index.to_i, eng.ref)
       raise Phidgets::Exception.new(r) if r != 0
       eng.free = nil
       eng.to_i
@@ -89,7 +89,7 @@ module Phidgets
     # * _index_ = The motor index.
     # * _state_ = The engaged state. Possible values are PTRUE  and PFALSE.
     def setEngaged(index, state)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_setEngaged', @handle, index, state)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_setEngaged', @handle, index.to_i, state.to_i)
       raise Phidgets::Exception.new(r) if r != 0
     end
 

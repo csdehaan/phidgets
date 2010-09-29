@@ -17,7 +17,7 @@ module Phidgets
   
   class InterfaceKit < Common
 
-    # Create a new interface kit object.
+    # Create a new InterfaceKit object.
     # === Parameters
     # * _serial_number_ = Serial number of the phidget board to open. Specify -1 to open any.
     # * _timeout_       = Time to wait for attachment. Specify 0 to not call open.
@@ -41,7 +41,7 @@ module Phidgets
     # * _index_ = The input index.
     def getInputState(index)
       state = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getInputState', @handle, index, state.ref)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getInputState', @handle, index.to_i, state.ref)
       raise Phidgets::Exception.new(r) if r != 0
       state.free = nil
       state.to_i
@@ -61,7 +61,7 @@ module Phidgets
     # * _index_ = The output index.
     def getOutputState(index)
       state = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getOutputState', @handle, index, state.ref)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getOutputState', @handle, index.to_i, state.ref)
       raise Phidgets::Exception.new(r) if r != 0
       state.free = nil
       state.to_i
@@ -70,9 +70,9 @@ module Phidgets
     # Sets the state of a digital output.
     # === Parameters
     # * _index_ = The output index.
-    # * _state_ = The output state. Possible values are PTRUE  and PFALSE.
+    # * _state_ = The output state. Possible values are PTRUE and PFALSE.
     def setOutputState(index, state)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_setOutputState', @handle, index, state)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_setOutputState', @handle, index.to_i, state.to_i)
       raise Phidgets::Exception.new(r) if r != 0
     end
 
@@ -90,7 +90,7 @@ module Phidgets
     # * _index_ = The sensor index.
     def getSensorValue(index)
       state = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getSensorValue', @handle, index, state.ref)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getSensorValue', @handle, index.to_i, state.ref)
       raise Phidgets::Exception.new(r) if r != 0
       state.free = nil
       state.to_i
@@ -101,7 +101,7 @@ module Phidgets
     # * _index_ = The sensor index.
     def getSensorRawValue(index)
       state = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getSensorRawValue', @handle, index, state.ref)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getSensorRawValue', @handle, index.to_i, state.ref)
       raise Phidgets::Exception.new(r) if r != 0
       state.free = nil
       state.to_i
@@ -120,7 +120,7 @@ module Phidgets
     # === Parameters
     # * _ratiometric_ = The ratiometric state. Possible values are PTRUE  and PFALSE.
     def setRatiometric(ratiometric)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_setRatiometric', @handle, ratiometric)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_setRatiometric', @handle, ratiometric.to_i)
       raise Phidgets::Exception.new(r) if r != 0
     end
 

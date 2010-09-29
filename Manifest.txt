@@ -5,7 +5,10 @@ PostInstall.txt
 README.txt
 README.rdoc
 Rakefile
+bin/phidget
 lib/phidgets.rb
+lib/phidgets/phidgets.rb
+lib/phidgets/manager.rb
 lib/phidgets/common.rb
 lib/phidgets/interfacekit.rb
 lib/phidgets/rfid.rb
