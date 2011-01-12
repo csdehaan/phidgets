@@ -1,7 +1,12 @@
+== 0.0.6 2011-01-11
+  * Added skeleton classes for all the phidget types. This will at least allow the Manager class to see them
+  * Check library version when loading the gem and print a warning if the version may cause problems
+  * Updated library interface to conform to versions 2.1.6 and 2.1.7. Future versions should maintain backward compatability with at least 2.1.6
+
 == 0.0.5 2010-10-28
   * Added Manager class
   * Added phidget executable
-  * Fixed a few bugs in the RFID class, but it is still untested.
+  * Fixed a few bugs in the RFID class, but it is still untested
 
 == 0.0.4 2010-09-10
   * Updated for compatability with Ruby 1.9
@@ -15,7 +20,7 @@
 == 0.0.2 2010-05-12
   * Rewrote using DL/Importable
   * Added some documentation
-  * Added support for Servo class.
+  * Added support for Servo class
   
 == 0.0.1 2009-03-27
   * Initial release
