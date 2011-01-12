@@ -13,6 +13,14 @@ module Phidgets
   extern "int CPhidgetInterfaceKit_getSensorRawValue(void *, int, int *)"
   extern "int CPhidgetInterfaceKit_getRatiometric(void *, int *)"
   extern "int CPhidgetInterfaceKit_setRatiometric(void *, int)"
+  begin
+    extern "int CPhidgetInterfaceKit_getDataRate(void *, int, int *)"
+    extern "int CPhidgetInterfaceKit_setDataRate(void *, int, int)"
+    extern "int CPhidgetInterfaceKit_getDataRateMax(void *, int, int *)"
+    extern "int CPhidgetInterfaceKit_getDataRateMin(void *, int, int *)"
+  rescue
+    $stderr.puts "Warning: Installed phidget library does not support InterfaceKit Data Rates."
+  end
   
   
   class InterfaceKit < Common
@@ -122,6 +130,48 @@ module Phidgets
     def setRatiometric(ratiometric)
       r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_setRatiometric', @handle, ratiometric.to_i)
       raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Gets the data rate in milliseconds for an analog input.
+    # === Parameters
+    # * _index_ = The sensor index.
+    def getDataRate(index)
+      rate = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getDataRate', @handle, index.to_i, rate.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      rate.free = nil
+      rate.to_i
+    end
+
+    # Sets the data rate for an analog input.
+    # === Parameters
+    # * _index_ = The sensor index.
+    # * _rate_  = The rate in milliseconds.
+    def setDataRate(index, rate)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_setDataRate', @handle, index.to_i, rate.to_i)
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Gets the maximum supported data rate for an analog input.
+    # === Parameters
+    # * _index_ = The sensor index.
+    def getDataRateMax(index)
+      rate = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getDataRateMax', @handle, index.to_i, rate.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      rate.free = nil
+      rate.to_i
+    end
+
+    # Gets the minimum supported data rate for an analog input.
+    # === Parameters
+    # * _index_ = The sensor index.
+    def getDataRateMin(index)
+      rate = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetInterfaceKit_getDataRateMin', @handle, index.to_i, rate.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      rate.free = nil
+      rate.to_i
     end
 
 

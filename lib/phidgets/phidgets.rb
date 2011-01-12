@@ -32,12 +32,9 @@ module Phidgets
   NOTATTACHED                      = 0
   ATTACHED                         = 1
 
-  CLASS_NOTHING                    = 1
   CLASS_ACCELEROMETER              = 2
   CLASS_ADVANCEDSERVO              = 3
   CLASS_ENCODER                    = 4
-  CLASS_GPS                        = 5
-  CLASS_GYROSCOPE                  = 6
   CLASS_INTERFACEKIT               = 7
   CLASS_LED                        = 8
   CLASS_MOTORCONTROL               = 9
@@ -49,19 +46,24 @@ module Phidgets
   CLASS_TEXTLCD                    = 15
   CLASS_TEXTLED                    = 16
   CLASS_WEIGHTSENSOR               = 17
+  CLASS_IR                         = 19
+  CLASS_SPATIAL                    = 20
 
   ID_ACCELEROMETER_2AXIS           = 0x071
   ID_ACCELEROMETER_3AXIS           = 0x07E
+  ID_ADVANCEDSERVO_1MOTOR          = 0x082
   ID_ADVANCEDSERVO_8MOTOR          = 0x03A
   ID_BIPOLAR_STEPPER_1MOTOR        = 0x07B
   ID_ENCODER_1ENCODER_1INPUT       = 0x04B
   ID_ENCODER_HS_1ENCODER           = 0x080
+  ID_ENCODER_HS_4ENCODER_4INPUT    = 0x04F
   ID_INTERFACEKIT_0_0_4            = 0x040
   ID_INTERFACEKIT_0_0_8            = 0x081
   ID_INTERFACEKIT_0_16_16          = 0x044
   ID_INTERFACEKIT_8_8_8            = 0x045
   ID_INTERFACEKIT_8_8_8_w_LCD      = 0x07D
   ID_LED_64                        = 0x04A
+  ID_LED_64_ADV                    = 0x04C
   ID_LINEAR_TOUCH                  = 0x076
   ID_MOTORCONTROL_HC_2MOTOR        = 0x059
   ID_MOTORCONTROL_LV_2MOTOR_4INPUT = 0x058
@@ -69,7 +71,10 @@ module Phidgets
   ID_RFID_2OUTPUT                  = 0x031
   ID_ROTARY_TOUCH                  = 0x077
   ID_SERVO_1MOTOR                  = 0x039
+  ID_SPATIAL_ACCEL_3AXIS           = 0x07F
+  ID_SPATIAL_ACCEL_GYRO_COMPASS    = 0x033
   ID_TEMPERATURESENSOR             = 0x070
+  ID_TEMPERATURESENSOR_4           = 0x032
   ID_TEXTLCD_2x20_w_8_8_8          = 0x17D
   ID_UNIPOLAR_STEPPER_4MOTOR       = 0x07A
   ID_INTERFACEKIT_0_8_8_w_LCD      = 0x053
@@ -83,6 +88,24 @@ module Phidgets
   ID_TEXTLED_1x8                   = 0x049
   ID_TEXTLED_4x8                   = 0x048
   ID_WEIGHTSENSOR                  = 0x072
+
+  SERVO_DEFAULT                    = 1
+  SERVO_RAW_us_MODE                = 2
+  SERVO_HITEC_HS322HD              = 3
+  SERVO_HITEC_HS5245MG             = 4
+  SERVO_HITEC_805BB                = 5
+  SERVO_HITEC_HS422                = 6
+  SERVO_TOWERPRO_MG90              = 7
+  SERVO_HITEC_HSR1425CR            = 8
+  SERVO_HITEC_HS785HB              = 9
+  SERVO_HITEC_HS485HB              = 10
+  SERVO_HITEC_HS645MG              = 11
+  SERVO_HITEC_815BB                = 12
+  SERVO_FIRGELLI_L12_30_50_06_R    = 13
+  SERVO_FIRGELLI_L12_50_100_06_R   = 14
+  SERVO_FIRGELLI_L12_50_210_06_R   = 15
+  SERVO_FIRGELLI_L12_100_50_06_R   = 16
+  SERVO_FIRGELLI_L12_100_100_06_R  = 17
 
   PHIDGET_LOG_CRITICAL             = 1
   PHIDGET_LOG_ERROR                = 2
@@ -221,5 +244,9 @@ module Phidgets
     raise Phidgets::Exception.new(r) if r != 0
   end
 
+  # Check library version and print warning if the version may cause problems
+  /Version (\d.\d.\d)/.match(Phidgets.getLibraryVersion)
+  $stderr.puts "Warning: Unable to determine phidgets library version." unless $1
+  $stderr.puts "Warning: Phidgets library version (#{$1}) may not be compatible. This gem has been tested with 2.1.6 and 2.1.7." unless $1 == '2.1.6' or $1 == '2.1.7'
 end
 

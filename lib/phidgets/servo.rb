@@ -9,6 +9,13 @@ module Phidgets
   extern "int CPhidgetServo_getPositionMin(void *, int, double *)"
   extern "int CPhidgetServo_getEngaged(void *, int, int *)"
   extern "int CPhidgetServo_setEngaged(void *, int, int)"
+  begin
+    extern "int CPhidgetServo_getServoType(void *, int, int *)"
+    extern "int CPhidgetServo_setServoType(void *, int, int)"
+    extern "int CPhidgetServo_setServoParameters(void *, int, double, double, double)"
+  rescue
+    $stderr.puts "Warning: Installed phidget library does not support get/set ServoType or setServoParameters."
+  end
 
   class Servo < Common
 
@@ -90,6 +97,37 @@ module Phidgets
     # * _state_ = The engaged state. Possible values are PTRUE  and PFALSE.
     def setEngaged(index, state)
       r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_setEngaged', @handle, index.to_i, state.to_i)
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+    
+    # Gets the servo type of a motor.
+    # === Parameters
+    # * _index_ = The motor index.
+    def getServoType(index)
+      type = Phidgets.malloc(SIZEOF_INT)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_getServoType', @handle, index.to_i, type.ref)
+      raise Phidgets::Exception.new(r) if r != 0
+      type.free = nil
+      type.to_i
+    end
+
+    # Sets the servo type of a motor.
+    # === Parameters
+    # * _index_ = The motor index.
+    # * _type_  = The servo type.
+    def setServoType(index, type)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_setServoType', @handle, index.to_i, type.to_i)
+      raise Phidgets::Exception.new(r) if r != 0
+    end
+
+    # Sets the servo parameters of a motor.
+    # === Parameters
+    # * _index_    = The motor index.
+    # * _min_us_   = The minimum supported PCM in microseconds.
+    # * _max_us_   = The maximum supported PCM in microseconds.
+    # * _degrees_  = The degrees of rotation defined by the given PCM range.
+    def setServoParameters(index, min_us, max_us, degrees)
+      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetServo_setServoParameters', @handle, index.to_i, min_us.to_f, max_us.to_f, degrees.to_f)
       raise Phidgets::Exception.new(r) if r != 0
     end
 

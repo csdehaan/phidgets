@@ -89,17 +89,43 @@ module Phidgets
         serial = getSerialNumber(handle)
 
         devices[serial] = case getDeviceClass(handle)
+        when CLASS_ACCELEROMETER
+          Accelerometer.new
+        when CLASS_ADVANCEDSERVO
+          AdvancedServo.new
+        when CLASS_ENCODER
+          Encoder.new
         when CLASS_INTERFACEKIT
           InterfaceKit.new
+        when CLASS_LED
+          LED.new
+        when CLASS_MOTORCONTROL
+          MotorControl.new
+        when CLASS_PHSENSOR
+          PhSensor.new
         when CLASS_RFID
           RFID.new
         when CLASS_SERVO
           Servo.new
+        when CLASS_STEPPER
+          Stepper.new
+        when CLASS_TEMPERATURESENSOR
+          TemperatureSensor.new
+        when CLASS_TEXTLCD
+          TextLCD.new
+        when CLASS_TEXTLED
+          TextLED.new
+        when CLASS_WEIGHTSENSOR
+          WeightSensor.new
+        when CLASS_IR
+          IR.new
+        when CLASS_SPATIAL
+          Spatial.new
         end
 
-        devices[serial].open(serial, 3000) unless @server
-        devices[serial].openRemote(serial, @server, @password, 4000) if @server and !@port
-        devices[serial].openRemoteIP(serial, @server, @port, @password, 4000) if @server and @port
+        devices[serial].open(serial, 4000) unless @server
+        devices[serial].openRemote(serial, @server, @password, 5000) if @server and !@port
+        devices[serial].openRemoteIP(serial, @server, @port, @password, 5000) if @server and @port
       }
 
       r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetManager_freeAttachedDevicesArray', handles)
