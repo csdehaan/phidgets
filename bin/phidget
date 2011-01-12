@@ -51,48 +51,30 @@ begin
   devices = manager.getAttachedDevices
   manager.close
 
-  if devices.count == 0
-    $stdout.puts
-    $stdout.puts 'There are no phidgets attached.'
-    $stdout.puts
+  if devices.size == 0
+    $stdout.puts "\nThere are no phidgets attached.\n"
     exit
   end
 
   if list
-    $stdout.puts
-    $stdout.puts "----------------------------------------------------------------------"
+    $stdout.puts "\n----------------------------------------------------------------------"
     $stdout.puts "| SerialNumber          | Device Name                                |"
     $stdout.puts "----------------------------------------------------------------------"
     devices.each_pair { |serial,phidget|
       d_str = "| #{serial}"
-      d_str += " " * (24 - d_str.length)
-      d_str += "| #{phidget.getDeviceName}"
+      d_str += " " * (24 - d_str.length) + "| #{phidget.getDeviceName}"
       d_str += " " * (69 - d_str.length) + "|"
       $stdout.puts d_str
     }
-    $stdout.puts "----------------------------------------------------------------------"
-    $stdout.puts
+    $stdout.puts "----------------------------------------------------------------------\n"
   
   else
-    phidget = id==-1 ? devices.first[1] :  devices[id]
-
-    $stdout.puts case ARGV.count
-    when 2
-      phidget.send(ARGV[1])
-    when 3
-      phidget.send(ARGV[1], ARGV[2])
-    when 4
-      phidget.send(ARGV[1], ARGV[2], ARGV[3])
-    else
-      raise "Invalid Arguments."
-    end
+    phidget = id==-1 ? devices.values[0] : devices[id]
+    $stdout.puts eval("phidget.#{ARGV[1]}(#{ARGV[2..-1].join(',')})")
   end
 
 rescue SystemExit
 rescue Exception => e
-  $stdout.puts "#{e}\n#{e.backtrace.join("\n")}"
-  $stdout.puts
-  usage
-  $stdout.puts
+  $stdout.puts "#{e}\n#{e.backtrace.join("\n")}\n#{usage}\n"
 end
 
