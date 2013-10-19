@@ -12,27 +12,25 @@ def usage
   $stdout.puts
   $stdout.puts '  Examples:'
   $stdout.puts '    phidget list'
-  $stdout.puts '    phidget -1 setOutputState 0 1'
-  $stdout.puts '    phidget 34619 getDeviceName'
+  $stdout.puts '    phidget -1 set_output_state 0 1'
+  $stdout.puts '    phidget 34619 device_name'
 end
 
 begin
-  list = false
-  host = nil
-  id = nil
+  args = {:port => 5001, :password => ''}
 
   case ARGV[0]
   when /^(-1|\d+)$/
-    id = $1.to_i
+    args[:serial_number] = $1.to_i
   when /^(\w|.+):(-1|\d+)$/
-    host = $1
-    id = $2.to_i
+    args[:address] = $1
+    args[:serial_number] = $2.to_i
   when /^list$/i
-    list = true
+    args[:list] = true
   when /^(\w|.+)$/
     if ARGV[1].downcase == 'list'
-      list = true
-      host = $1
+      args[:list] = true
+      args[:address] = $1
     else
       raise "Invalid Arguments."
     end
@@ -41,36 +39,41 @@ begin
   end
 
   manager = Phidgets::Manager.new
+  manager.open(args)
 
-  if host
-    manager.openRemoteIP(host)
-  else
-    manager.open
-  end
+  # give the manager some time to find the devices
+  args[:address] ? sleep(2) : sleep(1)
 
-  devices = manager.getAttachedDevices
+  devices = manager.attached_devices
   manager.close
 
   if devices.size == 0
-    $stdout.puts "\nThere are no phidgets attached.\n"
+    $stdout.puts "\nThere are no phidgets attached.\n\n"
     exit
   end
 
-  if list
+  if args[:list]
     $stdout.puts "\n----------------------------------------------------------------------"
     $stdout.puts "| SerialNumber          | Device Name                                |"
     $stdout.puts "----------------------------------------------------------------------"
     devices.each_pair { |serial,phidget|
+      phidget.open(args)
+      phidget.wait_for_attachment(2000)
       d_str = "| #{serial}"
-      d_str += " " * (24 - d_str.length) + "| #{phidget.getDeviceName}"
+      d_str += " " * (24 - d_str.length) + "| #{phidget.device_name}"
       d_str += " " * (69 - d_str.length) + "|"
       $stdout.puts d_str
+      phidget.close
     }
     $stdout.puts "----------------------------------------------------------------------\n"
   
   else
-    phidget = id==-1 ? devices.values[0] : devices[id]
+    phidget = args[:serial_number] > 0 ? devices[args[:serial_number]] : devices.values[0]
+    args[:serial_number] = devices.keys[0] unless args[:serial_number] > 0
+    phidget.open(args)
+    phidget.wait_for_attachment(2000)
     $stdout.puts eval("phidget.#{ARGV[1]}(#{ARGV[2..-1].join(',')})")
+    phidget.close
   end
 
 rescue SystemExit
