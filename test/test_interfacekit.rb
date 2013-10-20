@@ -2,192 +2,96 @@ require File.dirname(__FILE__) + '/test_helper.rb'
 
 class TestPhidgetsInterfaceKit < Test::Unit::TestCase
 
-  def setup
+  def test_create
+    assert_nothing_raised {Phidgets::InterfaceKit.new}
   end
-  
-  def test_001_create
-    assert_nothing_raised {
+
+  def test_get_input_count
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.input_count}
+  end
+
+  def test_get_input_state
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.input_state 1}
+  end
+
+  def test_get_output_count
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.output_count}
+  end
+
+  def test_get_output_state
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.output_state 1}
+  end
+
+  def test_set_output_state
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.set_output_state 1, true}
+  end
+
+  def test_get_sensor_count
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.sensor_count}
+  end
+
+  def test_get_sensor_value
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.sensor_value 1}
+  end
+
+  def test_get_sensor_raw_value
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.sensor_raw_value 1}
+  end
+
+  def test_get_ratiometric
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.ratiometric?}
+  end
+
+  def test_set_ratiometric
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.ratiometric = true}
+  end
+
+  def test_get_data_rate
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.data_rate 1}
+  end
+
+  def test_get_data_rate_min
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.data_rate_min 1}
+  end
+
+  def test_get_data_rate_max
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.data_rate_max 1}
+  end
+
+  def test_set_data_rate
+    ik = Phidgets::InterfaceKit.new
+    assert_raise(Phidgets::Error::NotAttached) {ik.set_data_rate 1, 5}
+  end
+
+  unless RUBY_VERSION < '1.9.0'
+    def test_set_on_input_change
       ik = Phidgets::InterfaceKit.new
-      ik.delete
-    }
-  end
-  
-  def test_002_attach
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      ik.close
-      ik.delete
-    }
-  end
-  
-  def test_003_fail_attach
-    assert_raise Phidgets::Exception do
-      ik = Phidgets::InterfaceKit.new(1, 2000)
-      ik.delete
+      assert_nothing_raised {ik.on_input_change {puts 'hello'}}
+    end
+
+    def test_set_on_output_change
+      ik = Phidgets::InterfaceKit.new
+      assert_nothing_raised {ik.on_output_change {puts 'hello'}}
+    end
+
+    def test_set_on_sensor_change
+      ik = Phidgets::InterfaceKit.new
+      assert_nothing_raised {ik.on_sensor_change {puts 'hello'}}
     end
   end
-  
-  def test_004_get_device_name
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      ik.getDeviceName
-      ik.close
-      ik.delete
-    }
-  end
-  
-  def test_005_get_serial_number
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      ik.getSerialNumber
-      ik.close
-      ik.delete
-    }
-  end
-  
-  def test_006_get_device_version
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      ik.getDeviceVersion
-      ik.close
-      ik.delete
-    }
-  end
-  
-  def test_007_get_device_status
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      ik.getDeviceStatus
-      ik.close
-      ik.delete
-    }
-  end
-  
-  def test_008_get_device_type
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      ik.getDeviceType
-      ik.close
-      ik.delete
-    }
-  end
-  
-  def test_009_get_device_label
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      ik.getDeviceLabel
-      ik.close
-      ik.delete
-    }
-  end
-  
-  def test_010_get_device_id
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      ik.getDeviceID
-      ik.close
-      ik.delete
-    }
-  end
-  
-  def test_011_get_device_class
-    device_class = Phidgets::CLASS_NOTHING
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      device_class = ik.getDeviceClass
-      ik.close
-      ik.delete
-    }
-    assert device_class == Phidgets::CLASS_INTERFACEKIT
-  end
-  
-  def test_012_get_input_count
-    device_id = 0
-    count = -1
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      device_id = ik.getDeviceID
-      count = ik.getInputCount
-      ik.close
-      ik.delete
-    }
-    case device_id
-      when Phidgets::ID_INTERFACEKIT_0_0_4
-        assert count == 0
-      when Phidgets::ID_INTERFACEKIT_0_0_8
-        assert count == 0
-      when Phidgets::ID_INTERFACEKIT_0_16_16
-        assert count == 16
-      when Phidgets::ID_INTERFACEKIT_8_8_8
-        assert count == 8
-      when Phidgets::ID_INTERFACEKIT_8_8_8_w_LCD
-        assert count == 8
-      when Phidgets::ID_INTERFACEKIT_0_8_8_w_LCD
-        assert count == 8
-      when Phidgets::ID_INTERFACEKIT_4_8_8
-        assert count == 8
-      else
-        flunk
-    end
-  end
-  
-  def test_013_get_output_count
-    device_id = 0
-    count = -1
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      device_id = ik.getDeviceID
-      count = ik.getOutputCount
-      ik.close
-      ik.delete
-    }
-    case device_id
-      when Phidgets::ID_INTERFACEKIT_0_0_4
-        assert count == 4
-      when Phidgets::ID_INTERFACEKIT_0_0_8
-        assert count == 8
-      when Phidgets::ID_INTERFACEKIT_0_16_16
-        assert count == 16
-      when Phidgets::ID_INTERFACEKIT_8_8_8
-        assert count == 8
-      when Phidgets::ID_INTERFACEKIT_8_8_8_w_LCD
-        assert count == 8
-      when Phidgets::ID_INTERFACEKIT_0_8_8_w_LCD
-        assert count == 8
-      when Phidgets::ID_INTERFACEKIT_4_8_8
-        assert count == 8
-      else
-        flunk
-    end
-  end
-  
-  def test_014_get_sensor_count
-    device_id = 0
-    count = -1
-    assert_nothing_raised {
-      ik = Phidgets::InterfaceKit.new(-1, 2000)
-      device_id = ik.getDeviceID
-      count = ik.getSensorCount
-      ik.close
-      ik.delete
-    }
-    case device_id
-      when Phidgets::ID_INTERFACEKIT_0_0_4
-        assert count == 0
-      when Phidgets::ID_INTERFACEKIT_0_0_8
-        assert count == 0
-      when Phidgets::ID_INTERFACEKIT_0_16_16
-        assert count == 0
-      when Phidgets::ID_INTERFACEKIT_8_8_8
-        assert count == 8
-      when Phidgets::ID_INTERFACEKIT_8_8_8_w_LCD
-        assert count == 8
-      when Phidgets::ID_INTERFACEKIT_0_8_8_w_LCD
-        assert count == 0
-      when Phidgets::ID_INTERFACEKIT_4_8_8
-        assert count == 4
-      else
-        flunk
-    end
-  end
+
 end
+

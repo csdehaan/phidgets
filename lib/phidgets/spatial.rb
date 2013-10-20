@@ -1,35 +1,25 @@
 
 
 module Phidgets
-
-  begin
-    extern "int CPhidgetSpatial_create(void *)"
-  rescue
-    $stderr.puts "Warning: Installed phidget library does not support Spatial device class."
-  end
-
   class Spatial < Common
 
-    # Create a new Spatial object.
-    # === Parameters
-    # * _serial_number_ = Serial number of the phidget board to open. Specify -1 to open any.
-    # * _timeout_       = Time to wait for attachment. Specify 0 to not call open.
-    def initialize(serial_number=-1, timeout=0)
-      super()
-      create
-      open(serial_number, timeout) if timeout > 0
-    end
+    unless RUBY_VERSION < '1.9.0'
 
+      # call-seq:
+      #   setOnSpatialDataHandler(proc=nil, &block)
+      #
+      # Set a Data event handler. This is called at getDataRate, up to 8ms.
+      #
+      def setOnSpatialDataHandler(cb_proc = nil, &cb_block)
+        @on_spatial_data_thread.kill if defined? @on_spatial_data_thread
+        callback = cb_proc || cb_block
+        @on_spatial_data_thread = Thread.new {ext_setOnSpatialDataHandler(callback)}
+      end
 
-    private
+      alias :on_spatial_data :setOnSpatialDataHandler
 
-    # Creates a Phidget Spatial handle.
-    def create
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetSpatial_create', @handle.ref)
-      raise Phidgets::Exception.new(r) if r != 0
     end
 
   end
-
 end
 

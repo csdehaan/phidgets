@@ -1,31 +1,25 @@
 
 
 module Phidgets
+  class PHSensor < Common
 
-  extern "int CPhidgetPHSensor_create(void *)"
+    unless RUBY_VERSION < '1.9.0'
 
-  class PhSensor < Common
+      # call-seq:
+      #   setOnPHChangeHandler(proc=nil, &block)
+      #
+      # Set a PH change handler. This is called when the PH changes by more then the change trigger.
+      #
+      def setOnPHChangeHandler(cb_proc = nil, &cb_block)
+        @on_ph_change_thread.kill if defined? @on_ph_change_thread
+        callback = cb_proc || cb_block
+        @on_ph_change_thread = Thread.new {ext_setOnPHChangeHandler(callback)}
+      end
 
-    # Create a new PhSensor object.
-    # === Parameters
-    # * _serial_number_ = Serial number of the phidget board to open. Specify -1 to open any.
-    # * _timeout_       = Time to wait for attachment. Specify 0 to not call open.
-    def initialize(serial_number=-1, timeout=0)
-      super()
-      create
-      open(serial_number, timeout) if timeout > 0
-    end
+      alias :on_ph_change :setOnPHChangeHandler
 
-
-    private
-
-    # Creates a Phidget PhSensor handle.
-    def create
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetPHSensor_create', @handle.ref)
-      raise Phidgets::Exception.new(r) if r != 0
     end
 
   end
-
 end
 

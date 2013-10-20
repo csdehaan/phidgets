@@ -1,200 +1,85 @@
 
 module Phidgets
-
-  extern "int CPhidget_open(void *, int)"
-  extern "int CPhidget_openRemote(void *, int, void *, void *)"
-  extern "int CPhidget_openRemoteIP(void *, int, void *, int, void *)"
-  extern "int CPhidget_close(void *)"
-  extern "int CPhidget_delete(void *)"
-  extern "int CPhidget_getDeviceName(void *, void *)"
-  extern "int CPhidget_getSerialNumber(void *, int *)"
-  extern "int CPhidget_getDeviceVersion(void *, int *)"
-  extern "int CPhidget_getDeviceStatus(void *, int *)"
-  extern "int CPhidget_getDeviceType(void *, void *)"
-  extern "int CPhidget_getDeviceLabel(void *, void *)"
-  extern "int CPhidget_setDeviceLabel(void *, void *)"
-  extern "int CPhidget_waitForAttachment(void *, int)"
-  extern "int CPhidget_getServerID(void *, void *)"
-  extern "int CPhidget_getServerAddress(void *, void *, int *)"
-  extern "int CPhidget_getServerStatus(void *, int *)"
-  extern "int CPhidget_getDeviceID(void *, int *)"
-  extern "int CPhidget_getDeviceClass(void *, int *)"
-
   class Common
 
-    # Opens a Phidget.
-    # === Parameters
-    # * _serial_number_ = Serial number. Specify -1 to open any.
-    # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
-    def open(serial_number=-1, timeout=0)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_open', @handle, serial_number.to_i)
-      raise Phidgets::Exception.new(r) if r != 0
-      waitForAttachment(timeout) if timeout > 0
-    end
-
-    # Opens a Phidget remotely by ServerID. Note that this requires Bonjour (mDNS) to be running on both the host and the server.
-    # === Parameters
-    # * _serial_number_ = Serial number. Specify -1 to open any.
-    # * _server_        = Server ID. Specify nil to open any.
-    # * _password_      = Password. Can be nil if the server is running unsecured.
-    # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
-    def openRemote(serial_number=-1, server=nil, password=nil, timeout=0)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_openRemote', @handle, serial_number.to_i, server, password)
-      raise Phidgets::Exception.new(r) if r != 0
-      waitForAttachment(timeout) if timeout > 0
-    end
-
-    # Opens a Phidget remotely by address and port.
-    # === Parameters
-    # * _serial_number_ = Serial number. Specify -1 to open any.
-    # * _address_       = Address. This can be a hostname or IP address.
-    # * _port_          = Port number. Default is 5001.
-    # * _password_      = Password. Can be nil if the server is running unsecured.
-    # * _timeout_       = Time to wait for attachment. Specify 0 to not wait.
-    def openRemoteIP(serial_number, address, port=5001, password=nil, timeout=0)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_openRemoteIP', @handle, serial_number.to_i, address, port.to_i, password)
-      raise Phidgets::Exception.new(r) if r != 0
-      waitForAttachment(timeout) if timeout > 0
-    end
-
-    # Closes a Phidget.
-    def close
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_close', @handle)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Frees a Phidget handle.
-    def delete
-      @handle.free = nil
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_delete', @handle)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Gets the specific name of a Phidget.
-    def getDeviceName
-      ptr = Phidgets.malloc(SIZEOF_VOIDP)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceName', @handle, ptr.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      ptr.free = nil
-      ptr.to_s
-    end
-
-    # Gets the serial number of a Phidget.
-    def getSerialNumber
-      sn = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getSerialNumber', @handle, sn.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      sn.free = nil
-      sn.to_i
-    end
-
-    # Gets the firmware version of a Phidget.
-    def getDeviceVersion
-      ver = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceVersion', @handle, ver.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      ver.free = nil
-      ver.to_i
-    end
-
-    # Gets the attached status of a Phidget.
-    def getDeviceStatus
-      stat = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceStatus', @handle, stat.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      stat.free = nil
-      stat.to_i
-    end
-
-    # Gets the type (class) of a Phidget.
-    def getDeviceType
-      ptr = Phidgets.malloc(SIZEOF_VOIDP)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceType', @handle, ptr.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      ptr.free = nil
-      ptr.to_s
-    end
-
-    # Gets the label of a Phidget.
-    def getDeviceLabel
-      ptr = Phidgets.malloc(SIZEOF_VOIDP)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceLabel', @handle, ptr.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      ptr.free = nil
-      ptr.to_s
-    end
-
-    # Sets the label of a Phidget. Note that this is not supported on very old Phidgets, and not yet supported in Windows.
-    # === Parameters
-    # * _label_ = A string containing the label to be set.
-    def setDeviceLabel(label)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_setDeviceLabel', @handle, label)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Waits for attachment to happen. This can be called right after calling open, as an alternative to using the attach handler.
-    # === Parameters
-    # * _timeout_ = Time to wait for the attachment. Specify 0 to wait forever.
-    def waitForAttachment(timeout)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_waitForAttachment', @handle, timeout.to_i)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Gets the server ID of a remotely opened Phidget. This will fail if the Phidget was opened locally.
-    def getServerID
-      ptr = Phidgets.malloc(SIZEOF_VOIDP)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getServerID', @handle, ptr.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      ptr.free = nil
-      ptr.to_s
-    end
-
-    # Gets the address and port of a remotely opened Phidget. This will fail if the Phidget was opened locally.
-    def getServerAddress
-      ptr = Phidgets.malloc(SIZEOF_VOIDP)
-      port = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getServerAddress', @handle, ptr.ref, port.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      ptr.free = nil
-      port.free = nil
-      [ptr.to_s, port.to_i]
-    end
-
-    # Gets the connected to server status of a remotely opened Phidget. This will fail if the Phidget was opened locally.
-    def getServerStatus
-      stat = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getServerStatus', @handle, stat.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      stat.free = nil
-      stat.to_i
-    end
-
-    # Gets the device ID of a Phidget.
-    def getDeviceID
-      dev = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceID', @handle, dev.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      dev.free = nil
-      dev.to_i
-    end
-
-    # Gets the class of a Phidget.
-    def getDeviceClass
-      dev = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'Phidget_getDeviceClass', @handle, dev.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      dev.free = nil
-      dev.to_i
+    # call-seq:
+    #   open(args)
+    #
+    # Opens a Phidget. Will attempt to make the correct open call (openLabel, openRemote, openRemoteIP, etc)
+    # based on the arguments passed in. Args can either be a serial number or a hash of arguments. If it is a
+    # hash, the following keys may be used: :serial_number, :label, :server_id, :address, :port, :password.
+    #
+    def open(args)
+      args = {:serial_number => args.to_i} unless args.is_a? Hash
+      if args.key? :server_id
+        return open_remote(args[:serial_number], args[:server_id], args[:password]) if args.key? :serial_number
+        return open_label_remote(args[:label], args[:server_id], args[:password]) if args.key? :label
+      elsif args.key? :address
+        return open_remote_ip(args[:serial_number], args[:address], args[:port], args[:password]) if args.key? :serial_number
+        return open_label_remote_ip(args[:label], args[:address], args[:port], args[:password]) if args.key? :label
+      else
+        return ext_open(args[:serial_number]) if args.key? :serial_number
+        return open_label(args[:label]) if args.key? :label
+      end
+      raise Phidgets::Error::InvalidArg.new
     end
 
 
-    private
+    unless RUBY_VERSION < '1.9.0'
 
-    def initialize
-      @handle = Phidgets.malloc(SIZEOF_VOIDP)
+      # call-seq:
+      #   setOnAttachHandler(proc=nil, &block)
+      #
+      # Sets an attach handler callback function. This is called when this Phidget is plugged into the system, and is ready for use.
+      #
+      def setOnAttachHandler(cb_proc = nil, &cb_block)
+        @on_attach_thread.kill if defined? @on_attach_thread
+        callback = cb_proc || cb_block
+        @on_attach_thread = Thread.new {ext_setOnAttachHandler(callback)}
+      end
+
+      # call-seq:
+      #   setOnDetachHandler(proc=nil, &block)
+      #
+      # Sets a detach handler callback function. This is called when this Phidget is unplugged from the system.
+      #
+      def setOnDetachHandler(cb_proc = nil, &cb_block)
+        @on_detach_thread.kill if defined? @on_detach_thread
+        callback = cb_proc || cb_block
+        @on_detach_thread = Thread.new {ext_setOnDetachHandler(callback)}
+      end
+
+      # call-seq:
+      #   setOnServerConnectHandler(proc=nil, &block)
+      #
+      # Sets a server connect handler callback function. This is used for opening Phidgets remotely,
+      # and is called when a connection to the sever has been made.
+      #
+      def setOnServerConnectHandler(cb_proc = nil, &cb_block)
+        @on_server_connect_thread.kill if defined? @on_server_connect_thread
+        callback = cb_proc || cb_block
+        @on_server_connect_thread = Thread.new {ext_setOnServerConnectHandler(callback)}
+      end
+
+      # call-seq:
+      #   setOnServerDisconnectHandler(proc=nil, &block)
+      #
+      # Sets a server disconnect handler callback function. This is used for opening Phidgets remotely,
+      # and is called when a connection to the server has been lost.
+      #
+      def setOnServerDisconnectHandler(cb_proc = nil, &cb_block)
+        @on_server_disconnect_thread.kill if defined? @on_server_disconnect_thread
+        callback = cb_proc || cb_block
+        @on_server_disconnect_thread = Thread.new {ext_setOnServerDisconnectHandler(callback)}
+      end
+
+      alias :on_attach :setOnAttachHandler
+      alias :on_detach :setOnDetachHandler
+      alias :on_server_connect :setOnServerConnectHandler
+      alias :on_server_disconnect :setOnServerDisconnectHandler
+
     end
 
   end
-
 end
 

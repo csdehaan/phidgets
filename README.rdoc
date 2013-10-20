@@ -1,6 +1,6 @@
 = phidgets
 
-* http://phidgets.rubyforge.org
+* https://github.com/csdehaan/phidgets
 
 == DESCRIPTION:
 
@@ -9,35 +9,51 @@ This gem provides a ruby interface to the phidgets library.
 
 == FEATURES/PROBLEMS:
 
-* This gem uses DL to call the c functions in the Phidgets shared library, so the library must be installed and working.
+* This gem compiles a c extension for the phidget library, so the library must be installed and the development files must be located
+  in a place that the compiler can find them. For windows the DevKit is required.
 * The gem has been tested to work on both Linux and Windows.
-* Not all the devices have been implemented, and not all of the devices that have been implemented have been fully tested.
-* The gem will attempt to guess the name of the phidgets library based on the platform it is run on (Linux, Windows or OS X).
-  If it guesses incorrectly please leave a message to let me know what your platform sets for Config::CONFIG['target_os'] and
-  what is the name of the phidgets library.
+* Tested with Phidget Library version 2.1.8.20130618
+* Callbacks do not work on Ruby versions earlier than 1.9. This is because native threads are required for them to work.
 
 == SYNOPSIS:
 
   require 'phidgets'
 
   begin
-    ik = Phidgets::InterfaceKit.new(-1,2000)
+    ik = Phidgets::InterfaceKit.new
+    ik.open -1
+    ik.wait_for_attachment
 
-    puts "Device Name     = #{ik.getDeviceName}"
-    puts "Serial Number   = #{ik.getSerialNumber}"
-    puts "Device Version  = #{ik.getDeviceVersion}"
+    puts "Device Name     = #{ik.device_name}"
+    puts "Serial Number   = #{ik.serial_number}"
+    puts "Device Version  = #{ik.device_version}"
 
     ik.close
 
-  rescue Phidgets::Exception => e
-    puts "Phidgets Error (#{e.code}). #{e}"
+  rescue Phidgets::Error => e
+    puts e
   end
 
 
-  The gem now installs a command line program that will list all phidgets devices that are attached, as well as allowing any
-  valid method for a given phidget type to be called. For example:
+  # Or using callbacks:
+
+  ik = Phidgets::InterfaceKit.new
+  ik.on_attach { |phid|
+    puts "Device Name     = #{phid.device_name}"
+    puts "Serial Number   = #{phid.serial_number}"
+    puts "Device Version  = #{phid.device_version}"
+  }
+
+  ik.open -1
+  sleep 5
+  ik.close
+
+
+  # The gem also installs a command line program that will list all phidget devices that are attached, as well as allowing any
+  # valid method for a given phidget type to be called. For example:
   
-  To list all phidgets attached to the local computer:
+  # To list all phidgets attached to the local computer:
+
     => phidget list
        ----------------------------------------------------------------------
        | SerialNumber          | Device Name                                |
@@ -46,7 +62,8 @@ This gem provides a ruby interface to the phidgets library.
        | 88103                 | Phidget InterfaceKit 0/0/4                 |
        ----------------------------------------------------------------------
 
-  To list all phidgets attached to a remote computer:
+  # To list all phidgets attached to a remote computer:
+
     => phidget 192.168.100.67 list
        ----------------------------------------------------------------------
        | SerialNumber          | Device Name                                |
@@ -54,16 +71,21 @@ This gem provides a ruby interface to the phidgets library.
        | 73782                 | Phidget InterfaceKit 0/0/8                 |
        ----------------------------------------------------------------------
 
-  To call a method for a specific local phidget:
+  # To call a method for a specific local phidget:
     => phidget 73723 setOutputState 0 1
     
-  To call a method for a specific remote phidget:
+  # To call a method for a specific remote phidget:
     => phidget 192.168.100.67:73782 setOuputState 2 0
 
 
 == REQUIREMENTS:
 
 * The Phidgets library (http://www.phidgets.com/)
+* For Windows the ruby DevKit is required
+* The development header file and library must be placed in a location where the compiler can find them.
+  For Linux this should be done when running "make install" for the Phidget Library. For Windows the files
+  need to be copied from the install directory (\\Program Files\\Phidgets). phidget21.h can be copied to
+  RUBY_DIR\\include\\ruby-1.9.1. phidget21.lib can be copied to RUBY_DIR\\lib.
 
 == INSTALL:
 
@@ -86,3 +108,4 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+

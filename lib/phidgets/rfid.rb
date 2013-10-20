@@ -1,122 +1,49 @@
 
 
 module Phidgets
-
-  extern "int CPhidgetRFID_create(void *)"
-  extern "int CPhidgetRFID_getOutputCount(void *, int *)"
-  extern "int CPhidgetRFID_getOutputState(void *, int, int *)"
-  extern "int CPhidgetRFID_setOutputState(void *, int, int)"
-  extern "int CPhidgetRFID_getAntennaOn(void *, int *)"
-  extern "int CPhidgetRFID_setAntennaOn(void *, int)"
-  extern "int CPhidgetRFID_getLEDOn(void *, int *)"
-  extern "int CPhidgetRFID_setLEDOn(void *, int)"
-  extern "int CPhidgetRFID_getLastTag(void *, void *)"
-  extern "int CPhidgetRFID_getTagStatus(void *, int *)"
-  
-  
   class RFID < Common
 
-    # Create a new RFID object.
-    # === Parameters
-    # * _serial_number_ = Serial number of the phidget board to open. Specify -1 to open any.
-    # * _timeout_       = Time to wait for attachment. Specify 0 to not call open.
-    def initialize(serial_number=-1, timeout=0)
-      super()
-      create
-      open(serial_number, timeout) if timeout > 0
-    end
+    unless RUBY_VERSION < '1.9.0'
 
-    # Gets the number of outputs supported by this board.
-    def getOutputCount
-      cnt = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_getOutputCount', @handle, cnt.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      cnt.free = nil
-      cnt.to_i
-    end
+      # call-seq:
+      #   setOnTagHandler(proc=nil, &block)
+      #
+      # Set a tag handler. This is called when a tag is first detected by the reader.
+      #
+      def setOnTagHandler(cb_proc = nil, &cb_block)
+        @on_tag_thread.kill if defined? @on_tag_thread
+        callback = cb_proc || cb_block
+        @on_tag_thread = Thread.new {ext_setOnTagHandler(callback)}
+      end
 
-    # Gets the state of an output.
-    # === Parameters
-    # * _index_ = The output index.
-    def getOutputState(index)
-      state = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_getOutputState', @handle, index.to_i, state.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      state.free = nil
-      state.to_i
-    end
+      # call-seq:
+      #   setOnTagLostHandler(proc=nil, &block)
+      #
+      # Set a tag lost handler. This is called when a tag is no longer detected by the reader.
+      #
+      def setOnTagLostHandler(cb_proc = nil, &cb_block)
+        @on_tag_lost_thread.kill if defined? @on_tag_lost_thread
+        callback = cb_proc || cb_block
+        @on_tag_lost_thread = Thread.new {ext_setOnTagLostHandler(callback)}
+      end
 
-    # Sets the state of an output.
-    # === Parameters
-    # * _index_ = The output index.
-    # * _state_ = The output state. Possible values are PTRUE  and PFALSE.
-    def setOutputState(index, state)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_setOutputState', @handle, index.to_i, state.to_i)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
+      # call-seq:
+      #   setOnOutputChangeHandler(proc=nil, &block)
+      #
+      # Set an output change handler. This is called when an output changes.
+      #
+      def setOnOutputChangeHandler(cb_proc = nil, &cb_block)
+        @on_output_change_thread.kill if defined? @on_output_change_thread
+        callback = cb_proc || cb_block
+        @on_output_change_thread = Thread.new {ext_setOnOutputChangeHandler(callback)}
+      end
 
-    # Gets the state of the antenna.
-    def getAntennaOn
-      state = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_getAntennaOn', @handle, state.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      state.free = nil
-      state.to_i
-    end
+      alias :on_tag :setOnTagHandler
+      alias :on_tag_lost :setOnTagLostHandler
+      alias :on_output_change :setOnOutputChangeHandler
 
-    # Sets the state of the antenna. Note that the antenna must be enabled before tags will be read.
-    # === Parameters
-    # * _state_ = The antenna state. Possible values are PTRUE  and PFALSE.
-    def setAntennaOn(state)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_setAntennaOn', @handle, state.to_i)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Gets the state of the onboard LED.
-    def getLedOn
-      state = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_getLEDOn', @handle, state.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      state.free = nil
-      state.to_i
-    end
-
-    # Sets the state of the onboard LED.
-    # === Parameters
-    # * _state_ = The LED state. Possible values are PTRUE  and PFALSE.
-    def setLedOn(state)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_setLEDOn', @handle, state.to_i)
-      raise Phidgets::Exception.new(r) if r != 0
-    end
-
-    # Gets the last tag read by the reader. This tag may or may not still be on the reader.
-    def getLastTag
-      tag = Phidgets.malloc(SIZEOF_VOIDP)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_getLastTag', @handle, tag.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      tag.free = nil
-      tag.to_s
-    end
-
-    # Gets the tag present status. This is whether or not a tag is being read by the reader.
-    def getTagStatus
-      stat = Phidgets.malloc(SIZEOF_INT)
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_getTagStatus', @handle, stat.ref)
-      raise Phidgets::Exception.new(r) if r != 0
-      stat.free = nil
-      stat.to_i
-    end
-
-
-    private
-
-    # Creates a Phidget RFID handle.
-    def create
-      r = Phidgets.send(FUNCTION_PREFIX + 'PhidgetRFID_create', @handle.ref)
-      raise Phidgets::Exception.new(r) if r != 0
     end
 
   end
-
 end
 
