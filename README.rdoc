@@ -14,6 +14,7 @@ This gem provides a ruby interface to the phidgets library.
 * The gem has been tested to work on both Linux and Windows.
 * Tested with Phidget Library version 2.1.8.20130618
 * Callbacks do not work on Ruby versions earlier than 1.9. This is because native threads are required for them to work.
+* Method names follow the naming convention of the C library (getOutputState, setOutputState, etc). In addition, more "rubyish" aliases are provided (output_state, set_output_state, etc)
 
 == SYNOPSIS:
 
@@ -72,10 +73,10 @@ This gem provides a ruby interface to the phidgets library.
        ----------------------------------------------------------------------
 
   # To call a method for a specific local phidget:
-    => phidget 73723 setOutputState 0 1
+    => phidget 73723 set_output_state 0 true
     
   # To call a method for a specific remote phidget:
-    => phidget 192.168.100.67:73782 setOuputState 2 0
+    => phidget 192.168.100.67:73782 set_output_state 2 false
 
 
 == REQUIREMENTS:
