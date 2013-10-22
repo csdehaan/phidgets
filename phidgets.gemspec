@@ -2,12 +2,12 @@
 
 Gem::Specification.new do |s|
   s.name = "phidgets"
-  s.version = "0.1.1"
+  s.version = "0.1.2"
   s.authors = ["Craig DeHaan"]
   s.email = ["cdehaan2@cfl.rr.com"]
   s.homepage = "https://github.com/csdehaan/phidgets"
   s.summary = "Phidgets are a set of \"plug and play\" building blocks for low cost USB sensing and control from your PC.\nThis gem provides a ruby interface to the phidgets library."
-  s.description = s.summary
+  s.description = "This gem provides a ruby interface to the phidgets library."
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.executables = ["phidget"]
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
             Dir.glob("ext/**/*.{c,h}") +
             Dir.glob("lib/**/*.rb")+
             Dir.glob("test/*.rb")+
-            %w(Rakefile GNU_GPL.txt History.txt README.rdoc phidgets.gemspec)
+            %w(Rakefile GNU_GPL.txt History.txt README.rdoc phidgets.gemspec .yardopts)
   s.test_files = Dir.glob("test/*.rb")
   s.post_install_message = "For more information on phidgets, see http://www.phidgets.com/"
   s.rdoc_options = ["--main", "README.rdoc"]
