@@ -12,7 +12,7 @@ def usage
   $stdout.puts
   $stdout.puts '  Examples:'
   $stdout.puts '    phidget list'
-  $stdout.puts '    phidget -1 set_output_state 0 1'
+  $stdout.puts '    phidget -1 set_output_state 0 true'
   $stdout.puts '    phidget 34619 device_name'
 end
 
@@ -57,6 +57,7 @@ begin
     $stdout.puts "| SerialNumber          | Device Name                                |"
     $stdout.puts "----------------------------------------------------------------------"
     devices.each_pair { |serial,phidget|
+      args[:serial_number] = serial
       phidget.open(args)
       phidget.wait_for_attachment(2000)
       d_str = "| #{serial}"
