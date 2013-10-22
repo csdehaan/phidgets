@@ -1,3 +1,7 @@
+== 0.1.1 2013-10-22
+  * Fixed bug in phidget executable that caused invalid arg exception when listing all attached phidget devices
+  * Updated some documentation that had examples from the old interface (using 1 and 0 instead of true and false)
+
 == 0.1.0 2013-10-19
   * Complete re-write as native C extension
 
