@@ -22,7 +22,9 @@ int ph_encoder_on_index(CPhidgetEncoderHandle phid, void *userPtr, int index, in
 #endif
 
 
-VALUE Init_phidgets_encoder(VALUE ph_module, VALUE ph_common) {
+void Init_encoder() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_encoder = rb_define_class_under(ph_module, "Encoder", ph_common);
 
   /* Document-method: new
@@ -103,8 +105,6 @@ VALUE Init_phidgets_encoder(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_encoder, "index_position", "getIndexPosition");
   rb_define_alias(ph_encoder, "enabled?", "getEnabled");
   rb_define_alias(ph_encoder, "set_enabled", "setEnabled");
-
-  return ph_encoder;
 }
 
 

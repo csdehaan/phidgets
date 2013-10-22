@@ -19,7 +19,9 @@ int ph_phsensor_on_ph_change(CPhidgetPHSensorHandle phid, void *userPtr, double 
 #endif
 
 
-VALUE Init_phidgets_phsensor(VALUE ph_module, VALUE ph_common) {
+void Init_ph_sensor() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_phsensor = rb_define_class_under(ph_module, "PHSensor", ph_common);
 
   /* Document-method: new
@@ -105,8 +107,6 @@ VALUE Init_phidgets_phsensor(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_phsensor, "potential_min", "getPotentialMin");
   rb_define_alias(ph_phsensor, "potential_max", "getPotentialMax");
   rb_define_alias(ph_phsensor, "temperature=", "setTemperature");
-
-  return ph_phsensor;
 }
 
 

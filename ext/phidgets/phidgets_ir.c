@@ -20,7 +20,9 @@ int ph_ir_on_raw_data(CPhidgetIRHandle phid, void *userPtr, int *data, int dataL
 #endif
 
 
-VALUE Init_phidgets_ir(VALUE ph_module, VALUE ph_common) {
+void Init_ir() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_ir = rb_define_class_under(ph_module, "IR", ph_common);
 
   /* Unknown - the default value */
@@ -105,8 +107,6 @@ VALUE Init_phidgets_ir(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_ir, "raw_data", "getRawData");
   rb_define_alias(ph_ir, "last_code", "getLastCode");
   rb_define_alias(ph_ir, "last_learned_code", "getLastLearnedCode");
-
-  return ph_ir;
 }
 
 

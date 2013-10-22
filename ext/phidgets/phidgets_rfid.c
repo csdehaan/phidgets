@@ -24,7 +24,9 @@ int ph_rfid_on_output_change(CPhidgetRFIDHandle phid, void *userPtr, int index, 
 #endif
 
 
-VALUE Init_phidgets_rfid(VALUE ph_module, VALUE ph_common) {
+void Init_rfid() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_rfid = rb_define_class_under(ph_module, "RFID", ph_common);
 
   /* EM4100 (EM4102) 40-bit */
@@ -126,8 +128,6 @@ VALUE Init_phidgets_rfid(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_rfid, "led_on=", "setLEDOn");
   rb_define_alias(ph_rfid, "last_tag", "getLastTag");
   rb_define_alias(ph_rfid, "tag_status", "getTagStatus");
-
-  return ph_rfid;
 }
 
 

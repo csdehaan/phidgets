@@ -20,7 +20,9 @@ int ph_servo_on_position_change(CPhidgetServoHandle phid, void *userPtr, int ind
 #endif
 
 
-VALUE Init_phidgets_servo(VALUE ph_module, VALUE ph_common) {
+void Init_servo() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_servo = rb_define_class_under(ph_module, "Servo", ph_common);
 
   /* Default - This is what the servo API been historically used, originally based on the Futaba FP-S148 */
@@ -168,8 +170,6 @@ VALUE Init_phidgets_servo(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_servo, "servo_type", "getServoType");
   rb_define_alias(ph_servo, "set_servo_type", "setServoType");
   rb_define_alias(ph_servo, "set_servo_parameters", "setServoParameters");
-
-  return ph_servo;
 }
 
 

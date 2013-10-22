@@ -29,7 +29,9 @@ int ph_spatial_on_spatial_data(CPhidgetSpatialHandle phid, void *userPtr, CPhidg
 #endif
 
 
-VALUE Init_phidgets_spatial(VALUE ph_module, VALUE ph_common) {
+void Init_spatial() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_spatial = rb_define_class_under(ph_module, "Spatial", ph_common);
 
   /* Document-method: new
@@ -197,8 +199,6 @@ VALUE Init_phidgets_spatial(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_spatial, "zero_gyro", "zeroGyro");
   rb_define_alias(ph_spatial, "set_compass_correction_parameters", "setCompassCorrectionParameters");
   rb_define_alias(ph_spatial, "reset_compass_correction_parameters", "resetCompassCorrectionParameters");
-
-  return ph_spatial;
 }
 
 

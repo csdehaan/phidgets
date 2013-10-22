@@ -26,7 +26,9 @@ VALUE ph_textlcd_set_screen_size(VALUE self, VALUE screen);
 VALUE ph_textlcd_init_screen(VALUE self);
 
 
-VALUE Init_phidgets_textlcd(VALUE ph_module, VALUE ph_common) {
+void Init_text_lcd() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_textlcd = rb_define_class_under(ph_module, "TextLCD", ph_common);
 
   /* no screen attached */
@@ -230,8 +232,6 @@ VALUE Init_phidgets_textlcd(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_textlcd, "screen_size", "getScreenSize");
   rb_define_alias(ph_textlcd, "screen_size=", "setScreenSize");
   rb_define_alias(ph_textlcd, "init_screen", "initScreen");
-
-  return ph_textlcd;
 }
 
 

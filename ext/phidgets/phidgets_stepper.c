@@ -42,7 +42,9 @@ int ph_stepper_on_current_change(CPhidgetStepperHandle phid, void *userPtr, int 
 #endif
 
 
-VALUE Init_phidgets_stepper(VALUE ph_module, VALUE ph_common) {
+void Init_stepper() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_stepper = rb_define_class_under(ph_module, "Stepper", ph_common);
 
   /* Document-method: new
@@ -267,8 +269,6 @@ VALUE Init_phidgets_stepper(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_stepper, "engaged?", "getEngaged");
   rb_define_alias(ph_stepper, "set_engaged", "setEngaged");
   rb_define_alias(ph_stepper, "stopped?", "getStopped");
-
-  return ph_stepper;
 }
 
 

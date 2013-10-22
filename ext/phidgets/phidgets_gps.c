@@ -21,7 +21,9 @@ int ph_gps_on_position_fix_status_change(CPhidgetGPSHandle phid, void *userPtr, 
 #endif
 
 
-VALUE Init_phidgets_gps(VALUE ph_module, VALUE ph_common) {
+void Init_gps() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_gps = rb_define_class_under(ph_module, "GPS", ph_common);
 
   /* Document-method: new
@@ -107,8 +109,6 @@ VALUE Init_phidgets_gps(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_gps, "date", "getDate");
   rb_define_alias(ph_gps, "position_fix_status", "getPositionFixStatus");
   rb_define_alias(ph_gps, "nmea_data", "getNMEAData");
-
-  return ph_gps;
 }
 
 

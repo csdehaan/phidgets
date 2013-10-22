@@ -17,7 +17,9 @@ int ph_accel_on_acceleration_change(CPhidgetAccelerometerHandle phid, void *user
 
 
 
-VALUE Init_phidgets_accel(VALUE ph_module, VALUE ph_common) {
+void Init_accelerometer() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_accel = rb_define_class_under(ph_module, "Accelerometer", ph_common);
 
   /* Document-method: new
@@ -79,8 +81,6 @@ VALUE Init_phidgets_accel(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_accel, "acceleration_max", "getAccelerationMax");
   rb_define_alias(ph_accel, "acceleration_change_trigger", "getAccelerationChangeTrigger");
   rb_define_alias(ph_accel, "set_acceleration_change_trigger", "setAccelerationChangeTrigger");
-
-  return ph_accel;
 }
 
 

@@ -27,7 +27,8 @@ int ph_manager_on_server_disconnect(CPhidgetManagerHandle phid, void *userPtr);
 #endif
 
 
-VALUE Init_phidgets_manager(VALUE ph_module) {
+void Init_manager() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
   VALUE ph_manager = rb_define_class_under(ph_module, "Manager", rb_cObject);
   rb_define_alloc_func(ph_manager, ph_manager_allocate);
 
@@ -102,8 +103,6 @@ VALUE Init_phidgets_manager(VALUE ph_module) {
   rb_define_alias(ph_manager, "server_address", "getServerAddress");
   rb_define_alias(ph_manager, "server_status", "getServerStatus");
   rb_define_alias(ph_manager, "attached_devices", "getAttachedDevices");
-
-  return ph_manager;
 }
 
 

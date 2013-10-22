@@ -13,7 +13,9 @@ int ph_weight_on_weight_change(CPhidgetWeightSensorHandle phid, void *userPtr, d
 #endif
 
 
-VALUE Init_phidgets_weight(VALUE ph_module, VALUE ph_common) {
+void Init_weight_sensor() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_weight = rb_define_class_under(ph_module, "WeightSensor", ph_common);
 
   /* Document-method: new
@@ -51,8 +53,6 @@ VALUE Init_phidgets_weight(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_weight, "weight", "getWeight");
   rb_define_alias(ph_weight, "weight_change_trigger", "getWeightChangeTrigger");
   rb_define_alias(ph_weight, "weight_change_trigger=", "setWeightChangeTrigger");
-
-  return ph_weight;
 }
 
 

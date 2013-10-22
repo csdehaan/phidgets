@@ -22,7 +22,9 @@ int ph_bridge_on_bridge_data(CPhidgetBridgeHandle phid, void *userPtr, int index
 #endif
 
 
-VALUE Init_phidgets_bridge(VALUE ph_module, VALUE ph_common) {
+void Init_bridge() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_bridge = rb_define_class_under(ph_module, "Bridge", ph_common);
 
   rb_define_const(ph_bridge, "GAIN_1", INT2FIX(PHIDGET_BRIDGE_GAIN_1));
@@ -140,8 +142,6 @@ VALUE Init_phidgets_bridge(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_bridge, "data_rate_min", "getDataRateMin");
   rb_define_alias(ph_bridge, "data_rate_max", "getDataRateMax");
   rb_define_alias(ph_bridge, "data_rate=", "setDataRate");
-
-  return ph_bridge;
 }
 
 

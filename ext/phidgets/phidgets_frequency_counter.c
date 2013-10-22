@@ -21,7 +21,9 @@ int ph_freq_on_count(CPhidgetFrequencyCounterHandle phid, void *userPtr, int ind
 #endif
 
 
-VALUE Init_phidgets_freq(VALUE ph_module, VALUE ph_common) {
+void Init_frequency_counter() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_freq = rb_define_class_under(ph_module, "FrequencyCounter", ph_common);
 
   rb_define_const(ph_freq, "FILTERTYPE_ZERO_CROSSING", INT2FIX(PHIDGET_FREQUENCYCOUNTER_FILTERTYPE_ZERO_CROSSING));
@@ -126,8 +128,6 @@ VALUE Init_phidgets_freq(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_freq, "set_enabled", "setEnabled");
   rb_define_alias(ph_freq, "filter", "getFilter");
   rb_define_alias(ph_freq, "set_filter", "setFilter");
-
-  return ph_freq;
 }
 
 

@@ -14,7 +14,9 @@ VALUE ph_led_get_current_limit_indexed(VALUE self, VALUE index);
 VALUE ph_led_set_current_limit_indexed(VALUE self, VALUE index, VALUE limit);
 
 
-VALUE Init_phidgets_led(VALUE ph_module, VALUE ph_common) {
+void Init_led() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_led = rb_define_class_under(ph_module, "LED", ph_common);
 
   rb_define_const(ph_led, "CURRENT_LIMIT_20mA", INT2FIX(PHIDGET_LED_CURRENT_LIMIT_20mA));
@@ -105,8 +107,6 @@ VALUE Init_phidgets_led(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_led, "set_brightness", "setBrightness");
   rb_define_alias(ph_led, "current_limit_indexed", "getCurrentLimitIndexed");
   rb_define_alias(ph_led, "set_current_limit_indexed", "setCurrentLimitIndexed");
-
-  return ph_led;
 }
 
 

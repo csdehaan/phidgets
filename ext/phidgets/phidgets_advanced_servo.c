@@ -39,7 +39,9 @@ int ph_advservo_on_current_change(CPhidgetAdvancedServoHandle phid, void *userPt
 #endif
 
 
-VALUE Init_phidgets_advservo(VALUE ph_module, VALUE ph_common) {
+void Init_advanced_servo() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_advservo = rb_define_class_under(ph_module, "AdvancedServo", ph_common);
 
   /* Default - This is what the servo API been historically used, originally based on the Futaba FP-S148 */
@@ -310,8 +312,6 @@ VALUE Init_phidgets_advservo(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_advservo, "servo_type", "getServoType");
   rb_define_alias(ph_advservo, "set_servo_type", "setServoType");
   rb_define_alias(ph_advservo, "set_servo_parameters", "setServoParameters");
-
-  return ph_advservo;
 }
 
 

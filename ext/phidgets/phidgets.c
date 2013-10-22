@@ -176,29 +176,29 @@ void Init_phidgets() {
    */
   rb_define_singleton_method(ph_module, "log", ph_log, 3);
 
-  Init_phidgets_dictionary(ph_module);
-  Init_phidgets_manager(ph_module);
-  ph_common = Init_phidgets_common(ph_module);
-  Init_phidgets_accel(ph_module, ph_common);
-  Init_phidgets_advservo(ph_module, ph_common);
-  Init_phidgets_analog(ph_module, ph_common);
-  Init_phidgets_bridge(ph_module, ph_common);
-  Init_phidgets_encoder(ph_module, ph_common);
-  Init_phidgets_freq(ph_module, ph_common);
-  Init_phidgets_gps(ph_module, ph_common);
-  Init_phidgets_ifkit(ph_module, ph_common);
-  Init_phidgets_ir(ph_module, ph_common);
-  Init_phidgets_led(ph_module, ph_common);
-  Init_phidgets_motor_control(ph_module, ph_common);
-  Init_phidgets_phsensor(ph_module, ph_common);
-  Init_phidgets_rfid(ph_module, ph_common);
-  Init_phidgets_servo(ph_module, ph_common);
-  Init_phidgets_spatial(ph_module, ph_common);
-  Init_phidgets_stepper(ph_module, ph_common);
-  Init_phidgets_temp(ph_module, ph_common);
-  Init_phidgets_textlcd(ph_module, ph_common);
-  Init_phidgets_textled(ph_module, ph_common);
-  Init_phidgets_weight(ph_module, ph_common);
+  Init_dictionary();
+  Init_manager();
+  Init_common();
+  Init_accelerometer();
+  Init_advanced_servo();
+  Init_analog();
+  Init_bridge();
+  Init_encoder();
+  Init_frequency_counter();
+  Init_gps();
+  Init_interface_kit();
+  Init_ir();
+  Init_led();
+  Init_motor_control();
+  Init_ph_sensor();
+  Init_rfid();
+  Init_servo();
+  Init_spatial();
+  Init_stepper();
+  Init_temperature_sensor();
+  Init_text_lcd();
+  Init_text_led();
+  Init_weight_sensor();
 }
 
 

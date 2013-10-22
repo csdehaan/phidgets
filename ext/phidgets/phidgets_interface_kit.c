@@ -28,7 +28,9 @@ int ph_ifkit_on_sensor_change(CPhidgetInterfaceKitHandle phid, void *userPtr, in
 #endif
 
 
-VALUE Init_phidgets_ifkit(VALUE ph_module, VALUE ph_common) {
+void Init_interface_kit() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_ifkit = rb_define_class_under(ph_module, "InterfaceKit", ph_common);
 
   /* Document-method: new
@@ -156,8 +158,6 @@ VALUE Init_phidgets_ifkit(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_ifkit, "data_rate_min", "getDataRateMin");
   rb_define_alias(ph_ifkit, "data_rate_max", "getDataRateMax");
   rb_define_alias(ph_ifkit, "set_data_rate", "setDataRate");
-
-  return ph_ifkit;
 }
 
 

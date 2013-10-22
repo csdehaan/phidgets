@@ -49,29 +49,29 @@ typedef struct ph_data {
 
 
 void Init_phidgets();
-VALUE Init_phidgets_dictionary(VALUE ph_module);
-VALUE Init_phidgets_manager(VALUE ph_module);
-VALUE Init_phidgets_common(VALUE ph_module);
-VALUE Init_phidgets_accel(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_advservo(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_analog(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_bridge(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_encoder(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_freq(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_gps(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_ifkit(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_ir(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_led(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_motor_control(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_phsensor(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_rfid(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_servo(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_spatial(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_stepper(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_temp(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_textlcd(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_textled(VALUE ph_module, VALUE ph_common);
-VALUE Init_phidgets_weight(VALUE ph_module, VALUE ph_common);
+void Init_dictionary();
+void Init_manager();
+void Init_common();
+void Init_accelerometer();
+void Init_advanced_servo();
+void Init_analog();
+void Init_bridge();
+void Init_encoder();
+void Init_frequency_counter();
+void Init_gps();
+void Init_interface_kit();
+void Init_ir();
+void Init_led();
+void Init_motor_control();
+void Init_ph_sensor();
+void Init_rfid();
+void Init_servo();
+void Init_spatial();
+void Init_stepper();
+void Init_temperature_sensor();
+void Init_text_lcd();
+void Init_text_led();
+void Init_weight_sensor();
 
 
 ph_data_t *get_ph_data(VALUE self);

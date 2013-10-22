@@ -12,7 +12,9 @@ VALUE ph_analog_get_enabled(VALUE self, VALUE index);
 VALUE ph_analog_set_enabled(VALUE self, VALUE index, VALUE state);
 
 
-VALUE Init_phidgets_analog(VALUE ph_module, VALUE ph_common) {
+void Init_analog() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_analog = rb_define_class_under(ph_module, "Analog", ph_common);
 
   /* Document-method: new
@@ -78,8 +80,6 @@ VALUE Init_phidgets_analog(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_analog, "set_voltage", "setVoltage");
   rb_define_alias(ph_analog, "enabled?", "getEnabled");
   rb_define_alias(ph_analog, "set_enabled", "setEnabled");
-
-  return ph_analog;
 }
 
 

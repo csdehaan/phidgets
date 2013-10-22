@@ -37,7 +37,8 @@ int ph_common_on_server_disconnect(CPhidgetHandle phid, void *userPtr);
 #endif
 
 
-VALUE Init_phidgets_common(VALUE ph_module) {
+void Init_common() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
   VALUE ph_common = rb_define_class_under(ph_module, "Common", rb_cObject);
   rb_define_alloc_func(ph_common, ph_common_allocate);
   rb_define_private_method(ph_common, "ext_open", ph_common_open, 1);
@@ -200,8 +201,6 @@ VALUE Init_phidgets_common(VALUE ph_module) {
   rb_define_alias(ph_common, "server_id", "getServerID");
   rb_define_alias(ph_common, "server_address", "getServerAddress");
   rb_define_alias(ph_common, "server_status", "getServerStatus");
-
-  return ph_common;
 }
 
 

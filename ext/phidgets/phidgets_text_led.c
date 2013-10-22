@@ -10,7 +10,9 @@ VALUE ph_textled_set_brightness(VALUE self, VALUE brightness);
 VALUE ph_textled_set_display_string(VALUE self, VALUE index, VALUE string);
 
 
-VALUE Init_phidgets_textled(VALUE ph_module, VALUE ph_common) {
+void Init_text_led() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_textled = rb_define_class_under(ph_module, "TextLED", ph_common);
 
   /* Document-method: new
@@ -60,8 +62,6 @@ VALUE Init_phidgets_textled(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_textled, "brightness", "getBrightness");
   rb_define_alias(ph_textled, "brightness=", "setBrightness");
   rb_define_alias(ph_textled, "display_string", "setDisplayString");
-
-  return ph_textled;
 }
 
 

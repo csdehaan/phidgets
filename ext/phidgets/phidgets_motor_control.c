@@ -48,7 +48,9 @@ int ph_motor_on_sensor_update(CPhidgetMotorControlHandle phid, void *userPtr, in
 #endif
 
 
-VALUE Init_phidgets_motor_control(VALUE ph_module, VALUE ph_common) {
+void Init_motor_control() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_motor = rb_define_class_under(ph_module, "MotorControl", ph_common);
 
   /* Document-method: new
@@ -262,8 +264,6 @@ VALUE Init_phidgets_motor_control(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_motor, "sensor_raw_value", "getSensorRawValue");
   rb_define_alias(ph_motor, "ratiometric?", "getRatiometric");
   rb_define_alias(ph_motor, "ratiometric=", "setRatiometric");
-
-  return ph_motor;
 }
 
 

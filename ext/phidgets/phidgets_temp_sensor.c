@@ -24,7 +24,9 @@ int ph_temp_on_temperature_change(CPhidgetTemperatureSensorHandle phid, void *us
 #endif
 
 
-VALUE Init_phidgets_temp(VALUE ph_module, VALUE ph_common) {
+void Init_temperature_sensor() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_temp = rb_define_class_under(ph_module, "TemperatureSensor", ph_common);
 
   rb_define_const(ph_temp, "K_TYPE", INT2FIX(PHIDGET_TEMPERATURE_SENSOR_K_TYPE));
@@ -157,8 +159,6 @@ VALUE Init_phidgets_temp(VALUE ph_module, VALUE ph_common) {
   rb_define_alias(ph_temp, "ambient_temperature_max", "getAmbientTemperatureMax");
   rb_define_alias(ph_temp, "thermocouple_type", "getThermocoupleType");
   rb_define_alias(ph_temp, "set_thermocouple_type", "setThermocoupleType");
-
-  return ph_temp;
 }
 
 

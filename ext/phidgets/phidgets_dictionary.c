@@ -25,7 +25,8 @@ int ph_dictionary_on_server_disconnect(CPhidgetDictionaryHandle phid, void *user
 #endif
 
 
-VALUE Init_phidgets_dictionary(VALUE ph_module) {
+void Init_dictionary() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
   VALUE ph_dictionary = rb_define_class_under(ph_module, "Dictionary", rb_cObject);
   rb_define_alloc_func(ph_dictionary, ph_dictionary_allocate);
 
@@ -128,8 +129,6 @@ VALUE Init_phidgets_dictionary(VALUE ph_module) {
   rb_define_alias(ph_dictionary, "remove_key", "removeKey");
   rb_define_alias(ph_dictionary, "server_address", "getServerAddress");
   rb_define_alias(ph_dictionary, "server_status", "getServerStatus");
-
-  return ph_dictionary;
 }
 
 
