@@ -1,8 +1,12 @@
 # -*- encoding: utf-8 -*-
+lib = File.expand_path('../lib/', __FILE__)  
+$:.unshift lib unless $:.include?(lib)
+
+require 'phidgets'
 
 Gem::Specification.new do |s|
   s.name = "phidgets"
-  s.version = "0.1.2"
+  s.version = Phidgets::VERSION
   s.authors = ["Craig DeHaan"]
   s.email = ["cdehaan2@cfl.rr.com"]
   s.homepage = "https://github.com/csdehaan/phidgets"

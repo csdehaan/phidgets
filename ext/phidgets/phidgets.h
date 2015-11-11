@@ -24,7 +24,12 @@ typedef struct ph_callback_data {
 } ph_callback_data_t;
 
 void ph_callback_thread(ph_callback_data_t *callback_data);
-VALUE wait_for_callback(void *arg);
+#if defined(HAVE_RB_THREAD_CALL_WITHOUT_GVL) && defined(HAVE_RUBY_THREAD_H)
+typedef void * ph_callback_return_t;
+#else
+typedef VALUE ph_callback_return_t;
+#endif
+ph_callback_return_t wait_for_callback(void *arg);
 void cancel_wait_for_callback(void *arg);
 #endif
 

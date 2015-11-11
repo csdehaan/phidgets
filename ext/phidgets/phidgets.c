@@ -1,6 +1,9 @@
 
 #include "phidgets.h"
 
+#if defined(HAVE_RUBY_THREAD_H)
+#include <ruby/thread.h>
+#endif
 
 VALUE ph_errors[PHIDGET_ERROR_CODE_COUNT+1];
 
@@ -14,7 +17,6 @@ VALUE ph_log(VALUE self, VALUE level, VALUE msg_id, VALUE message);
 void Init_phidgets() {
   VALUE ph_module = rb_define_module("Phidgets");
   VALUE ph_error;
-  VALUE ph_common;
 
   rb_define_const(ph_module, "NOTATTACHED", INT2FIX(PHIDGET_NOTATTACHED));
   rb_define_const(ph_module, "ATTACHED", INT2FIX(PHIDGET_ATTACHED));
@@ -249,19 +251,23 @@ VALUE ph_log(VALUE self, VALUE level, VALUE msg_id, VALUE message) {
 #ifdef PH_CALLBACK
 void ph_callback_thread(ph_callback_data_t *callback_data) {
   while(! callback_data->exit) {
+#if defined(HAVE_RB_THREAD_CALL_WITHOUT_GVL) && defined(HAVE_RUBY_THREAD_H)
+    rb_thread_call_without_gvl(wait_for_callback, (void *)callback_data, cancel_wait_for_callback, (void *)callback_data);
+#else
     rb_thread_blocking_region(wait_for_callback, (void *)callback_data, cancel_wait_for_callback, (void *)callback_data);
+#endif
     if(TYPE(callback_data->callback) != T_NIL) rb_funcall(callback_data->callback, rb_intern("call"), 1, callback_data->phidget);
     callback_data->called = false;
   };
 }
 
-VALUE wait_for_callback(void *arg) {
+ph_callback_return_t wait_for_callback(void *arg) {
   ph_callback_data_t *callback_data = (ph_callback_data_t *)arg;
   while(! callback_data->exit) {
     usleep(PH_CALLBACK_POLLING_INTERVAL);
-    if(callback_data->called) return Qnil;
+    if(callback_data->called) return (ph_callback_return_t)Qnil;
   };
-  return Qnil;
+  return (ph_callback_return_t)Qnil;
 }
 
 void cancel_wait_for_callback(void *arg) {

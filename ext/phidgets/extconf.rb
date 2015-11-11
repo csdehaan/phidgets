@@ -8,6 +8,10 @@ have_framework('Phidget21') unless RUBY_VERSION < '1.9.0'
 have_library('phidget21') 
 dir_config("phidgets")
 
+have_header('ruby/thread.h')
+have_func('rb_thread_blocking_region')
+have_func('rb_thread_call_without_gvl')
+
 $CFLAGS += ' -DPH_CALLBACK' unless RUBY_VERSION < '1.9.0'
 
 create_makefile("phidgets")
