@@ -28,5 +28,5 @@ require File.dirname(__FILE__) + '/phidgets/text_led.rb'
 require File.dirname(__FILE__) + '/phidgets/weight_sensor.rb'
 
 module Phidgets
-  VERSION = '0.1.3'
+  VERSION = '1.0.0'
 end
