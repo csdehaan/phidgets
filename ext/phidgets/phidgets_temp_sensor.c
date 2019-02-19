@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_temp_init(VALUE self);
 VALUE ph_temp_get_temperature_input_count(VALUE self);
 VALUE ph_temp_get_temperature(VALUE self, VALUE index);
@@ -18,10 +18,8 @@ VALUE ph_temp_get_ambient_temperature_max(VALUE self);
 VALUE ph_temp_get_thermocouple_type(VALUE self, VALUE index);
 VALUE ph_temp_set_thermocouple_type(VALUE self, VALUE index, VALUE thermocouple);
 
-#ifdef PH_CALLBACK
 VALUE ph_temp_set_on_temperature_change_handler(VALUE self, VALUE handler);
-int ph_temp_on_temperature_change(CPhidgetTemperatureSensorHandle phid, void *userPtr, int index, double temperature);
-#endif
+int ph_temp_on_temperature_change(PhidgetTemperatureSensorHandle phid, void *userPtr, int index, double temperature);
 
 
 void Init_temperature_sensor() {
@@ -141,9 +139,7 @@ void Init_temperature_sensor() {
    */
   rb_define_method(ph_temp, "setThermocoupleType", ph_temp_set_thermocouple_type, 2);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_temp, "ext_setOnTemperatureChangeHandler", ph_temp_set_on_temperature_change_handler, 1);
-#endif
 
   rb_define_alias(ph_temp, "temperature_input_count", "getTemperatureInputCount");
   rb_define_alias(ph_temp, "temperature", "getTemperature");
@@ -165,131 +161,128 @@ void Init_temperature_sensor() {
 
 VALUE ph_temp_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetTemperatureSensor_create((CPhidgetTemperatureSensorHandle *)(&(ph->handle))));
+  ph_raise(PhidgetTemperatureSensor_create((PhidgetTemperatureSensorHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_temp_get_temperature_input_count(VALUE self) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetTemperatureSensor_getTemperatureInputCount(handle, &count));
+  ph_raise(PhidgetTemperatureSensor_getTemperatureInputCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_temp_get_temperature(VALUE self, VALUE index) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   double temperature;
-  ph_raise(CPhidgetTemperatureSensor_getTemperature(handle, FIX2INT(index), &temperature));
+  ph_raise(PhidgetTemperatureSensor_getTemperature(handle, FIX2INT(index), &temperature));
   return rb_float_new(temperature);
 }
 
 VALUE ph_temp_get_temperature_min(VALUE self, VALUE index) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   double temperature;
-  ph_raise(CPhidgetTemperatureSensor_getTemperatureMin(handle, FIX2INT(index), &temperature));
+  ph_raise(PhidgetTemperatureSensor_getTemperatureMin(handle, FIX2INT(index), &temperature));
   return rb_float_new(temperature);
 }
 
 VALUE ph_temp_get_temperature_max(VALUE self, VALUE index) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   double temperature;
-  ph_raise(CPhidgetTemperatureSensor_getTemperatureMax(handle, FIX2INT(index), &temperature));
+  ph_raise(PhidgetTemperatureSensor_getTemperatureMax(handle, FIX2INT(index), &temperature));
   return rb_float_new(temperature);
 }
 
 VALUE ph_temp_get_temperature_change_trigger(VALUE self, VALUE index) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   double temperature;
-  ph_raise(CPhidgetTemperatureSensor_getTemperatureChangeTrigger(handle, FIX2INT(index), &temperature));
+  ph_raise(PhidgetTemperatureSensor_getTemperatureChangeTrigger(handle, FIX2INT(index), &temperature));
   return rb_float_new(temperature);
 }
 
 VALUE ph_temp_set_temperature_change_trigger(VALUE self, VALUE index, VALUE temperature) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTemperatureSensor_setTemperatureChangeTrigger(handle, FIX2INT(index), NUM2DBL(temperature)));
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
+  ph_raise(PhidgetTemperatureSensor_setTemperatureChangeTrigger(handle, FIX2INT(index), NUM2DBL(temperature)));
   return Qnil;
 }
 
 VALUE ph_temp_get_potential(VALUE self, VALUE index) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   double potential;
-  ph_raise(CPhidgetTemperatureSensor_getPotential(handle, FIX2INT(index), &potential));
+  ph_raise(PhidgetTemperatureSensor_getPotential(handle, FIX2INT(index), &potential));
   return rb_float_new(potential);
 }
 
 VALUE ph_temp_get_potential_min(VALUE self, VALUE index) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   double potential;
-  ph_raise(CPhidgetTemperatureSensor_getPotentialMin(handle, FIX2INT(index), &potential));
+  ph_raise(PhidgetTemperatureSensor_getPotentialMin(handle, FIX2INT(index), &potential));
   return rb_float_new(potential);
 }
 
 VALUE ph_temp_get_potential_max(VALUE self, VALUE index) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   double potential;
-  ph_raise(CPhidgetTemperatureSensor_getPotentialMax(handle, FIX2INT(index), &potential));
+  ph_raise(PhidgetTemperatureSensor_getPotentialMax(handle, FIX2INT(index), &potential));
   return rb_float_new(potential);
 }
 
 VALUE ph_temp_get_ambient_temperature(VALUE self) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   double temperature;
-  ph_raise(CPhidgetTemperatureSensor_getAmbientTemperature(handle, &temperature));
+  ph_raise(PhidgetTemperatureSensor_getAmbientTemperature(handle, &temperature));
   return rb_float_new(temperature);
 }
 
 VALUE ph_temp_get_ambient_temperature_min(VALUE self) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   double temperature;
-  ph_raise(CPhidgetTemperatureSensor_getAmbientTemperatureMin(handle, &temperature));
+  ph_raise(PhidgetTemperatureSensor_getAmbientTemperatureMin(handle, &temperature));
   return rb_float_new(temperature);
 }
 
 VALUE ph_temp_get_ambient_temperature_max(VALUE self) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
   double temperature;
-  ph_raise(CPhidgetTemperatureSensor_getAmbientTemperatureMax(handle, &temperature));
+  ph_raise(PhidgetTemperatureSensor_getAmbientTemperatureMax(handle, &temperature));
   return rb_float_new(temperature);
 }
 
 VALUE ph_temp_get_thermocouple_type(VALUE self, VALUE index) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
-  CPhidgetTemperatureSensor_ThermocoupleType type;
-  ph_raise(CPhidgetTemperatureSensor_getThermocoupleType(handle, FIX2INT(index), &type));
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
+  PhidgetTemperatureSensor_ThermocoupleType type;
+  ph_raise(PhidgetTemperatureSensor_getThermocoupleType(handle, FIX2INT(index), &type));
   return INT2FIX(type);
 }
 
 VALUE ph_temp_set_thermocouple_type(VALUE self, VALUE index, VALUE type) {
-  CPhidgetTemperatureSensorHandle handle = (CPhidgetTemperatureSensorHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTemperatureSensor_setThermocoupleType(handle, FIX2INT(index), (CPhidgetTemperatureSensor_ThermocoupleType)FIX2INT(type)));
+  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
+  ph_raise(PhidgetTemperatureSensor_setThermocoupleType(handle, FIX2INT(index), (PhidgetTemperatureSensor_ThermocoupleType)FIX2INT(type)));
   return Qnil;
 }
 
 
-#ifdef PH_CALLBACK
 VALUE ph_temp_set_on_temperature_change_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetTemperatureSensor_set_OnTemperatureChange_Handler((CPhidgetTemperatureSensorHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetTemperatureSensor_set_OnTemperatureChange_Handler((PhidgetTemperatureSensorHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetTemperatureSensor_set_OnTemperatureChange_Handler((CPhidgetTemperatureSensorHandle)ph->handle, ph_temp_on_temperature_change, (void *)callback_data));
+    ph_raise(PhidgetTemperatureSensor_set_OnTemperatureChange_Handler((PhidgetTemperatureSensorHandle)ph->handle, ph_temp_on_temperature_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_temp_on_temperature_change(CPhidgetTemperatureSensorHandle phid, void *userPtr, int index, double temperature) {
+int ph_temp_on_temperature_change(PhidgetTemperatureSensorHandle phid, void *userPtr, int index, double temperature) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
-
 #endif
-

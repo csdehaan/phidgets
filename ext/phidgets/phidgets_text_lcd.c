@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_textlcd_init(VALUE self);
 VALUE ph_textlcd_get_row_count(VALUE self);
 VALUE ph_textlcd_get_column_count(VALUE self);
@@ -238,144 +238,144 @@ void Init_text_lcd() {
 
 VALUE ph_textlcd_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetTextLCD_create((CPhidgetTextLCDHandle *)(&(ph->handle))));
+  ph_raise(PhidgetTextLCD_create((PhidgetTextLCDHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_textlcd_get_row_count(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetTextLCD_getRowCount(handle, &count));
+  ph_raise(PhidgetTextLCD_getRowCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_textlcd_get_column_count(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetTextLCD_getColumnCount(handle, &count));
+  ph_raise(PhidgetTextLCD_getColumnCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_textlcd_get_backlight(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetTextLCD_getBacklight(handle, &state));
+  ph_raise(PhidgetTextLCD_getBacklight(handle, &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_textlcd_set_backlight(VALUE self, VALUE state) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTextLCD_setBacklight(handle, TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  ph_raise(PhidgetTextLCD_setBacklight(handle, TYPE(state) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_textlcd_get_brightness(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
   int brightness;
-  ph_raise(CPhidgetTextLCD_getBrightness(handle, &brightness));
+  ph_raise(PhidgetTextLCD_getBrightness(handle, &brightness));
   return INT2FIX(brightness);
 }
 
 VALUE ph_textlcd_set_brightness(VALUE self, VALUE brightness) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTextLCD_setBrightness(handle, FIX2INT(brightness)));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  ph_raise(PhidgetTextLCD_setBrightness(handle, FIX2INT(brightness)));
   return Qnil;
 }
 
 VALUE ph_textlcd_get_contrast(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
   int contrast;
-  ph_raise(CPhidgetTextLCD_getContrast(handle, &contrast));
+  ph_raise(PhidgetTextLCD_getContrast(handle, &contrast));
   return INT2FIX(contrast);
 }
 
 VALUE ph_textlcd_set_contrast(VALUE self, VALUE contrast) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTextLCD_setContrast(handle, FIX2INT(contrast)));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  ph_raise(PhidgetTextLCD_setContrast(handle, FIX2INT(contrast)));
   return Qnil;
 }
 
 VALUE ph_textlcd_get_cursor_on(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetTextLCD_getCursorOn(handle, &state));
+  ph_raise(PhidgetTextLCD_getCursorOn(handle, &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_textlcd_set_cursor_on(VALUE self, VALUE state) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTextLCD_setCursorOn(handle, TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  ph_raise(PhidgetTextLCD_setCursorOn(handle, TYPE(state) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_textlcd_get_cursor_blink(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetTextLCD_getCursorBlink(handle, &state));
+  ph_raise(PhidgetTextLCD_getCursorBlink(handle, &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_textlcd_set_cursor_blink(VALUE self, VALUE state) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTextLCD_setCursorBlink(handle, TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  ph_raise(PhidgetTextLCD_setCursorBlink(handle, TYPE(state) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_textlcd_set_custom_character(VALUE self, VALUE index, VALUE var1, VALUE var2) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTextLCD_setCustomCharacter(handle, FIX2INT(index), FIX2INT(var1), FIX2INT(var2)));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  ph_raise(PhidgetTextLCD_setCustomCharacter(handle, FIX2INT(index), FIX2INT(var1), FIX2INT(var2)));
   return Qnil;
 }
 
 VALUE ph_textlcd_set_display_character(VALUE self, VALUE index, VALUE column, VALUE character) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
   char *str = StringValueCStr(character);
-  ph_raise(CPhidgetTextLCD_setDisplayCharacter(handle, FIX2INT(index), FIX2INT(column), str[0]));
+  ph_raise(PhidgetTextLCD_setDisplayCharacter(handle, FIX2INT(index), FIX2INT(column), str[0]));
   return Qnil;
 }
 
 VALUE ph_textlcd_set_display_string(VALUE self, VALUE index, VALUE string) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTextLCD_setDisplayString(handle, FIX2INT(index), StringValueCStr(string)));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  ph_raise(PhidgetTextLCD_setDisplayString(handle, FIX2INT(index), StringValueCStr(string)));
   return Qnil;
 }
 
 VALUE ph_textlcd_get_screen_count(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetTextLCD_getScreenCount(handle, &count));
+  ph_raise(PhidgetTextLCD_getScreenCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_textlcd_get_screen(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
   int screen;
-  ph_raise(CPhidgetTextLCD_getScreen(handle, &screen));
+  ph_raise(PhidgetTextLCD_getScreen(handle, &screen));
   return INT2FIX(screen);
 }
 
 VALUE ph_textlcd_set_screen(VALUE self, VALUE screen) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTextLCD_setScreen(handle, FIX2INT(screen)));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  ph_raise(PhidgetTextLCD_setScreen(handle, FIX2INT(screen)));
   return Qnil;
 }
 
 VALUE ph_textlcd_get_screen_size(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  CPhidgetTextLCD_ScreenSize screen;
-  ph_raise(CPhidgetTextLCD_getScreenSize(handle, &screen));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  PhidgetTextLCD_ScreenSize screen;
+  ph_raise(PhidgetTextLCD_getScreenSize(handle, &screen));
   return INT2FIX(screen);
 }
 
 VALUE ph_textlcd_set_screen_size(VALUE self, VALUE screen) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTextLCD_setScreenSize(handle, (CPhidgetTextLCD_ScreenSize)FIX2INT(screen)));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  ph_raise(PhidgetTextLCD_setScreenSize(handle, (PhidgetTextLCD_ScreenSize)FIX2INT(screen)));
   return Qnil;
 }
 
 VALUE ph_textlcd_init_screen(VALUE self) {
-  CPhidgetTextLCDHandle handle = (CPhidgetTextLCDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetTextLCD_initialize(handle));
+  PhidgetTextLCDHandle handle = (PhidgetTextLCDHandle)get_ph_handle(self);
+  ph_raise(PhidgetTextLCD_initialize(handle));
   return Qnil;
 }
-
+#endif

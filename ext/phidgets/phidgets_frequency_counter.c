@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_freq_init(VALUE self);
 VALUE ph_freq_get_frequency_input_count(VALUE self);
 VALUE ph_freq_reset(VALUE self, VALUE index);
@@ -15,10 +15,8 @@ VALUE ph_freq_set_enabled(VALUE self, VALUE index, VALUE state);
 VALUE ph_freq_get_filter(VALUE self, VALUE index);
 VALUE ph_freq_set_filter(VALUE self, VALUE index, VALUE filter);
 
-#ifdef PH_CALLBACK
 VALUE ph_freq_set_on_count_handler(VALUE self, VALUE handler);
-int ph_freq_on_count(CPhidgetFrequencyCounterHandle phid, void *userPtr, int index, int time, int counts);
-#endif
+int ph_freq_on_count(PhidgetFrequencyCounterHandle phid, void *userPtr, int index, int time, int counts);
 
 
 void Init_frequency_counter() {
@@ -114,9 +112,7 @@ void Init_frequency_counter() {
    */
   rb_define_method(ph_freq, "setFilter", ph_freq_set_filter, 2);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_freq, "ext_setOnCountHandler", ph_freq_set_on_count_handler, 1);
-#endif
 
   rb_define_alias(ph_freq, "frequency_input_count", "getFrequencyInputCount");
   rb_define_alias(ph_freq, "frequency", "getFrequency");
@@ -134,108 +130,105 @@ void Init_frequency_counter() {
 
 VALUE ph_freq_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetFrequencyCounter_create((CPhidgetFrequencyCounterHandle *)(&(ph->handle))));
+  ph_raise(PhidgetFrequencyCounter_create((PhidgetFrequencyCounterHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_freq_get_frequency_input_count(VALUE self) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetFrequencyCounter_getFrequencyInputCount(handle, &count));
+  ph_raise(PhidgetFrequencyCounter_getFrequencyInputCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_freq_reset(VALUE self, VALUE index) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
-  ph_raise(CPhidgetFrequencyCounter_reset(handle, FIX2INT(index)));
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
+  ph_raise(PhidgetFrequencyCounter_reset(handle, FIX2INT(index)));
   return Qnil;
 }
 
 VALUE ph_freq_get_frequency(VALUE self, VALUE index) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
   double freq;
-  ph_raise(CPhidgetFrequencyCounter_getFrequency(handle, FIX2INT(index), &freq));
+  ph_raise(PhidgetFrequencyCounter_getFrequency(handle, FIX2INT(index), &freq));
   return rb_float_new(freq);
 }
 
 VALUE ph_freq_get_total_time(VALUE self, VALUE index) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
   __int64 time;
-  ph_raise(CPhidgetFrequencyCounter_getTotalTime(handle, FIX2INT(index), &time));
+  ph_raise(PhidgetFrequencyCounter_getTotalTime(handle, FIX2INT(index), &time));
   return INT2NUM(time);
 }
 
 VALUE ph_freq_get_total_count(VALUE self, VALUE index) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
   __int64 count;
-  ph_raise(CPhidgetFrequencyCounter_getTotalCount(handle, FIX2INT(index), &count));
+  ph_raise(PhidgetFrequencyCounter_getTotalCount(handle, FIX2INT(index), &count));
   return INT2NUM(count);
 }
 
 VALUE ph_freq_get_timeout(VALUE self, VALUE index) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
   int timeout;
-  ph_raise(CPhidgetFrequencyCounter_getTimeout(handle, FIX2INT(index), &timeout));
+  ph_raise(PhidgetFrequencyCounter_getTimeout(handle, FIX2INT(index), &timeout));
   return INT2FIX(timeout);
 }
 
 VALUE ph_freq_set_timeout(VALUE self, VALUE index, VALUE timeout) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
-  ph_raise(CPhidgetFrequencyCounter_setTimeout(handle, FIX2INT(index), FIX2INT(timeout)));
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
+  ph_raise(PhidgetFrequencyCounter_setTimeout(handle, FIX2INT(index), FIX2INT(timeout)));
   return Qnil;
 }
 
 VALUE ph_freq_get_enabled(VALUE self, VALUE index) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetFrequencyCounter_getEnabled(handle, FIX2INT(index), &state));
+  ph_raise(PhidgetFrequencyCounter_getEnabled(handle, FIX2INT(index), &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_freq_set_enabled(VALUE self, VALUE index, VALUE state) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
-  ph_raise(CPhidgetFrequencyCounter_setEnabled(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
+  ph_raise(PhidgetFrequencyCounter_setEnabled(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_freq_get_filter(VALUE self, VALUE index) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
-  CPhidgetFrequencyCounter_FilterType filter;
-  ph_raise(CPhidgetFrequencyCounter_getFilter(handle, FIX2INT(index), &filter));
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
+  PhidgetFrequencyCounter_FilterType filter;
+  ph_raise(PhidgetFrequencyCounter_getFilter(handle, FIX2INT(index), &filter));
   return INT2FIX(filter);
 }
 
 VALUE ph_freq_set_filter(VALUE self, VALUE index, VALUE filter) {
-  CPhidgetFrequencyCounterHandle handle = (CPhidgetFrequencyCounterHandle)get_ph_handle(self);
-  ph_raise(CPhidgetFrequencyCounter_setFilter(handle, FIX2INT(index), FIX2INT(filter)));
+  PhidgetFrequencyCounterHandle handle = (PhidgetFrequencyCounterHandle)get_ph_handle(self);
+  ph_raise(PhidgetFrequencyCounter_setFilter(handle, FIX2INT(index), FIX2INT(filter)));
   return Qnil;
 }
 
 
-#ifdef PH_CALLBACK
 VALUE ph_freq_set_on_count_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetFrequencyCounter_set_OnCount_Handler((CPhidgetFrequencyCounterHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetFrequencyCounter_set_OnCount_Handler((PhidgetFrequencyCounterHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetFrequencyCounter_set_OnCount_Handler((CPhidgetFrequencyCounterHandle)ph->handle, ph_freq_on_count, (void *)callback_data));
+    ph_raise(PhidgetFrequencyCounter_set_OnCount_Handler((PhidgetFrequencyCounterHandle)ph->handle, ph_freq_on_count, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_freq_on_count(CPhidgetFrequencyCounterHandle phid, void *userPtr, int index, int time, int counts) {
+int ph_freq_on_count(PhidgetFrequencyCounterHandle phid, void *userPtr, int index, int time, int counts) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
-
 #endif
-

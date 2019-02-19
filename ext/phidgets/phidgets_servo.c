@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_servo_init(VALUE self);
 VALUE ph_servo_get_motor_count(VALUE self);
 VALUE ph_servo_get_position(VALUE self, VALUE index);
@@ -14,10 +14,8 @@ VALUE ph_servo_get_servo_type(VALUE self, VALUE index);
 VALUE ph_servo_set_servo_type(VALUE self, VALUE index, VALUE type);
 VALUE ph_servo_set_servo_parameters(VALUE self, VALUE index, VALUE min_us, VALUE max_us, VALUE degrees);
 
-#ifdef PH_CALLBACK
 VALUE ph_servo_set_on_position_change_handler(VALUE self, VALUE handler);
-int ph_servo_on_position_change(CPhidgetServoHandle phid, void *userPtr, int index, double position);
-#endif
+int ph_servo_on_position_change(PhidgetServoHandle phid, void *userPtr, int index, double position);
 
 
 void Init_servo() {
@@ -156,9 +154,7 @@ void Init_servo() {
    */
   rb_define_method(ph_servo, "setServoParameters", ph_servo_set_servo_parameters, 4);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_servo, "ext_setOnPositionChangeHandler", ph_servo_set_on_position_change_handler, 1);
-#endif
 
   rb_define_alias(ph_servo, "motor_count", "getMotorCount");
   rb_define_alias(ph_servo, "position", "getPosition");
@@ -176,101 +172,98 @@ void Init_servo() {
 
 VALUE ph_servo_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetServo_create((CPhidgetServoHandle *)(&(ph->handle))));
+  ph_raise(PhidgetServo_create((PhidgetServoHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_servo_get_motor_count(VALUE self) {
-  CPhidgetServoHandle handle = (CPhidgetServoHandle)get_ph_handle(self);
+  PhidgetServoHandle handle = (PhidgetServoHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetServo_getMotorCount(handle, &count));
+  ph_raise(PhidgetServo_getMotorCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_servo_get_position(VALUE self, VALUE index) {
-  CPhidgetServoHandle handle = (CPhidgetServoHandle)get_ph_handle(self);
+  PhidgetServoHandle handle = (PhidgetServoHandle)get_ph_handle(self);
   double position;
-  ph_raise(CPhidgetServo_getPosition(handle, FIX2INT(index), &position));
+  ph_raise(PhidgetServo_getPosition(handle, FIX2INT(index), &position));
   return rb_float_new(position);
 }
 
 VALUE ph_servo_get_position_min(VALUE self, VALUE index) {
-  CPhidgetServoHandle handle = (CPhidgetServoHandle)get_ph_handle(self);
+  PhidgetServoHandle handle = (PhidgetServoHandle)get_ph_handle(self);
   double position;
-  ph_raise(CPhidgetServo_getPositionMin(handle, FIX2INT(index), &position));
+  ph_raise(PhidgetServo_getPositionMin(handle, FIX2INT(index), &position));
   return rb_float_new(position);
 }
 
 VALUE ph_servo_get_position_max(VALUE self, VALUE index) {
-  CPhidgetServoHandle handle = (CPhidgetServoHandle)get_ph_handle(self);
+  PhidgetServoHandle handle = (PhidgetServoHandle)get_ph_handle(self);
   double position;
-  ph_raise(CPhidgetServo_getPositionMax(handle, FIX2INT(index), &position));
+  ph_raise(PhidgetServo_getPositionMax(handle, FIX2INT(index), &position));
   return rb_float_new(position);
 }
 
 VALUE ph_servo_set_position(VALUE self, VALUE index, VALUE position) {
-  CPhidgetServoHandle handle = (CPhidgetServoHandle)get_ph_handle(self);
-  ph_raise(CPhidgetServo_setPosition(handle, FIX2INT(index), NUM2DBL(position)));
+  PhidgetServoHandle handle = (PhidgetServoHandle)get_ph_handle(self);
+  ph_raise(PhidgetServo_setPosition(handle, FIX2INT(index), NUM2DBL(position)));
   return Qnil;
 }
 
 VALUE ph_servo_get_engaged(VALUE self, VALUE index) {
-  CPhidgetServoHandle handle = (CPhidgetServoHandle)get_ph_handle(self);
+  PhidgetServoHandle handle = (PhidgetServoHandle)get_ph_handle(self);
   int engaged;
-  ph_raise(CPhidgetServo_getEngaged(handle, FIX2INT(index), &engaged));
+  ph_raise(PhidgetServo_getEngaged(handle, FIX2INT(index), &engaged));
   return engaged == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_servo_set_engaged(VALUE self, VALUE index, VALUE engaged) {
-  CPhidgetServoHandle handle = (CPhidgetServoHandle)get_ph_handle(self);
-  ph_raise(CPhidgetServo_setEngaged(handle, FIX2INT(index), TYPE(engaged) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetServoHandle handle = (PhidgetServoHandle)get_ph_handle(self);
+  ph_raise(PhidgetServo_setEngaged(handle, FIX2INT(index), TYPE(engaged) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_servo_get_servo_type(VALUE self, VALUE index) {
-  CPhidgetServoHandle handle = (CPhidgetServoHandle)get_ph_handle(self);
-  CPhidget_ServoType type;
-  ph_raise(CPhidgetServo_getServoType(handle, FIX2INT(index), &type));
+  PhidgetServoHandle handle = (PhidgetServoHandle)get_ph_handle(self);
+  Phidget_ServoType type;
+  ph_raise(PhidgetServo_getServoType(handle, FIX2INT(index), &type));
   return INT2FIX(type);
 }
 
 VALUE ph_servo_set_servo_type(VALUE self, VALUE index, VALUE type) {
-  CPhidgetServoHandle handle = (CPhidgetServoHandle)get_ph_handle(self);
-  ph_raise(CPhidgetServo_setServoType(handle, FIX2INT(index), (CPhidget_ServoType)FIX2INT(type)));
+  PhidgetServoHandle handle = (PhidgetServoHandle)get_ph_handle(self);
+  ph_raise(PhidgetServo_setServoType(handle, FIX2INT(index), (Phidget_ServoType)FIX2INT(type)));
   return Qnil;
 }
 
 VALUE ph_servo_set_servo_parameters(VALUE self, VALUE index, VALUE min_us, VALUE max_us, VALUE degrees) {
-  CPhidgetServoHandle handle = (CPhidgetServoHandle)get_ph_handle(self);
-  ph_raise(CPhidgetServo_setServoParameters(handle, FIX2INT(index), NUM2DBL(min_us), NUM2DBL(max_us), NUM2DBL(degrees)));
+  PhidgetServoHandle handle = (PhidgetServoHandle)get_ph_handle(self);
+  ph_raise(PhidgetServo_setServoParameters(handle, FIX2INT(index), NUM2DBL(min_us), NUM2DBL(max_us), NUM2DBL(degrees)));
   return Qnil;
 }
 
 
-#ifdef PH_CALLBACK
 VALUE ph_servo_set_on_position_change_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetServo_set_OnPositionChange_Handler((CPhidgetServoHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetServo_set_OnPositionChange_Handler((PhidgetServoHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetServo_set_OnPositionChange_Handler((CPhidgetServoHandle)ph->handle, ph_servo_on_position_change, (void *)callback_data));
+    ph_raise(PhidgetServo_set_OnPositionChange_Handler((PhidgetServoHandle)ph->handle, ph_servo_on_position_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_servo_on_position_change(CPhidgetServoHandle phid, void *userPtr, int index, double position) {
+int ph_servo_on_position_change(PhidgetServoHandle phid, void *userPtr, int index, double position) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
-
 #endif
-

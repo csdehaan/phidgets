@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_accel_init(VALUE self);
 VALUE ph_accel_get_axis_count(VALUE self);
 VALUE ph_accel_get_acceleration(VALUE self, VALUE index);
@@ -10,10 +10,8 @@ VALUE ph_accel_get_acceleration_max(VALUE self, VALUE index);
 VALUE ph_accel_get_acceleration_change_trigger(VALUE self, VALUE index);
 VALUE ph_accel_set_acceleration_change_trigger(VALUE self, VALUE index, VALUE trigger);
 
-#ifdef PH_CALLBACK
 VALUE ph_accel_set_on_acceleration_change_handler(VALUE self, VALUE handler);
-int ph_accel_on_acceleration_change(CPhidgetAccelerometerHandle phid, void *userPtr, int index, double accel);
-#endif
+int ph_accel_on_acceleration_change(PhidgetAccelerometerHandle phid, void *userPtr, int index, double accel);
 
 
 
@@ -71,9 +69,7 @@ void Init_accelerometer() {
    */
   rb_define_method(ph_accel, "setAccelerationChangeTrigger", ph_accel_set_acceleration_change_trigger, 2);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_accel, "ext_setOnAccelerationChangeHandler", ph_accel_set_on_acceleration_change_handler, 1);
-#endif
 
   rb_define_alias(ph_accel, "axis_count", "getAxisCount");
   rb_define_alias(ph_accel, "acceleration", "getAcceleration");
@@ -86,80 +82,78 @@ void Init_accelerometer() {
 
 VALUE ph_accel_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetAccelerometer_create((CPhidgetAccelerometerHandle *)(&(ph->handle))));
+  ph_raise(PhidgetAccelerometer_create((PhidgetAccelerometerHandle *)(&(ph->handle))));
   return self;
 }
 
 
 VALUE ph_accel_get_axis_count(VALUE self) {
-  CPhidgetAccelerometerHandle handle = (CPhidgetAccelerometerHandle)get_ph_handle(self);
+  PhidgetAccelerometerHandle handle = (PhidgetAccelerometerHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetAccelerometer_getAxisCount(handle, &count));
+  ph_raise(PhidgetAccelerometer_getAxisCount(handle, &count));
   return INT2FIX(count);
 }
 
 
 VALUE ph_accel_get_acceleration(VALUE self, VALUE index) {
-  CPhidgetAccelerometerHandle handle = (CPhidgetAccelerometerHandle)get_ph_handle(self);
+  PhidgetAccelerometerHandle handle = (PhidgetAccelerometerHandle)get_ph_handle(self);
   double accel;
-  ph_raise(CPhidgetAccelerometer_getAcceleration(handle, NUM2INT(index), &accel));
+  ph_raise(PhidgetAccelerometer_getAcceleration(handle, NUM2INT(index), &accel));
   return rb_float_new(accel);
 }
 
 
 VALUE ph_accel_get_acceleration_min(VALUE self, VALUE index) {
-  CPhidgetAccelerometerHandle handle = (CPhidgetAccelerometerHandle)get_ph_handle(self);
+  PhidgetAccelerometerHandle handle = (PhidgetAccelerometerHandle)get_ph_handle(self);
   double accel;
-  ph_raise(CPhidgetAccelerometer_getAccelerationMin(handle, NUM2INT(index), &accel));
+  ph_raise(PhidgetAccelerometer_getAccelerationMin(handle, NUM2INT(index), &accel));
   return rb_float_new(accel);
 }
 
 
 VALUE ph_accel_get_acceleration_max(VALUE self, VALUE index) {
-  CPhidgetAccelerometerHandle handle = (CPhidgetAccelerometerHandle)get_ph_handle(self);
+  PhidgetAccelerometerHandle handle = (PhidgetAccelerometerHandle)get_ph_handle(self);
   double accel;
-  ph_raise(CPhidgetAccelerometer_getAccelerationMax(handle, NUM2INT(index), &accel));
+  ph_raise(PhidgetAccelerometer_getAccelerationMax(handle, NUM2INT(index), &accel));
   return rb_float_new(accel);
 }
 
 
 VALUE ph_accel_get_acceleration_change_trigger(VALUE self, VALUE index) {
-  CPhidgetAccelerometerHandle handle = (CPhidgetAccelerometerHandle)get_ph_handle(self);
+  PhidgetAccelerometerHandle handle = (PhidgetAccelerometerHandle)get_ph_handle(self);
   double trigger;
-  ph_raise(CPhidgetAccelerometer_getAccelerationChangeTrigger(handle, NUM2INT(index), &trigger));
+  ph_raise(PhidgetAccelerometer_getAccelerationChangeTrigger(handle, NUM2INT(index), &trigger));
   return rb_float_new(trigger);
 }
 
 
 VALUE ph_accel_set_acceleration_change_trigger(VALUE self, VALUE index, VALUE trigger) {
-  CPhidgetAccelerometerHandle handle = (CPhidgetAccelerometerHandle)get_ph_handle(self);
-  ph_raise(CPhidgetAccelerometer_setAccelerationChangeTrigger(handle, NUM2INT(index), NUM2DBL(trigger)));
+  PhidgetAccelerometerHandle handle = (PhidgetAccelerometerHandle)get_ph_handle(self);
+  ph_raise(PhidgetAccelerometer_setAccelerationChangeTrigger(handle, NUM2INT(index), NUM2DBL(trigger)));
   return Qnil;
 }
 
-#ifdef PH_CALLBACK
 VALUE ph_accel_set_on_acceleration_change_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetAccelerometer_set_OnAccelerationChange_Handler((CPhidgetAccelerometerHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetAccelerometer_set_OnAccelerationChange_Handler((PhidgetAccelerometerHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetAccelerometer_set_OnAccelerationChange_Handler((CPhidgetAccelerometerHandle)ph->handle, ph_accel_on_acceleration_change, (void *)callback_data));
+    ph_raise(PhidgetAccelerometer_set_OnAccelerationChange_Handler((PhidgetAccelerometerHandle)ph->handle, ph_accel_on_acceleration_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_accel_on_acceleration_change(CPhidgetAccelerometerHandle phid, void *userPtr, int index, double accel) {
+int ph_accel_on_acceleration_change(PhidgetAccelerometerHandle phid, void *userPtr, int index, double accel) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 #endif
-

@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_bridge_init(VALUE self);
 VALUE ph_bridge_get_input_count(VALUE self);
 VALUE ph_bridge_get_bridge_value(VALUE self, VALUE index);
@@ -16,10 +16,8 @@ VALUE ph_bridge_get_data_rate_min(VALUE self);
 VALUE ph_bridge_get_data_rate_max(VALUE self);
 VALUE ph_bridge_set_data_rate(VALUE self, VALUE milliseconds);
 
-#ifdef PH_CALLBACK
 VALUE ph_bridge_set_on_bridge_data_handler(VALUE self, VALUE handler);
-int ph_bridge_on_bridge_data(CPhidgetBridgeHandle phid, void *userPtr, int index, double value);
-#endif
+int ph_bridge_on_bridge_data(PhidgetBridgeHandle phid, void *userPtr, int index, double value);
 
 
 void Init_bridge() {
@@ -126,9 +124,7 @@ void Init_bridge() {
    */
   rb_define_method(ph_bridge, "setDataRate", ph_bridge_set_data_rate, 1);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_bridge, "ext_setOnBridgeDataHandler", ph_bridge_set_on_bridge_data_handler, 1);
-#endif
 
   rb_define_alias(ph_bridge, "input_count", "getInputCount");
   rb_define_alias(ph_bridge, "bridge_value", "getBridgeValue");
@@ -148,116 +144,113 @@ void Init_bridge() {
 
 VALUE ph_bridge_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetBridge_create((CPhidgetBridgeHandle *)(&(ph->handle))));
+  ph_raise(PhidgetBridge_create((PhidgetBridgeHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_bridge_get_input_count(VALUE self) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetBridge_getInputCount(handle, &count));
+  ph_raise(PhidgetBridge_getInputCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_bridge_get_bridge_value(VALUE self, VALUE index) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetBridge_getBridgeValue(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetBridge_getBridgeValue(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_bridge_get_bridge_min(VALUE self, VALUE index) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetBridge_getBridgeMin(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetBridge_getBridgeMin(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_bridge_get_bridge_max(VALUE self, VALUE index) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetBridge_getBridgeMax(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetBridge_getBridgeMax(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_bridge_get_enabled(VALUE self, VALUE index) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetBridge_getEnabled(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetBridge_getEnabled(handle, FIX2INT(index), &value));
   return value == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_bridge_set_enabled(VALUE self, VALUE index, VALUE state) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
-  ph_raise(CPhidgetBridge_setEnabled(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
+  ph_raise(PhidgetBridge_setEnabled(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_bridge_get_gain(VALUE self, VALUE index) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
-  CPhidgetBridge_Gain value;
-  ph_raise(CPhidgetBridge_getGain(handle, FIX2INT(index), &value));
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
+  PhidgetBridge_Gain value;
+  ph_raise(PhidgetBridge_getGain(handle, FIX2INT(index), &value));
   return INT2FIX(value);
 }
 
 VALUE ph_bridge_set_gain(VALUE self, VALUE index, VALUE gain) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
-  ph_raise(CPhidgetBridge_setGain(handle, FIX2INT(index), FIX2INT(gain)));
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
+  ph_raise(PhidgetBridge_setGain(handle, FIX2INT(index), FIX2INT(gain)));
   return Qnil;
 }
 
 VALUE ph_bridge_get_data_rate(VALUE self) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetBridge_getDataRate(handle, &value));
+  ph_raise(PhidgetBridge_getDataRate(handle, &value));
   return INT2FIX(value);
 }
 
 VALUE ph_bridge_get_data_rate_min(VALUE self) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetBridge_getDataRateMin(handle, &value));
+  ph_raise(PhidgetBridge_getDataRateMin(handle, &value));
   return INT2FIX(value);
 }
 
 VALUE ph_bridge_get_data_rate_max(VALUE self) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetBridge_getDataRateMax(handle, &value));
+  ph_raise(PhidgetBridge_getDataRateMax(handle, &value));
   return INT2FIX(value);
 }
 
 VALUE ph_bridge_set_data_rate(VALUE self, VALUE milliseconds) {
-  CPhidgetBridgeHandle handle = (CPhidgetBridgeHandle)get_ph_handle(self);
-  ph_raise(CPhidgetBridge_setDataRate(handle, FIX2INT(milliseconds)));
+  PhidgetBridgeHandle handle = (PhidgetBridgeHandle)get_ph_handle(self);
+  ph_raise(PhidgetBridge_setDataRate(handle, FIX2INT(milliseconds)));
   return Qnil;
 }
 
 
-#ifdef PH_CALLBACK
 VALUE ph_bridge_set_on_bridge_data_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetBridge_set_OnBridgeData_Handler((CPhidgetBridgeHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetBridge_set_OnBridgeData_Handler((PhidgetBridgeHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetBridge_set_OnBridgeData_Handler((CPhidgetBridgeHandle)ph->handle, ph_bridge_on_bridge_data, (void *)callback_data));
+    ph_raise(PhidgetBridge_set_OnBridgeData_Handler((PhidgetBridgeHandle)ph->handle, ph_bridge_on_bridge_data, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_bridge_on_bridge_data(CPhidgetBridgeHandle phid, void *userPtr, int index, double value) {
+int ph_bridge_on_bridge_data(PhidgetBridgeHandle phid, void *userPtr, int index, double value) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
-
 #endif
-

@@ -3,57 +3,45 @@
 #include <math.h>
 #include <time.h>
 #include <unistd.h>
+#include <semaphore.h>
 
 #include <ruby.h>
-#include <phidget21.h>
+#include <phidget22.h>
 
 #ifndef _PHIDGETS_EXT_
 #define _PHIDGETS_EXT_
 
 
 #define PH_CALLBACK_POLLING_INTERVAL   100000
-#define EPHIDGET_NOTIMPLEMENTED        PHIDGET_ERROR_CODE_COUNT
+#define EPHIDGET_NOTIMPLEMENTED        0x5000
 
 
-#ifdef PH_CALLBACK
 typedef struct ph_callback_data {
-  volatile bool called;
+  sem_t sem;
   volatile bool exit;
   VALUE phidget;
   VALUE callback;
+  VALUE arg1;
+  VALUE arg2;
 } ph_callback_data_t;
 
 void ph_callback_thread(ph_callback_data_t *callback_data);
-#if defined(HAVE_RB_THREAD_CALL_WITHOUT_GVL) && defined(HAVE_RUBY_THREAD_H)
-typedef void * ph_callback_return_t;
-#else
-typedef VALUE ph_callback_return_t;
-#endif
-ph_callback_return_t wait_for_callback(void *arg);
+void *wait_for_callback(void *arg);
 void cancel_wait_for_callback(void *arg);
-#endif
 
 
 typedef struct ph_data {
-  CPhidgetHandle handle;
-#ifdef PH_CALLBACK
+  PhidgetHandle handle;
   ph_callback_data_t attach_callback;
   ph_callback_data_t detach_callback;
-  ph_callback_data_t server_connect_callback;
-  ph_callback_data_t server_disconnect_callback;
-  ph_callback_data_t dev_callback_1;
-  ph_callback_data_t dev_callback_2;
-  ph_callback_data_t dev_callback_3;
-  ph_callback_data_t dev_callback_4;
-  ph_callback_data_t dev_callback_5;
-  ph_callback_data_t dev_callback_6;
-  ph_callback_data_t dev_callback_7;
-  ph_callback_data_t dev_callback_8;
-#endif
+  ph_callback_data_t error_callback;
+  ph_callback_data_t property_change_callback;
+  ph_callback_data_t dev_callbacks[4];
 } ph_data_t;
 
 
 void Init_phidgets();
+void Init_logging();
 void Init_dictionary();
 void Init_manager();
 void Init_common();
@@ -64,7 +52,8 @@ void Init_bridge();
 void Init_encoder();
 void Init_frequency_counter();
 void Init_gps();
-void Init_interface_kit();
+void Init_digital_input();
+void Init_digital_output();
 void Init_ir();
 void Init_led();
 void Init_motor_control();
@@ -80,7 +69,7 @@ void Init_weight_sensor();
 
 
 ph_data_t *get_ph_data(VALUE self);
-CPhidgetHandle get_ph_handle(VALUE self);
+PhidgetHandle get_ph_handle(VALUE self);
 void ph_raise(int err_code);
 
 #endif

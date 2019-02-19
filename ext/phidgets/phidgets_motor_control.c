@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_motor_init(VALUE self);
 VALUE ph_motor_get_motor_count(VALUE self);
 VALUE ph_motor_get_velocity(VALUE self, VALUE index);
@@ -28,7 +28,6 @@ VALUE ph_motor_get_sensor_raw_value(VALUE self, VALUE index);
 VALUE ph_motor_get_ratiometric(VALUE self);
 VALUE ph_motor_set_ratiometric(VALUE self, VALUE ratiometric);
 
-#ifdef PH_CALLBACK
 VALUE ph_motor_set_on_velocity_change_handler(VALUE self, VALUE handler);
 VALUE ph_motor_set_on_current_change_handler(VALUE self, VALUE handler);
 VALUE ph_motor_set_on_current_update_handler(VALUE self, VALUE handler);
@@ -37,15 +36,14 @@ VALUE ph_motor_set_on_encoder_position_change_handler(VALUE self, VALUE handler)
 VALUE ph_motor_set_on_encoder_position_update_handler(VALUE self, VALUE handler);
 VALUE ph_motor_set_on_back_emf_update_handler(VALUE self, VALUE handler);
 VALUE ph_motor_set_on_sensor_update_handler(VALUE self, VALUE handler);
-int ph_motor_on_velocity_change(CPhidgetMotorControlHandle phid, void *userPtr, int index, double velocity);
-int ph_motor_on_current_change(CPhidgetMotorControlHandle phid, void *userPtr, int index, double current);
-int ph_motor_on_current_update(CPhidgetMotorControlHandle phid, void *userPtr, int index, double current);
-int ph_motor_on_input_change(CPhidgetMotorControlHandle phid, void *userPtr, int index, int state);
-int ph_motor_on_encoder_position_change(CPhidgetMotorControlHandle phid, void *userPtr, int index, int time, int change);
-int ph_motor_on_encoder_position_update(CPhidgetMotorControlHandle phid, void *userPtr, int index, int change);
-int ph_motor_on_back_emf_update(CPhidgetMotorControlHandle phid, void *userPtr, int index, double voltage);
-int ph_motor_on_sensor_update(CPhidgetMotorControlHandle phid, void *userPtr, int index, int value);
-#endif
+int ph_motor_on_velocity_change(PhidgetMotorControlHandle phid, void *userPtr, int index, double velocity);
+int ph_motor_on_current_change(PhidgetMotorControlHandle phid, void *userPtr, int index, double current);
+int ph_motor_on_current_update(PhidgetMotorControlHandle phid, void *userPtr, int index, double current);
+int ph_motor_on_input_change(PhidgetMotorControlHandle phid, void *userPtr, int index, int state);
+int ph_motor_on_encoder_position_change(PhidgetMotorControlHandle phid, void *userPtr, int index, int time, int change);
+int ph_motor_on_encoder_position_update(PhidgetMotorControlHandle phid, void *userPtr, int index, int change);
+int ph_motor_on_back_emf_update(PhidgetMotorControlHandle phid, void *userPtr, int index, double voltage);
+int ph_motor_on_sensor_update(PhidgetMotorControlHandle phid, void *userPtr, int index, int value);
 
 
 void Init_motor_control() {
@@ -229,7 +227,6 @@ void Init_motor_control() {
    */
   rb_define_method(ph_motor, "setRatiometric", ph_motor_set_ratiometric, 1);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_motor, "ext_setOnVelocityChangeHandler", ph_motor_set_on_velocity_change_handler, 1);
   rb_define_private_method(ph_motor, "ext_setOnCurrentChangeHandler", ph_motor_set_on_velocity_change_handler, 1);
   rb_define_private_method(ph_motor, "ext_setOnCurrentUpdateHandler", ph_motor_set_on_velocity_change_handler, 1);
@@ -238,7 +235,6 @@ void Init_motor_control() {
   rb_define_private_method(ph_motor, "ext_setOnEncoderPositionUpdateHandler", ph_motor_set_on_velocity_change_handler, 1);
   rb_define_private_method(ph_motor, "ext_setOnBackEMFUpdateHandler", ph_motor_set_on_velocity_change_handler, 1);
   rb_define_private_method(ph_motor, "ext_setOnSensorUpdateHandler", ph_motor_set_on_velocity_change_handler, 1);
-#endif
 
   rb_define_alias(ph_motor, "motor_count", "getMotorCount");
   rb_define_alias(ph_motor, "velocity", "getVelocity");
@@ -270,187 +266,185 @@ void Init_motor_control() {
 
 VALUE ph_motor_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetMotorControl_create((CPhidgetMotorControlHandle *)(&(ph->handle))));
+  ph_raise(PhidgetMotorControl_create((PhidgetMotorControlHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_motor_get_motor_count(VALUE self) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetMotorControl_getMotorCount(handle, &count));
+  ph_raise(PhidgetMotorControl_getMotorCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_motor_get_velocity(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   double velocity;
-  ph_raise(CPhidgetMotorControl_getVelocity(handle, FIX2INT(index), &velocity));
+  ph_raise(PhidgetMotorControl_getVelocity(handle, FIX2INT(index), &velocity));
   return rb_float_new(velocity);
 }
 
 VALUE ph_motor_set_velocity(VALUE self, VALUE index, VALUE velocity) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
-  ph_raise(CPhidgetMotorControl_setVelocity(handle, FIX2INT(index), NUM2DBL(velocity)));
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
+  ph_raise(PhidgetMotorControl_setVelocity(handle, FIX2INT(index), NUM2DBL(velocity)));
   return Qnil;
 }
 
 VALUE ph_motor_get_acceleration(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   double accel;
-  ph_raise(CPhidgetMotorControl_getAcceleration(handle, FIX2INT(index), &accel));
+  ph_raise(PhidgetMotorControl_getAcceleration(handle, FIX2INT(index), &accel));
   return rb_float_new(accel);
 }
 
 VALUE ph_motor_get_acceleration_min(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   double accel;
-  ph_raise(CPhidgetMotorControl_getAccelerationMin(handle, FIX2INT(index), &accel));
+  ph_raise(PhidgetMotorControl_getAccelerationMin(handle, FIX2INT(index), &accel));
   return rb_float_new(accel);
 }
 
 VALUE ph_motor_get_acceleration_max(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   double accel;
-  ph_raise(CPhidgetMotorControl_getAccelerationMax(handle, FIX2INT(index), &accel));
+  ph_raise(PhidgetMotorControl_getAccelerationMax(handle, FIX2INT(index), &accel));
   return rb_float_new(accel);
 }
 
 VALUE ph_motor_set_acceleration(VALUE self, VALUE index, VALUE accel) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
-  ph_raise(CPhidgetMotorControl_setAcceleration(handle, FIX2INT(index), NUM2DBL(accel)));
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
+  ph_raise(PhidgetMotorControl_setAcceleration(handle, FIX2INT(index), NUM2DBL(accel)));
   return Qnil;
 }
 
 VALUE ph_motor_get_current(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   double current;
-  ph_raise(CPhidgetMotorControl_getCurrent(handle, FIX2INT(index), &current));
+  ph_raise(PhidgetMotorControl_getCurrent(handle, FIX2INT(index), &current));
   return rb_float_new(current);
 }
 
 VALUE ph_motor_get_input_count(VALUE self) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetMotorControl_getInputCount(handle, &count));
+  ph_raise(PhidgetMotorControl_getInputCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_motor_get_input_state(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetMotorControl_getInputState(handle, FIX2INT(index), &state));
+  ph_raise(PhidgetMotorControl_getInputState(handle, FIX2INT(index), &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_motor_get_encoder_count(VALUE self) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetMotorControl_getEncoderCount(handle, &count));
+  ph_raise(PhidgetMotorControl_getEncoderCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_motor_get_encoder_position(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   int position;
-  ph_raise(CPhidgetMotorControl_getEncoderPosition(handle, FIX2INT(index), &position));
+  ph_raise(PhidgetMotorControl_getEncoderPosition(handle, FIX2INT(index), &position));
   return INT2FIX(position);
 }
 
 VALUE ph_motor_set_encoder_position(VALUE self, VALUE index, VALUE position) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
-  ph_raise(CPhidgetMotorControl_setEncoderPosition(handle, FIX2INT(index), FIX2INT(position)));
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
+  ph_raise(PhidgetMotorControl_setEncoderPosition(handle, FIX2INT(index), FIX2INT(position)));
   return Qnil;
 }
 
 VALUE ph_motor_get_back_emf(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   double voltage;
-  ph_raise(CPhidgetMotorControl_getBackEMF(handle, FIX2INT(index), &voltage));
+  ph_raise(PhidgetMotorControl_getBackEMF(handle, FIX2INT(index), &voltage));
   return rb_float_new(voltage);
 }
 
 VALUE ph_motor_get_back_emf_sensing_state(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetMotorControl_getBackEMFSensingState(handle, FIX2INT(index), &state));
+  ph_raise(PhidgetMotorControl_getBackEMFSensingState(handle, FIX2INT(index), &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_motor_set_back_emf_sensing_state(VALUE self, VALUE index, VALUE state) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
-  ph_raise(CPhidgetMotorControl_setBackEMFSensingState(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
+  ph_raise(PhidgetMotorControl_setBackEMFSensingState(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_motor_get_supply_voltage(VALUE self) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   double voltage;
-  ph_raise(CPhidgetMotorControl_getSupplyVoltage(handle, &voltage));
+  ph_raise(PhidgetMotorControl_getSupplyVoltage(handle, &voltage));
   return rb_float_new(voltage);
 }
 
 VALUE ph_motor_get_braking(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   double braking;
-  ph_raise(CPhidgetMotorControl_getBraking(handle, FIX2INT(index), &braking));
+  ph_raise(PhidgetMotorControl_getBraking(handle, FIX2INT(index), &braking));
   return rb_float_new(braking);
 }
 
 VALUE ph_motor_set_braking(VALUE self, VALUE index, VALUE braking) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
-  ph_raise(CPhidgetMotorControl_setBraking(handle, FIX2INT(index), NUM2DBL(braking)));
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
+  ph_raise(PhidgetMotorControl_setBraking(handle, FIX2INT(index), NUM2DBL(braking)));
   return Qnil;
 }
 
 VALUE ph_motor_get_sensor_count(VALUE self) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetMotorControl_getSensorCount(handle, &count));
+  ph_raise(PhidgetMotorControl_getSensorCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_motor_get_sensor_value(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetMotorControl_getSensorValue(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetMotorControl_getSensorValue(handle, FIX2INT(index), &value));
   return INT2FIX(value);
 }
 
 VALUE ph_motor_get_sensor_raw_value(VALUE self, VALUE index) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetMotorControl_getSensorRawValue(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetMotorControl_getSensorRawValue(handle, FIX2INT(index), &value));
   return INT2FIX(value);
 }
 
 VALUE ph_motor_get_ratiometric(VALUE self) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
   int ratiometric;
-  ph_raise(CPhidgetMotorControl_getRatiometric(handle, &ratiometric));
+  ph_raise(PhidgetMotorControl_getRatiometric(handle, &ratiometric));
   return ratiometric == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_motor_set_ratiometric(VALUE self, VALUE ratiometric) {
-  CPhidgetMotorControlHandle handle = (CPhidgetMotorControlHandle)get_ph_handle(self);
-  ph_raise(CPhidgetMotorControl_setRatiometric(handle, TYPE(ratiometric) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetMotorControlHandle handle = (PhidgetMotorControlHandle)get_ph_handle(self);
+  ph_raise(PhidgetMotorControl_setRatiometric(handle, TYPE(ratiometric) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 
-
-#ifdef PH_CALLBACK
 VALUE ph_motor_set_on_velocity_change_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetMotorControl_set_OnVelocityChange_Handler((CPhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetMotorControl_set_OnVelocityChange_Handler((PhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetMotorControl_set_OnVelocityChange_Handler((CPhidgetMotorControlHandle)ph->handle, ph_motor_on_velocity_change, (void *)callback_data));
+    ph_raise(PhidgetMotorControl_set_OnVelocityChange_Handler((PhidgetMotorControlHandle)ph->handle, ph_motor_on_velocity_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -462,13 +456,13 @@ VALUE ph_motor_set_on_current_change_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_2;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetMotorControl_set_OnCurrentChange_Handler((CPhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetMotorControl_set_OnCurrentChange_Handler((PhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetMotorControl_set_OnCurrentChange_Handler((CPhidgetMotorControlHandle)ph->handle, ph_motor_on_current_change, (void *)callback_data));
+    ph_raise(PhidgetMotorControl_set_OnCurrentChange_Handler((PhidgetMotorControlHandle)ph->handle, ph_motor_on_current_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -480,13 +474,13 @@ VALUE ph_motor_set_on_current_update_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_3;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetMotorControl_set_OnCurrentUpdate_Handler((CPhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetMotorControl_set_OnCurrentUpdate_Handler((PhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetMotorControl_set_OnCurrentUpdate_Handler((CPhidgetMotorControlHandle)ph->handle, ph_motor_on_current_update, (void *)callback_data));
+    ph_raise(PhidgetMotorControl_set_OnCurrentUpdate_Handler((PhidgetMotorControlHandle)ph->handle, ph_motor_on_current_update, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -498,13 +492,13 @@ VALUE ph_motor_set_on_input_change_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_4;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetMotorControl_set_OnInputChange_Handler((CPhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetMotorControl_set_OnInputChange_Handler((PhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetMotorControl_set_OnInputChange_Handler((CPhidgetMotorControlHandle)ph->handle, ph_motor_on_input_change, (void *)callback_data));
+    ph_raise(PhidgetMotorControl_set_OnInputChange_Handler((PhidgetMotorControlHandle)ph->handle, ph_motor_on_input_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -516,13 +510,13 @@ VALUE ph_motor_set_on_encoder_position_change_handler(VALUE self, VALUE handler)
   ph_callback_data_t *callback_data = &ph->dev_callback_5;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetMotorControl_set_OnEncoderPositionChange_Handler((CPhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetMotorControl_set_OnEncoderPositionChange_Handler((PhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetMotorControl_set_OnEncoderPositionChange_Handler((CPhidgetMotorControlHandle)ph->handle, ph_motor_on_encoder_position_change, (void *)callback_data));
+    ph_raise(PhidgetMotorControl_set_OnEncoderPositionChange_Handler((PhidgetMotorControlHandle)ph->handle, ph_motor_on_encoder_position_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -534,13 +528,13 @@ VALUE ph_motor_set_on_encoder_position_update_handler(VALUE self, VALUE handler)
   ph_callback_data_t *callback_data = &ph->dev_callback_6;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetMotorControl_set_OnEncoderPositionUpdate_Handler((CPhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetMotorControl_set_OnEncoderPositionUpdate_Handler((PhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetMotorControl_set_OnEncoderPositionUpdate_Handler((CPhidgetMotorControlHandle)ph->handle, ph_motor_on_encoder_position_update, (void *)callback_data));
+    ph_raise(PhidgetMotorControl_set_OnEncoderPositionUpdate_Handler((PhidgetMotorControlHandle)ph->handle, ph_motor_on_encoder_position_update, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -552,13 +546,13 @@ VALUE ph_motor_set_on_back_emf_update_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_7;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetMotorControl_set_OnBackEMFUpdate_Handler((CPhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetMotorControl_set_OnBackEMFUpdate_Handler((PhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetMotorControl_set_OnBackEMFUpdate_Handler((CPhidgetMotorControlHandle)ph->handle, ph_motor_on_back_emf_update, (void *)callback_data));
+    ph_raise(PhidgetMotorControl_set_OnBackEMFUpdate_Handler((PhidgetMotorControlHandle)ph->handle, ph_motor_on_back_emf_update, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -570,73 +564,71 @@ VALUE ph_motor_set_on_sensor_update_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_8;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetMotorControl_set_OnSensorUpdate_Handler((CPhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetMotorControl_set_OnSensorUpdate_Handler((PhidgetMotorControlHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetMotorControl_set_OnSensorUpdate_Handler((CPhidgetMotorControlHandle)ph->handle, ph_motor_on_sensor_update, (void *)callback_data));
+    ph_raise(PhidgetMotorControl_set_OnSensorUpdate_Handler((PhidgetMotorControlHandle)ph->handle, ph_motor_on_sensor_update, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_motor_on_velocity_change(CPhidgetMotorControlHandle phid, void *userPtr, int index, double velocity) {
+int ph_motor_on_velocity_change(PhidgetMotorControlHandle phid, void *userPtr, int index, double velocity) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_motor_on_current_change(CPhidgetMotorControlHandle phid, void *userPtr, int index, double current) {
+int ph_motor_on_current_change(PhidgetMotorControlHandle phid, void *userPtr, int index, double current) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_motor_on_current_update(CPhidgetMotorControlHandle phid, void *userPtr, int index, double current) {
+int ph_motor_on_current_update(PhidgetMotorControlHandle phid, void *userPtr, int index, double current) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_motor_on_input_change(CPhidgetMotorControlHandle phid, void *userPtr, int index, int state) {
+int ph_motor_on_input_change(PhidgetMotorControlHandle phid, void *userPtr, int index, int state) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_motor_on_encoder_position_change(CPhidgetMotorControlHandle phid, void *userPtr, int index, int time, int change) {
+int ph_motor_on_encoder_position_change(PhidgetMotorControlHandle phid, void *userPtr, int index, int time, int change) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_motor_on_encoder_position_update(CPhidgetMotorControlHandle phid, void *userPtr, int index, int change) {
+int ph_motor_on_encoder_position_update(PhidgetMotorControlHandle phid, void *userPtr, int index, int change) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_motor_on_back_emf_update(CPhidgetMotorControlHandle phid, void *userPtr, int index, double voltage) {
+int ph_motor_on_back_emf_update(PhidgetMotorControlHandle phid, void *userPtr, int index, double voltage) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_motor_on_sensor_update(CPhidgetMotorControlHandle phid, void *userPtr, int index, int value) {
+int ph_motor_on_sensor_update(PhidgetMotorControlHandle phid, void *userPtr, int index, int value) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
-
 #endif
-

@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_ifkit_init(VALUE self);
 VALUE ph_ifkit_get_input_count(VALUE self);
 VALUE ph_ifkit_get_input_state(VALUE self, VALUE index);
@@ -18,14 +18,12 @@ VALUE ph_ifkit_get_data_rate_min(VALUE self, VALUE index);
 VALUE ph_ifkit_get_data_rate_max(VALUE self, VALUE index);
 VALUE ph_ifkit_set_data_rate(VALUE self, VALUE index, VALUE rate);
 
-#ifdef PH_CALLBACK
 VALUE ph_ifkit_set_on_input_change_handler(VALUE self, VALUE handler);
 VALUE ph_ifkit_set_on_output_change_handler(VALUE self, VALUE handler);
 VALUE ph_ifkit_set_on_sensor_change_handler(VALUE self, VALUE handler);
-int ph_ifkit_on_input_change(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int state);
-int ph_ifkit_on_output_change(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int state);
-int ph_ifkit_on_sensor_change(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int value);
-#endif
+int ph_ifkit_on_input_change(PhidgetInterfaceKitHandle phid, void *userPtr, int index, int state);
+int ph_ifkit_on_output_change(PhidgetInterfaceKitHandle phid, void *userPtr, int index, int state);
+int ph_ifkit_on_sensor_change(PhidgetInterfaceKitHandle phid, void *userPtr, int index, int value);
 
 
 void Init_interface_kit() {
@@ -138,11 +136,9 @@ void Init_interface_kit() {
    */
   rb_define_method(ph_ifkit, "setDataRate", ph_ifkit_set_data_rate, 2);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_ifkit, "ext_setOnInputChangeHandler", ph_ifkit_set_on_input_change_handler, 1);
   rb_define_private_method(ph_ifkit, "ext_setOnOutputChangeHandler", ph_ifkit_set_on_output_change_handler, 1);
   rb_define_private_method(ph_ifkit, "ext_setOnSensorChangeHandler", ph_ifkit_set_on_sensor_change_handler, 1);
-#endif
 
   rb_define_alias(ph_ifkit, "input_count", "getInputCount");
   rb_define_alias(ph_ifkit, "input_state", "getInputState");
@@ -164,118 +160,117 @@ void Init_interface_kit() {
 
 VALUE ph_ifkit_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetInterfaceKit_create((CPhidgetInterfaceKitHandle *)(&(ph->handle))));
+  ph_raise(PhidgetInterfaceKit_create((PhidgetInterfaceKitHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_ifkit_get_input_count(VALUE self) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetInterfaceKit_getInputCount(handle, &count));
+  ph_raise(PhidgetInterfaceKit_getInputCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_ifkit_get_input_state(VALUE self, VALUE index) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetInterfaceKit_getInputState(handle, FIX2INT(index), &state));
+  ph_raise(PhidgetInterfaceKit_getInputState(handle, FIX2INT(index), &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_ifkit_get_output_count(VALUE self) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetInterfaceKit_getOutputCount(handle, &count));
+  ph_raise(PhidgetInterfaceKit_getOutputCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_ifkit_get_output_state(VALUE self, VALUE index) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetInterfaceKit_getOutputState(handle, FIX2INT(index), &state));
+  ph_raise(PhidgetInterfaceKit_getOutputState(handle, FIX2INT(index), &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_ifkit_set_output_state(VALUE self, VALUE index, VALUE state) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
-  ph_raise(CPhidgetInterfaceKit_setOutputState(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
+  ph_raise(PhidgetInterfaceKit_setOutputState(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_ifkit_get_sensor_count(VALUE self) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetInterfaceKit_getSensorCount(handle, &count));
+  ph_raise(PhidgetInterfaceKit_getSensorCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_ifkit_get_sensor_value(VALUE self, VALUE index) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetInterfaceKit_getSensorValue(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetInterfaceKit_getSensorValue(handle, FIX2INT(index), &value));
   return INT2FIX(value);
 }
 
 VALUE ph_ifkit_get_sensor_raw_value(VALUE self, VALUE index) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetInterfaceKit_getSensorRawValue(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetInterfaceKit_getSensorRawValue(handle, FIX2INT(index), &value));
   return INT2FIX(value);
 }
 
 VALUE ph_ifkit_get_ratiometric(VALUE self) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int ratiometric;
-  ph_raise(CPhidgetInterfaceKit_getRatiometric(handle, &ratiometric));
+  ph_raise(PhidgetInterfaceKit_getRatiometric(handle, &ratiometric));
   return ratiometric == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_ifkit_set_ratiometric(VALUE self, VALUE ratiometric) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
-  ph_raise(CPhidgetInterfaceKit_setRatiometric(handle, TYPE(ratiometric) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
+  ph_raise(PhidgetInterfaceKit_setRatiometric(handle, TYPE(ratiometric) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_ifkit_get_data_rate(VALUE self, VALUE index) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int rate;
-  ph_raise(CPhidgetInterfaceKit_getDataRate(handle, FIX2INT(index), &rate));
+  ph_raise(PhidgetInterfaceKit_getDataRate(handle, FIX2INT(index), &rate));
   return INT2FIX(rate);
 }
 
 VALUE ph_ifkit_get_data_rate_min(VALUE self, VALUE index) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int rate;
-  ph_raise(CPhidgetInterfaceKit_getDataRateMin(handle, FIX2INT(index), &rate));
+  ph_raise(PhidgetInterfaceKit_getDataRateMin(handle, FIX2INT(index), &rate));
   return INT2FIX(rate);
 }
 
 VALUE ph_ifkit_get_data_rate_max(VALUE self, VALUE index) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
   int rate;
-  ph_raise(CPhidgetInterfaceKit_getDataRateMax(handle, FIX2INT(index), &rate));
+  ph_raise(PhidgetInterfaceKit_getDataRateMax(handle, FIX2INT(index), &rate));
   return INT2FIX(rate);
 }
 
 VALUE ph_ifkit_set_data_rate(VALUE self, VALUE index, VALUE rate) {
-  CPhidgetInterfaceKitHandle handle = (CPhidgetInterfaceKitHandle)get_ph_handle(self);
-  ph_raise(CPhidgetInterfaceKit_setDataRate(handle, FIX2INT(index), FIX2INT(rate)));
+  PhidgetInterfaceKitHandle handle = (PhidgetInterfaceKitHandle)get_ph_handle(self);
+  ph_raise(PhidgetInterfaceKit_setDataRate(handle, FIX2INT(index), FIX2INT(rate)));
   return Qnil;
 }
 
-#ifdef PH_CALLBACK
 VALUE ph_ifkit_set_on_input_change_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetInterfaceKit_set_OnInputChange_Handler((CPhidgetInterfaceKitHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetInterfaceKit_set_OnInputChange_Handler((PhidgetInterfaceKitHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetInterfaceKit_set_OnInputChange_Handler((CPhidgetInterfaceKitHandle)ph->handle, ph_ifkit_on_input_change, (void *)callback_data));
+    ph_raise(PhidgetInterfaceKit_set_OnInputChange_Handler((PhidgetInterfaceKitHandle)ph->handle, ph_ifkit_on_input_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -286,13 +281,13 @@ VALUE ph_ifkit_set_on_output_change_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_2;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetInterfaceKit_set_OnOutputChange_Handler((CPhidgetInterfaceKitHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetInterfaceKit_set_OnOutputChange_Handler((PhidgetInterfaceKitHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetInterfaceKit_set_OnOutputChange_Handler((CPhidgetInterfaceKitHandle)ph->handle, ph_ifkit_on_output_change, (void *)callback_data));
+    ph_raise(PhidgetInterfaceKit_set_OnOutputChange_Handler((PhidgetInterfaceKitHandle)ph->handle, ph_ifkit_on_output_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -303,38 +298,36 @@ VALUE ph_ifkit_set_on_sensor_change_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_3;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetInterfaceKit_set_OnSensorChange_Handler((CPhidgetInterfaceKitHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetInterfaceKit_set_OnSensorChange_Handler((PhidgetInterfaceKitHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetInterfaceKit_set_OnSensorChange_Handler((CPhidgetInterfaceKitHandle)ph->handle, ph_ifkit_on_sensor_change, (void *)callback_data));
+    ph_raise(PhidgetInterfaceKit_set_OnSensorChange_Handler((PhidgetInterfaceKitHandle)ph->handle, ph_ifkit_on_sensor_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_ifkit_on_input_change(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int state) {
+int ph_ifkit_on_input_change(PhidgetInterfaceKitHandle phid, void *userPtr, int index, int state) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_ifkit_on_output_change(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int state) {
+int ph_ifkit_on_output_change(PhidgetInterfaceKitHandle phid, void *userPtr, int index, int state) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_ifkit_on_sensor_change(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int value) {
+int ph_ifkit_on_sensor_change(PhidgetInterfaceKitHandle phid, void *userPtr, int index, int value) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 #endif
-
-

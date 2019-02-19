@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_rfid_init(VALUE self);
 VALUE ph_rfid_get_output_count(VALUE self);
 VALUE ph_rfid_get_output_state(VALUE self, VALUE index);
@@ -14,14 +14,12 @@ VALUE ph_rfid_get_last_tag(VALUE self);
 VALUE ph_rfid_get_tag_status(VALUE self);
 VALUE ph_rfid_write(VALUE self, VALUE tag, VALUE protocol, VALUE lock);
 
-#ifdef PH_CALLBACK
 VALUE ph_rfid_set_on_tag_handler(VALUE self, VALUE handler);
 VALUE ph_rfid_set_on_tag_lost_handler(VALUE self, VALUE handler);
 VALUE ph_rfid_set_on_output_change_handler(VALUE self, VALUE handler);
-int ph_rfid_on_tag(CPhidgetRFIDHandle phid, void *userPtr, char *tagString, CPhidgetRFID_Protocol protocol);
-int ph_rfid_on_tag_lost(CPhidgetRFIDHandle phid, void *userPtr, char *tagString, CPhidgetRFID_Protocol protocol);
-int ph_rfid_on_output_change(CPhidgetRFIDHandle phid, void *userPtr, int index, int state);
-#endif
+int ph_rfid_on_tag(PhidgetRFIDHandle phid, void *userPtr, char *tagString, PhidgetRFID_Protocol protocol);
+int ph_rfid_on_tag_lost(PhidgetRFIDHandle phid, void *userPtr, char *tagString, PhidgetRFID_Protocol protocol);
+int ph_rfid_on_output_change(PhidgetRFIDHandle phid, void *userPtr, int index, int state);
 
 
 void Init_rfid() {
@@ -113,11 +111,9 @@ void Init_rfid() {
    */
   rb_define_method(ph_rfid, "write", ph_rfid_write, 3);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_rfid, "ext_setOnTagHandler", ph_rfid_set_on_tag_handler, 1);
   rb_define_private_method(ph_rfid, "ext_setOnTagLostHandler", ph_rfid_set_on_tag_lost_handler, 1);
   rb_define_private_method(ph_rfid, "ext_setOnOutputChangeHandler", ph_rfid_set_on_output_change_handler, 1);
-#endif
 
   rb_define_alias(ph_rfid, "output_count", "getOutputCount");
   rb_define_alias(ph_rfid, "output_state", "getOutputState");
@@ -134,90 +130,89 @@ void Init_rfid() {
 
 VALUE ph_rfid_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetRFID_create((CPhidgetRFIDHandle *)(&(ph->handle))));
+  ph_raise(PhidgetRFID_create((PhidgetRFIDHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_rfid_get_output_count(VALUE self) {
-  CPhidgetRFIDHandle handle = (CPhidgetRFIDHandle)get_ph_handle(self);
+  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetRFID_getOutputCount(handle, &count));
+  ph_raise(PhidgetRFID_getOutputCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_rfid_get_output_state(VALUE self, VALUE index) {
-  CPhidgetRFIDHandle handle = (CPhidgetRFIDHandle)get_ph_handle(self);
+  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetRFID_getOutputState(handle, FIX2INT(index), &state));
+  ph_raise(PhidgetRFID_getOutputState(handle, FIX2INT(index), &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_rfid_set_output_state(VALUE self, VALUE index, VALUE state) {
-  CPhidgetRFIDHandle handle = (CPhidgetRFIDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetRFID_setOutputState(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
+  ph_raise(PhidgetRFID_setOutputState(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_rfid_get_antenna_on(VALUE self) {
-  CPhidgetRFIDHandle handle = (CPhidgetRFIDHandle)get_ph_handle(self);
+  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
   int on;
-  ph_raise(CPhidgetRFID_getAntennaOn(handle, &on));
+  ph_raise(PhidgetRFID_getAntennaOn(handle, &on));
   return on == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_rfid_set_antenna_on(VALUE self, VALUE on) {
-  CPhidgetRFIDHandle handle = (CPhidgetRFIDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetRFID_setAntennaOn(handle, TYPE(on) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
+  ph_raise(PhidgetRFID_setAntennaOn(handle, TYPE(on) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_rfid_get_led_on(VALUE self) {
-  CPhidgetRFIDHandle handle = (CPhidgetRFIDHandle)get_ph_handle(self);
+  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
   int on;
-  ph_raise(CPhidgetRFID_getLEDOn(handle, &on));
+  ph_raise(PhidgetRFID_getLEDOn(handle, &on));
   return on == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_rfid_set_led_on(VALUE self, VALUE on) {
-  CPhidgetRFIDHandle handle = (CPhidgetRFIDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetRFID_setLEDOn(handle, TYPE(on) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
+  ph_raise(PhidgetRFID_setLEDOn(handle, TYPE(on) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_rfid_get_last_tag(VALUE self) {
-  CPhidgetRFIDHandle handle = (CPhidgetRFIDHandle)get_ph_handle(self);
+  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
   char *tag;
-  CPhidgetRFID_Protocol protocol;
-  ph_raise(CPhidgetRFID_getLastTag2(handle, &tag, &protocol));
+  PhidgetRFID_Protocol protocol;
+  ph_raise(PhidgetRFID_getLastTag2(handle, &tag, &protocol));
   return rb_ary_new3(2, rb_str_new2(tag), INT2FIX(protocol));
 }
 
 VALUE ph_rfid_get_tag_status(VALUE self) {
-  CPhidgetRFIDHandle handle = (CPhidgetRFIDHandle)get_ph_handle(self);
+  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
   int status;
-  ph_raise(CPhidgetRFID_getTagStatus(handle, &status));
+  ph_raise(PhidgetRFID_getTagStatus(handle, &status));
   return status == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_rfid_write(VALUE self, VALUE tag, VALUE protocol, VALUE lock) {
-  CPhidgetRFIDHandle handle = (CPhidgetRFIDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetRFID_write(handle, StringValueCStr(tag), FIX2INT(protocol), TYPE(lock) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
+  ph_raise(PhidgetRFID_write(handle, StringValueCStr(tag), FIX2INT(protocol), TYPE(lock) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
-#ifdef PH_CALLBACK
 VALUE ph_rfid_set_on_tag_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetRFID_set_OnTag2_Handler((CPhidgetRFIDHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetRFID_set_OnTag2_Handler((PhidgetRFIDHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetRFID_set_OnTag2_Handler((CPhidgetRFIDHandle)ph->handle, ph_rfid_on_tag, (void *)callback_data));
+    ph_raise(PhidgetRFID_set_OnTag2_Handler((PhidgetRFIDHandle)ph->handle, ph_rfid_on_tag, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -228,13 +223,13 @@ VALUE ph_rfid_set_on_tag_lost_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_2;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetRFID_set_OnTagLost2_Handler((CPhidgetRFIDHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetRFID_set_OnTagLost2_Handler((PhidgetRFIDHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetRFID_set_OnTagLost2_Handler((CPhidgetRFIDHandle)ph->handle, ph_rfid_on_tag_lost, (void *)callback_data));
+    ph_raise(PhidgetRFID_set_OnTagLost2_Handler((PhidgetRFIDHandle)ph->handle, ph_rfid_on_tag_lost, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -245,37 +240,36 @@ VALUE ph_rfid_set_on_output_change_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_3;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetRFID_set_OnOutputChange_Handler((CPhidgetRFIDHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetRFID_set_OnOutputChange_Handler((PhidgetRFIDHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetRFID_set_OnOutputChange_Handler((CPhidgetRFIDHandle)ph->handle, ph_rfid_on_output_change, (void *)callback_data));
+    ph_raise(PhidgetRFID_set_OnOutputChange_Handler((PhidgetRFIDHandle)ph->handle, ph_rfid_on_output_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_rfid_on_tag(CPhidgetRFIDHandle phid, void *userPtr, char *tagString, CPhidgetRFID_Protocol protocol) {
+int ph_rfid_on_tag(PhidgetRFIDHandle phid, void *userPtr, char *tagString, PhidgetRFID_Protocol protocol) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_rfid_on_tag_lost(CPhidgetRFIDHandle phid, void *userPtr, char *tagString, CPhidgetRFID_Protocol protocol) {
+int ph_rfid_on_tag_lost(PhidgetRFIDHandle phid, void *userPtr, char *tagString, PhidgetRFID_Protocol protocol) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_rfid_on_output_change(CPhidgetRFIDHandle phid, void *userPtr, int index, int state) {
+int ph_rfid_on_output_change(PhidgetRFIDHandle phid, void *userPtr, int index, int state) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 #endif
-

@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_ir_init(VALUE self);
 VALUE ph_ir_transmit(VALUE self, VALUE data, VALUE code_info);
 VALUE ph_ir_transmit_repeat(VALUE self);
@@ -10,14 +10,12 @@ VALUE ph_ir_get_raw_data(VALUE self, VALUE length);
 VALUE ph_ir_get_last_code(VALUE self);
 VALUE ph_ir_get_last_learned_code(VALUE self);
 
-#ifdef PH_CALLBACK
 VALUE ph_ir_set_on_code_handler(VALUE self, VALUE handler);
 VALUE ph_ir_set_on_learn_handler(VALUE self, VALUE handler);
 VALUE ph_ir_set_on_raw_data_handler(VALUE self, VALUE handler);
-int ph_ir_on_code(CPhidgetIRHandle phid, void *userPtr, unsigned char *data, int dataLength, int bitCount, int repeat);
-int ph_ir_on_learn(CPhidgetIRHandle phid, void *userPtr, unsigned char *data, int dataLength, CPhidgetIR_CodeInfoHandle codeInfo);
-int ph_ir_on_raw_data(CPhidgetIRHandle phid, void *userPtr, int *data, int dataLength);
-#endif
+int ph_ir_on_code(PhidgetIRHandle phid, void *userPtr, unsigned char *data, int dataLength, int bitCount, int repeat);
+int ph_ir_on_learn(PhidgetIRHandle phid, void *userPtr, unsigned char *data, int dataLength, PhidgetIR_CodeInfoHandle codeInfo);
+int ph_ir_on_raw_data(PhidgetIRHandle phid, void *userPtr, int *data, int dataLength);
 
 
 void Init_ir() {
@@ -96,11 +94,9 @@ void Init_ir() {
    */
   rb_define_method(ph_ir, "getLastLearnedCode", ph_ir_get_last_learned_code, 0);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_ir, "ext_setOnCodeHandler", ph_ir_set_on_code_handler, 1);
   rb_define_private_method(ph_ir, "ext_setOnLearnHandler", ph_ir_set_on_learn_handler, 1);
   rb_define_private_method(ph_ir, "ext_setOnRawDataHandler", ph_ir_set_on_raw_data_handler, 1);
-#endif
 
   rb_define_alias(ph_ir, "transmit_repeat", "transmitRepeat");
   rb_define_alias(ph_ir, "transmit_raw", "transmitRaw");
@@ -113,7 +109,7 @@ void Init_ir() {
 
 VALUE ph_ir_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetIR_create((CPhidgetIRHandle *)(&(ph->handle))));
+  ph_raise(PhidgetIR_create((PhidgetIRHandle *)(&(ph->handle))));
   return self;
 }
 
@@ -123,13 +119,13 @@ VALUE ph_ir_transmit(VALUE self, VALUE data, VALUE code_info) {
 }
 
 VALUE ph_ir_transmit_repeat(VALUE self) {
-  CPhidgetIRHandle handle = (CPhidgetIRHandle)get_ph_handle(self);
-  ph_raise(CPhidgetIR_TransmitRepeat(handle));
+  PhidgetIRHandle handle = (PhidgetIRHandle)get_ph_handle(self);
+  ph_raise(PhidgetIR_TransmitRepeat(handle));
   return Qnil;
 }
 
 VALUE ph_ir_transmit_raw(VALUE self, VALUE data, VALUE carrier_freq, VALUE duty_cycle, VALUE gap) {
-  CPhidgetIRHandle handle = (CPhidgetIRHandle)get_ph_handle(self);
+  PhidgetIRHandle handle = (PhidgetIRHandle)get_ph_handle(self);
   int data_length = RARRAY_LEN(data);
   int *int_data = (int *)malloc(data_length * sizeof(int));
   int i;
@@ -138,20 +134,20 @@ VALUE ph_ir_transmit_raw(VALUE self, VALUE data, VALUE carrier_freq, VALUE duty_
     int_data[i] = NUM2INT(rb_ary_entry(data, i));
   }
 
-  ph_raise(CPhidgetIR_TransmitRaw(handle, int_data, data_length, FIX2INT(carrier_freq), FIX2INT(duty_cycle), FIX2INT(gap)));
+  ph_raise(PhidgetIR_TransmitRaw(handle, int_data, data_length, FIX2INT(carrier_freq), FIX2INT(duty_cycle), FIX2INT(gap)));
 
   free(int_data);
   return Qnil;
 }
 
 VALUE ph_ir_get_raw_data(VALUE self, VALUE length) {
-  CPhidgetIRHandle handle = (CPhidgetIRHandle)get_ph_handle(self);
+  PhidgetIRHandle handle = (PhidgetIRHandle)get_ph_handle(self);
   int data_length = FIX2INT(length);
   int *raw_data = (int *)malloc(data_length * sizeof(int));
   VALUE rb_data;
   int i;
 
-  ph_raise(CPhidgetIR_getRawData(handle, raw_data, &data_length));
+  ph_raise(PhidgetIR_getRawData(handle, raw_data, &data_length));
 
   rb_data = rb_ary_new();
   for(i=0; i<data_length; i++) {
@@ -172,19 +168,18 @@ VALUE ph_ir_get_last_learned_code(VALUE self) {
 }
 
 
-#ifdef PH_CALLBACK
 VALUE ph_ir_set_on_code_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetIR_set_OnCode_Handler((CPhidgetIRHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetIR_set_OnCode_Handler((PhidgetIRHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetIR_set_OnCode_Handler((CPhidgetIRHandle)ph->handle, ph_ir_on_code, (void *)callback_data));
+    ph_raise(PhidgetIR_set_OnCode_Handler((PhidgetIRHandle)ph->handle, ph_ir_on_code, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -196,13 +191,13 @@ VALUE ph_ir_set_on_learn_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_2;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetIR_set_OnLearn_Handler((CPhidgetIRHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetIR_set_OnLearn_Handler((PhidgetIRHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetIR_set_OnLearn_Handler((CPhidgetIRHandle)ph->handle, ph_ir_on_learn, (void *)callback_data));
+    ph_raise(PhidgetIR_set_OnLearn_Handler((PhidgetIRHandle)ph->handle, ph_ir_on_learn, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -214,38 +209,36 @@ VALUE ph_ir_set_on_raw_data_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_3;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetIR_set_OnRawData_Handler((CPhidgetIRHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetIR_set_OnRawData_Handler((PhidgetIRHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetIR_set_OnRawData_Handler((CPhidgetIRHandle)ph->handle, ph_ir_on_raw_data, (void *)callback_data));
+    ph_raise(PhidgetIR_set_OnRawData_Handler((PhidgetIRHandle)ph->handle, ph_ir_on_raw_data, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_ir_on_code(CPhidgetIRHandle phid, void *userPtr, unsigned char *data, int dataLength, int bitCount, int repeat) {
+int ph_ir_on_code(PhidgetIRHandle phid, void *userPtr, unsigned char *data, int dataLength, int bitCount, int repeat) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_ir_on_learn(CPhidgetIRHandle phid, void *userPtr, unsigned char *data, int dataLength, CPhidgetIR_CodeInfoHandle codeInfo) {
+int ph_ir_on_learn(PhidgetIRHandle phid, void *userPtr, unsigned char *data, int dataLength, PhidgetIR_CodeInfoHandle codeInfo) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_ir_on_raw_data(CPhidgetIRHandle phid, void *userPtr, int *data, int dataLength) {
+int ph_ir_on_raw_data(PhidgetIRHandle phid, void *userPtr, int *data, int dataLength) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
-
 #endif
-

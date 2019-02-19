@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_manager_allocate(VALUE klass);
 void  ph_manager_free(ph_data_t *ph);
 VALUE ph_manager_init(VALUE self);
@@ -13,18 +13,16 @@ VALUE ph_manager_get_server_id(VALUE self);
 VALUE ph_manager_get_server_address(VALUE self);
 VALUE ph_manager_get_server_status(VALUE self);
 VALUE ph_manager_get_attached_devices(VALUE self);
-VALUE ph_manager_instance_from_class(CPhidget_DeviceClass dev_class);
+VALUE ph_manager_instance_from_class(Phidget_DeviceClass dev_class);
 
-#ifdef PH_CALLBACK
 VALUE ph_manager_set_on_attach_handler(VALUE self, VALUE handler);
 VALUE ph_manager_set_on_detach_handler(VALUE self, VALUE handler);
 VALUE ph_manager_set_on_server_connect_handler(VALUE self, VALUE handler);
 VALUE ph_manager_set_on_server_disconnect_handler(VALUE self, VALUE handler);
-int ph_manager_on_attach(CPhidgetHandle phid, void *userPtr);
-int ph_manager_on_detach(CPhidgetHandle phid, void *userPtr);
-int ph_manager_on_server_connect(CPhidgetManagerHandle phid, void *userPtr);
-int ph_manager_on_server_disconnect(CPhidgetManagerHandle phid, void *userPtr);
-#endif
+int ph_manager_on_attach(PhidgetHandle phid, void *userPtr);
+int ph_manager_on_detach(PhidgetHandle phid, void *userPtr);
+int ph_manager_on_server_connect(PhidgetManagerHandle phid, void *userPtr);
+int ph_manager_on_server_disconnect(PhidgetManagerHandle phid, void *userPtr);
 
 
 void Init_manager() {
@@ -90,12 +88,10 @@ void Init_manager() {
    */
   rb_define_method(ph_manager, "getAttachedDevices", ph_manager_get_attached_devices, 0);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_manager, "ext_setOnAttachHandler", ph_manager_set_on_attach_handler, 1);
   rb_define_private_method(ph_manager, "ext_setOnDetachHandler", ph_manager_set_on_detach_handler, 1);
   rb_define_private_method(ph_manager, "ext_setOnServerConnectHandler", ph_manager_set_on_server_connect_handler, 1);
   rb_define_private_method(ph_manager, "ext_setOnServerDisconnectHandler", ph_manager_set_on_server_disconnect_handler, 1);
-#endif
 
   rb_define_alias(ph_manager, "open_remote", "openRemote");
   rb_define_alias(ph_manager, "open_remote_ip", "openRemoteIP");
@@ -116,8 +112,8 @@ VALUE ph_manager_allocate(VALUE klass) {
 
 void ph_manager_free(ph_data_t *ph) {
   if (ph && ph->handle) {
-    CPhidgetManager_close((CPhidgetManagerHandle)ph->handle);
-    CPhidgetManager_delete((CPhidgetManagerHandle)ph->handle);
+    PhidgetManager_close((PhidgetManagerHandle)ph->handle);
+    PhidgetManager_delete((PhidgetManagerHandle)ph->handle);
     ph->handle = NULL;
   }
   if(ph) xfree(ph);
@@ -125,74 +121,74 @@ void ph_manager_free(ph_data_t *ph) {
 
 VALUE ph_manager_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetManager_create((CPhidgetManagerHandle *)(&(ph->handle))));
+  ph_raise(PhidgetManager_create((PhidgetManagerHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_manager_open(VALUE self) {
-  CPhidgetManagerHandle handle = (CPhidgetManagerHandle)get_ph_handle(self);
-  ph_raise(CPhidgetManager_open(handle));
+  PhidgetManagerHandle handle = (PhidgetManagerHandle)get_ph_handle(self);
+  ph_raise(PhidgetManager_open(handle));
   return Qnil;
 }
 
 VALUE ph_manager_open_remote(VALUE self, VALUE server_id, VALUE password) {
-  CPhidgetManagerHandle handle = (CPhidgetManagerHandle)get_ph_handle(self);
-  ph_raise(CPhidgetManager_openRemote(handle, StringValueCStr(server_id), StringValueCStr(password)));
+  PhidgetManagerHandle handle = (PhidgetManagerHandle)get_ph_handle(self);
+  ph_raise(PhidgetManager_openRemote(handle, StringValueCStr(server_id), StringValueCStr(password)));
   return Qnil;
 }
 
 VALUE ph_manager_open_remote_ip(VALUE self, VALUE address, VALUE port, VALUE password) {
-  CPhidgetManagerHandle handle = (CPhidgetManagerHandle)get_ph_handle(self);
-  ph_raise(CPhidgetManager_openRemoteIP(handle, StringValueCStr(address), FIX2INT(port), StringValueCStr(password)));
+  PhidgetManagerHandle handle = (PhidgetManagerHandle)get_ph_handle(self);
+  ph_raise(PhidgetManager_openRemoteIP(handle, StringValueCStr(address), FIX2INT(port), StringValueCStr(password)));
   return Qnil;
 }
 
 VALUE ph_manager_close(VALUE self) {
-  CPhidgetManagerHandle handle = (CPhidgetManagerHandle)get_ph_handle(self);
-  ph_raise(CPhidgetManager_close(handle));
+  PhidgetManagerHandle handle = (PhidgetManagerHandle)get_ph_handle(self);
+  ph_raise(PhidgetManager_close(handle));
   return Qnil;
 }
 
 VALUE ph_manager_get_server_id(VALUE self) {
-  CPhidgetManagerHandle handle = (CPhidgetManagerHandle)get_ph_handle(self);
+  PhidgetManagerHandle handle = (PhidgetManagerHandle)get_ph_handle(self);
   const char *server_id;
-  ph_raise(CPhidgetManager_getServerID(handle, &server_id));
+  ph_raise(PhidgetManager_getServerID(handle, &server_id));
   return rb_str_new2(server_id);
 }
 
 VALUE ph_manager_get_server_address(VALUE self) {
-  CPhidgetManagerHandle handle = (CPhidgetManagerHandle)get_ph_handle(self);
+  PhidgetManagerHandle handle = (PhidgetManagerHandle)get_ph_handle(self);
   const char *address;
   int port;
-  ph_raise(CPhidgetManager_getServerAddress(handle, &address, &port));
+  ph_raise(PhidgetManager_getServerAddress(handle, &address, &port));
   return rb_ary_new3(2, rb_str_new2(address), INT2FIX(port));
 }
 
 VALUE ph_manager_get_server_status(VALUE self) {
-  CPhidgetManagerHandle handle = (CPhidgetManagerHandle)get_ph_handle(self);
+  PhidgetManagerHandle handle = (PhidgetManagerHandle)get_ph_handle(self);
   int server_status;
-  ph_raise(CPhidgetManager_getServerStatus(handle, &server_status));
+  ph_raise(PhidgetManager_getServerStatus(handle, &server_status));
   return INT2FIX(server_status);
 }
 
 VALUE ph_manager_get_attached_devices(VALUE self) {
-  CPhidgetManagerHandle handle = (CPhidgetManagerHandle)get_ph_handle(self);
-  CPhidgetHandle *devices;
+  PhidgetManagerHandle handle = (PhidgetManagerHandle)get_ph_handle(self);
+  PhidgetHandle *devices;
   int count, i;
   VALUE rb_hash = rb_hash_new();
-  ph_raise(CPhidgetManager_getAttachedDevices(handle, &devices, &count));
+  ph_raise(PhidgetManager_getAttachedDevices(handle, &devices, &count));
   for(i=0; i<count; i++) {
     int serial;
-    CPhidget_DeviceClass dev_class;
-    ph_raise(CPhidget_getSerialNumber(devices[i], &serial));
-    ph_raise(CPhidget_getDeviceClass(devices[i], &dev_class));
+    Phidget_DeviceClass dev_class;
+    ph_raise(Phidget_getSerialNumber(devices[i], &serial));
+    ph_raise(Phidget_getDeviceClass(devices[i], &dev_class));
     rb_hash_aset(rb_hash, INT2FIX(serial), ph_manager_instance_from_class(dev_class));
   }
-  ph_raise(CPhidgetManager_freeAttachedDevicesArray(devices));
+  ph_raise(PhidgetManager_freeAttachedDevicesArray(devices));
   return rb_hash;
 }
 
-VALUE ph_manager_instance_from_class(CPhidget_DeviceClass dev_class) {
+VALUE ph_manager_instance_from_class(Phidget_DeviceClass dev_class) {
   VALUE ph_module = rb_const_get(rb_cModule, rb_intern("Phidgets"));
   VALUE klass;
   VALUE argv[0];
@@ -265,19 +261,18 @@ VALUE ph_manager_instance_from_class(CPhidget_DeviceClass dev_class) {
   return rb_class_new_instance(0, argv, klass);
 }
 
-#ifdef PH_CALLBACK
 VALUE ph_manager_set_on_attach_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->attach_callback;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetManager_set_OnAttach_Handler((CPhidgetManagerHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetManager_set_OnAttach_Handler((PhidgetManagerHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetManager_set_OnAttach_Handler((CPhidgetManagerHandle)ph->handle, ph_manager_on_attach, (void *)callback_data));
+    ph_raise(PhidgetManager_set_OnAttach_Handler((PhidgetManagerHandle)ph->handle, ph_manager_on_attach, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -288,13 +283,13 @@ VALUE ph_manager_set_on_detach_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->detach_callback;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetManager_set_OnDetach_Handler((CPhidgetManagerHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetManager_set_OnDetach_Handler((PhidgetManagerHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetManager_set_OnDetach_Handler((CPhidgetManagerHandle)ph->handle, ph_manager_on_detach, (void *)callback_data));
+    ph_raise(PhidgetManager_set_OnDetach_Handler((PhidgetManagerHandle)ph->handle, ph_manager_on_detach, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -305,13 +300,13 @@ VALUE ph_manager_set_on_server_connect_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->server_connect_callback;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetManager_set_OnServerConnect_Handler((CPhidgetManagerHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetManager_set_OnServerConnect_Handler((PhidgetManagerHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetManager_set_OnServerConnect_Handler((CPhidgetManagerHandle)ph->handle, ph_manager_on_server_connect, (void *)callback_data));
+    ph_raise(PhidgetManager_set_OnServerConnect_Handler((PhidgetManagerHandle)ph->handle, ph_manager_on_server_connect, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -322,44 +317,43 @@ VALUE ph_manager_set_on_server_disconnect_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->server_disconnect_callback;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetManager_set_OnServerDisconnect_Handler((CPhidgetManagerHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetManager_set_OnServerDisconnect_Handler((PhidgetManagerHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetManager_set_OnServerDisconnect_Handler((CPhidgetManagerHandle)ph->handle, ph_manager_on_server_disconnect, (void *)callback_data));
+    ph_raise(PhidgetManager_set_OnServerDisconnect_Handler((PhidgetManagerHandle)ph->handle, ph_manager_on_server_disconnect, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_manager_on_attach(CPhidgetHandle phid, void *userPtr) {
+int ph_manager_on_attach(PhidgetHandle phid, void *userPtr) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_manager_on_detach(CPhidgetHandle phid, void *userPtr) {
+int ph_manager_on_detach(PhidgetHandle phid, void *userPtr) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_manager_on_server_connect(CPhidgetManagerHandle phid, void *userPtr) {
+int ph_manager_on_server_connect(PhidgetManagerHandle phid, void *userPtr) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_manager_on_server_disconnect(CPhidgetManagerHandle phid, void *userPtr) {
+int ph_manager_on_server_disconnect(PhidgetManagerHandle phid, void *userPtr) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 #endif
-

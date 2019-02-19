@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_encoder_init(VALUE self);
 VALUE ph_encoder_get_input_count(VALUE self);
 VALUE ph_encoder_get_input_state(VALUE self, VALUE index);
@@ -12,14 +12,12 @@ VALUE ph_encoder_get_index_position(VALUE self, VALUE index);
 VALUE ph_encoder_get_enabled(VALUE self, VALUE index);
 VALUE ph_encoder_set_enabled(VALUE self, VALUE index, VALUE state);
 
-#ifdef PH_CALLBACK
 VALUE ph_encoder_set_on_input_change_handler(VALUE self, VALUE handler);
 VALUE ph_encoder_set_on_position_change_handler(VALUE self, VALUE handler);
 VALUE ph_encoder_set_on_index_handler(VALUE self, VALUE handler);
-int ph_encoder_on_input_change(CPhidgetEncoderHandle phid, void *userPtr, int index, int state);
-int ph_encoder_on_position_change(CPhidgetEncoderHandle phid, void *userPtr, int index, int time, int change);
-int ph_encoder_on_index(CPhidgetEncoderHandle phid, void *userPtr, int index, int index_pos);
-#endif
+int ph_encoder_on_input_change(PhidgetEncoderHandle phid, void *userPtr, int index, int state);
+int ph_encoder_on_position_change(PhidgetEncoderHandle phid, void *userPtr, int index, int time, int change);
+int ph_encoder_on_index(PhidgetEncoderHandle phid, void *userPtr, int index, int index_pos);
 
 
 void Init_encoder() {
@@ -91,11 +89,9 @@ void Init_encoder() {
    */
   rb_define_method(ph_encoder, "setEnabled", ph_encoder_set_enabled, 2);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_encoder, "ext_setOnInputChangeHandler", ph_encoder_set_on_input_change_handler, 1);
   rb_define_private_method(ph_encoder, "ext_setOnPositionChangeHandler", ph_encoder_set_on_position_change_handler, 1);
   rb_define_private_method(ph_encoder, "ext_setOnIndexHandler", ph_encoder_set_on_index_handler, 1);
-#endif
 
   rb_define_alias(ph_encoder, "input_count", "getInputCount");
   rb_define_alias(ph_encoder, "input_state", "getInputState");
@@ -111,78 +107,77 @@ void Init_encoder() {
 
 VALUE ph_encoder_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetEncoder_create((CPhidgetEncoderHandle *)(&(ph->handle))));
+  ph_raise(PhidgetEncoder_create((PhidgetEncoderHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_encoder_get_input_count(VALUE self) {
-  CPhidgetEncoderHandle handle = (CPhidgetEncoderHandle)get_ph_handle(self);
+  PhidgetEncoderHandle handle = (PhidgetEncoderHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetEncoder_getInputCount(handle, &count));
+  ph_raise(PhidgetEncoder_getInputCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_encoder_get_input_state(VALUE self, VALUE index) {
-  CPhidgetEncoderHandle handle = (CPhidgetEncoderHandle)get_ph_handle(self);
+  PhidgetEncoderHandle handle = (PhidgetEncoderHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetEncoder_getInputState(handle, FIX2INT(index), &state));
+  ph_raise(PhidgetEncoder_getInputState(handle, FIX2INT(index), &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_encoder_get_encoder_count(VALUE self) {
-  CPhidgetEncoderHandle handle = (CPhidgetEncoderHandle)get_ph_handle(self);
+  PhidgetEncoderHandle handle = (PhidgetEncoderHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetEncoder_getEncoderCount(handle, &count));
+  ph_raise(PhidgetEncoder_getEncoderCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_encoder_get_position(VALUE self, VALUE index) {
-  CPhidgetEncoderHandle handle = (CPhidgetEncoderHandle)get_ph_handle(self);
+  PhidgetEncoderHandle handle = (PhidgetEncoderHandle)get_ph_handle(self);
   int position;
-  ph_raise(CPhidgetEncoder_getPosition(handle, FIX2INT(index), &position));
+  ph_raise(PhidgetEncoder_getPosition(handle, FIX2INT(index), &position));
   return INT2FIX(position);
 }
 
 VALUE ph_encoder_set_position(VALUE self, VALUE index, VALUE position) {
-  CPhidgetEncoderHandle handle = (CPhidgetEncoderHandle)get_ph_handle(self);
-  ph_raise(CPhidgetEncoder_setPosition(handle, FIX2INT(index), FIX2INT(position)));
+  PhidgetEncoderHandle handle = (PhidgetEncoderHandle)get_ph_handle(self);
+  ph_raise(PhidgetEncoder_setPosition(handle, FIX2INT(index), FIX2INT(position)));
   return Qnil;
 }
 
 VALUE ph_encoder_get_index_position(VALUE self, VALUE index) {
-  CPhidgetEncoderHandle handle = (CPhidgetEncoderHandle)get_ph_handle(self);
+  PhidgetEncoderHandle handle = (PhidgetEncoderHandle)get_ph_handle(self);
   int position;
-  ph_raise(CPhidgetEncoder_getIndexPosition(handle, FIX2INT(index), &position));
+  ph_raise(PhidgetEncoder_getIndexPosition(handle, FIX2INT(index), &position));
   return INT2FIX(position);
 }
 
 VALUE ph_encoder_get_enabled(VALUE self, VALUE index) {
-  CPhidgetEncoderHandle handle = (CPhidgetEncoderHandle)get_ph_handle(self);
+  PhidgetEncoderHandle handle = (PhidgetEncoderHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetEncoder_getEnabled(handle, FIX2INT(index), &state));
+  ph_raise(PhidgetEncoder_getEnabled(handle, FIX2INT(index), &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_encoder_set_enabled(VALUE self, VALUE index, VALUE state) {
-  CPhidgetEncoderHandle handle = (CPhidgetEncoderHandle)get_ph_handle(self);
-  ph_raise(CPhidgetEncoder_setEnabled(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetEncoderHandle handle = (PhidgetEncoderHandle)get_ph_handle(self);
+  ph_raise(PhidgetEncoder_setEnabled(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 
-#ifdef PH_CALLBACK
 VALUE ph_encoder_set_on_input_change_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetEncoder_set_OnInputChange_Handler((CPhidgetEncoderHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetEncoder_set_OnInputChange_Handler((PhidgetEncoderHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetEncoder_set_OnInputChange_Handler((CPhidgetEncoderHandle)ph->handle, ph_encoder_on_input_change, (void *)callback_data));
+    ph_raise(PhidgetEncoder_set_OnInputChange_Handler((PhidgetEncoderHandle)ph->handle, ph_encoder_on_input_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -194,13 +189,13 @@ VALUE ph_encoder_set_on_position_change_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_2;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetEncoder_set_OnPositionChange_Handler((CPhidgetEncoderHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetEncoder_set_OnPositionChange_Handler((PhidgetEncoderHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetEncoder_set_OnPositionChange_Handler((CPhidgetEncoderHandle)ph->handle, ph_encoder_on_position_change, (void *)callback_data));
+    ph_raise(PhidgetEncoder_set_OnPositionChange_Handler((PhidgetEncoderHandle)ph->handle, ph_encoder_on_position_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -212,38 +207,36 @@ VALUE ph_encoder_set_on_index_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->dev_callback_3;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetEncoder_set_OnIndex_Handler((CPhidgetEncoderHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetEncoder_set_OnIndex_Handler((PhidgetEncoderHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetEncoder_set_OnIndex_Handler((CPhidgetEncoderHandle)ph->handle, ph_encoder_on_index, (void *)callback_data));
+    ph_raise(PhidgetEncoder_set_OnIndex_Handler((PhidgetEncoderHandle)ph->handle, ph_encoder_on_index, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_encoder_on_input_change(CPhidgetEncoderHandle phid, void *userPtr, int index, int state) {
+int ph_encoder_on_input_change(PhidgetEncoderHandle phid, void *userPtr, int index, int state) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_encoder_on_position_change(CPhidgetEncoderHandle phid, void *userPtr, int index, int time, int change) {
+int ph_encoder_on_position_change(PhidgetEncoderHandle phid, void *userPtr, int index, int time, int change) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_encoder_on_index(CPhidgetEncoderHandle phid, void *userPtr, int index, int index_pos) {
+int ph_encoder_on_index(PhidgetEncoderHandle phid, void *userPtr, int index, int index_pos) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
-
 #endif
-

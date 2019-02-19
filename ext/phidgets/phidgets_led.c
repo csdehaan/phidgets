@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_led_init(VALUE self);
 VALUE ph_led_get_led_count(VALUE self);
 VALUE ph_led_get_current_limit(VALUE self);
@@ -113,66 +113,66 @@ void Init_led() {
 
 VALUE ph_led_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetLED_create((CPhidgetLEDHandle *)(&(ph->handle))));
+  ph_raise(PhidgetLED_create((PhidgetLEDHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_led_get_led_count(VALUE self) {
-  CPhidgetLEDHandle handle = (CPhidgetLEDHandle)get_ph_handle(self);
+  PhidgetLEDHandle handle = (PhidgetLEDHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetLED_getLEDCount(handle, &count));
+  ph_raise(PhidgetLED_getLEDCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_led_get_current_limit(VALUE self) {
-  CPhidgetLEDHandle handle = (CPhidgetLEDHandle)get_ph_handle(self);
-  CPhidgetLED_CurrentLimit limit;
-  ph_raise(CPhidgetLED_getCurrentLimit(handle, &limit));
+  PhidgetLEDHandle handle = (PhidgetLEDHandle)get_ph_handle(self);
+  PhidgetLED_CurrentLimit limit;
+  ph_raise(PhidgetLED_getCurrentLimit(handle, &limit));
   return INT2FIX(limit);
 }
 
 VALUE ph_led_set_current_limit(VALUE self, VALUE limit) {
-  CPhidgetLEDHandle handle = (CPhidgetLEDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetLED_setCurrentLimit(handle, FIX2INT(limit)));
+  PhidgetLEDHandle handle = (PhidgetLEDHandle)get_ph_handle(self);
+  ph_raise(PhidgetLED_setCurrentLimit(handle, FIX2INT(limit)));
   return Qnil;
 }
 
 VALUE ph_led_get_voltage(VALUE self) {
-  CPhidgetLEDHandle handle = (CPhidgetLEDHandle)get_ph_handle(self);
-  CPhidgetLED_Voltage voltage;
-  ph_raise(CPhidgetLED_getVoltage(handle, &voltage));
+  PhidgetLEDHandle handle = (PhidgetLEDHandle)get_ph_handle(self);
+  PhidgetLED_Voltage voltage;
+  ph_raise(PhidgetLED_getVoltage(handle, &voltage));
   return INT2FIX(voltage);
 }
 
 VALUE ph_led_set_voltage(VALUE self, VALUE voltage) {
-  CPhidgetLEDHandle handle = (CPhidgetLEDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetLED_setVoltage(handle, FIX2INT(voltage)));
+  PhidgetLEDHandle handle = (PhidgetLEDHandle)get_ph_handle(self);
+  ph_raise(PhidgetLED_setVoltage(handle, FIX2INT(voltage)));
   return Qnil;
 }
 
 VALUE ph_led_get_brightness(VALUE self, VALUE index) {
-  CPhidgetLEDHandle handle = (CPhidgetLEDHandle)get_ph_handle(self);
+  PhidgetLEDHandle handle = (PhidgetLEDHandle)get_ph_handle(self);
   double brightness;
-  ph_raise(CPhidgetLED_getBrightness(handle, FIX2INT(index), &brightness));
+  ph_raise(PhidgetLED_getBrightness(handle, FIX2INT(index), &brightness));
   return rb_float_new(brightness);
 }
 
 VALUE ph_led_set_brightness(VALUE self, VALUE index, VALUE brightness) {
-  CPhidgetLEDHandle handle = (CPhidgetLEDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetLED_setBrightness(handle, FIX2INT(index), NUM2DBL(brightness)));
+  PhidgetLEDHandle handle = (PhidgetLEDHandle)get_ph_handle(self);
+  ph_raise(PhidgetLED_setBrightness(handle, FIX2INT(index), NUM2DBL(brightness)));
   return Qnil;
 }
 
 VALUE ph_led_get_current_limit_indexed(VALUE self, VALUE index) {
-  CPhidgetLEDHandle handle = (CPhidgetLEDHandle)get_ph_handle(self);
+  PhidgetLEDHandle handle = (PhidgetLEDHandle)get_ph_handle(self);
   double limit;
-  ph_raise(CPhidgetLED_getCurrentLimitIndexed(handle, FIX2INT(index), &limit));
+  ph_raise(PhidgetLED_getCurrentLimitIndexed(handle, FIX2INT(index), &limit));
   return rb_float_new(limit);
 }
 
 VALUE ph_led_set_current_limit_indexed(VALUE self, VALUE index, VALUE limit) {
-  CPhidgetLEDHandle handle = (CPhidgetLEDHandle)get_ph_handle(self);
-  ph_raise(CPhidgetLED_setCurrentLimitIndexed(handle, FIX2INT(index), NUM2DBL(limit)));
+  PhidgetLEDHandle handle = (PhidgetLEDHandle)get_ph_handle(self);
+  ph_raise(PhidgetLED_setCurrentLimitIndexed(handle, FIX2INT(index), NUM2DBL(limit)));
   return Qnil;
 }
-
+#endif

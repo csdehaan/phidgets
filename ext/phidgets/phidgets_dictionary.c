@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_dictionary_allocate(VALUE klass);
 void  ph_dictionary_free(ph_data_t *ph);
 VALUE ph_dictionary_init(VALUE self);
@@ -15,14 +15,12 @@ VALUE ph_dictionary_get_server_id(VALUE self);
 VALUE ph_dictionary_get_server_address(VALUE self);
 VALUE ph_dictionary_get_server_status(VALUE self);
 
-#ifdef PH_CALLBACK
 VALUE ph_dictionary_set_on_key_change_handler(VALUE self, VALUE handler);
 VALUE ph_dictionary_remove_on_key_change_handler(VALUE self, VALUE listener);
 VALUE ph_dictionary_set_on_server_connect_handler(VALUE self, VALUE handler);
 VALUE ph_dictionary_set_on_server_disconnect_handler(VALUE self, VALUE handler);
-int ph_dictionary_on_server_connect(CPhidgetDictionaryHandle phid, void *userPtr);
-int ph_dictionary_on_server_disconnect(CPhidgetDictionaryHandle phid, void *userPtr);
-#endif
+int ph_dictionary_on_server_connect(PhidgetDictionaryHandle phid, void *userPtr);
+int ph_dictionary_on_server_disconnect(PhidgetDictionaryHandle phid, void *userPtr);
 
 
 void Init_dictionary() {
@@ -100,7 +98,6 @@ void Init_dictionary() {
    */
   rb_define_method(ph_dictionary, "getServerStatus", ph_dictionary_get_server_status, 0);
 
-#ifdef PH_CALLBACK
 
   /* Document-method: setOnKeyChangeHandler
    * call-seq: setOnKeyChangeHandler(proc=nil, &block)
@@ -119,7 +116,6 @@ void Init_dictionary() {
   rb_define_private_method(ph_dictionary, "ext_setOnServerDisconnectHandler", ph_dictionary_set_on_server_disconnect_handler, 1);
   rb_define_alias(ph_dictionary, "on_key_change", "setOnKeyChangeHandler");
   rb_define_alias(ph_dictionary, "remove_on_key_change", "removeOnKeyChangeHandler");
-#endif
 
   rb_define_alias(ph_dictionary, "open_remote", "openRemote");
   rb_define_alias(ph_dictionary, "open_remote_ip", "openRemoteIP");
@@ -142,8 +138,8 @@ VALUE ph_dictionary_allocate(VALUE klass) {
 
 void ph_dictionary_free(ph_data_t *ph) {
   if (ph && ph->handle) {
-    CPhidgetDictionary_close((CPhidgetDictionaryHandle)ph->handle);
-    CPhidgetDictionary_delete((CPhidgetDictionaryHandle)ph->handle);
+    PhidgetDictionary_close((PhidgetDictionaryHandle)ph->handle);
+    PhidgetDictionary_delete((PhidgetDictionaryHandle)ph->handle);
     ph->handle = NULL;
   }
   if(ph) xfree(ph);
@@ -151,72 +147,71 @@ void ph_dictionary_free(ph_data_t *ph) {
 
 VALUE ph_dictionary_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetDictionary_create((CPhidgetDictionaryHandle *)(&(ph->handle))));
+  ph_raise(PhidgetDictionary_create((PhidgetDictionaryHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_dictionary_open_remote(VALUE self, VALUE server_id, VALUE password) {
-  CPhidgetDictionaryHandle handle = (CPhidgetDictionaryHandle)get_ph_handle(self);
-  ph_raise(CPhidgetDictionary_openRemote(handle, StringValueCStr(server_id), StringValueCStr(password)));
+  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
+  ph_raise(PhidgetDictionary_openRemote(handle, StringValueCStr(server_id), StringValueCStr(password)));
   return Qnil;
 }
 
 VALUE ph_dictionary_open_remote_ip(VALUE self, VALUE address, VALUE port, VALUE password) {
-  CPhidgetDictionaryHandle handle = (CPhidgetDictionaryHandle)get_ph_handle(self);
-  ph_raise(CPhidgetDictionary_openRemoteIP(handle, StringValueCStr(address), FIX2INT(port), StringValueCStr(password)));
+  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
+  ph_raise(PhidgetDictionary_openRemoteIP(handle, StringValueCStr(address), FIX2INT(port), StringValueCStr(password)));
   return Qnil;
 }
 
 VALUE ph_dictionary_close(VALUE self) {
-  CPhidgetDictionaryHandle handle = (CPhidgetDictionaryHandle)get_ph_handle(self);
-  ph_raise(CPhidgetDictionary_close(handle));
+  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
+  ph_raise(PhidgetDictionary_close(handle));
   return Qnil;
 }
 
 VALUE ph_dictionary_get_key(VALUE self, VALUE key) {
 #define VALUE_LEN 512
-  CPhidgetDictionaryHandle handle = (CPhidgetDictionaryHandle)get_ph_handle(self);
+  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
   char value[VALUE_LEN];
-  ph_raise(CPhidgetDictionary_getKey(handle, StringValueCStr(key), value, VALUE_LEN));
+  ph_raise(PhidgetDictionary_getKey(handle, StringValueCStr(key), value, VALUE_LEN));
   return rb_str_new2(value);
 }
 
 VALUE ph_dictionary_add_key(VALUE self, VALUE key, VALUE value, VALUE persist) {
-  CPhidgetDictionaryHandle handle = (CPhidgetDictionaryHandle)get_ph_handle(self);
-  ph_raise(CPhidgetDictionary_addKey(handle, StringValueCStr(key), StringValueCStr(value), TYPE(persist) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
+  ph_raise(PhidgetDictionary_addKey(handle, StringValueCStr(key), StringValueCStr(value), TYPE(persist) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
 
 VALUE ph_dictionary_remove_key(VALUE self, VALUE pattern) {
-  CPhidgetDictionaryHandle handle = (CPhidgetDictionaryHandle)get_ph_handle(self);
-  ph_raise(CPhidgetDictionary_removeKey(handle, StringValueCStr(pattern)));
+  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
+  ph_raise(PhidgetDictionary_removeKey(handle, StringValueCStr(pattern)));
   return Qnil;
 }
 
 VALUE ph_dictionary_get_server_id(VALUE self) {
-  CPhidgetDictionaryHandle handle = (CPhidgetDictionaryHandle)get_ph_handle(self);
+  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
   const char *server_id;
-  ph_raise(CPhidgetDictionary_getServerID(handle, &server_id));
+  ph_raise(PhidgetDictionary_getServerID(handle, &server_id));
   return rb_str_new2(server_id);
 }
 
 VALUE ph_dictionary_get_server_address(VALUE self) {
-  CPhidgetDictionaryHandle handle = (CPhidgetDictionaryHandle)get_ph_handle(self);
+  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
   const char *address;
   int port;
-  ph_raise(CPhidgetDictionary_getServerAddress(handle, &address, &port));
+  ph_raise(PhidgetDictionary_getServerAddress(handle, &address, &port));
   return rb_ary_new3(2, rb_str_new2(address), INT2FIX(port));
 }
 
 VALUE ph_dictionary_get_server_status(VALUE self) {
-  CPhidgetDictionaryHandle handle = (CPhidgetDictionaryHandle)get_ph_handle(self);
+  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
   int server_status;
-  ph_raise(CPhidgetDictionary_getServerStatus(handle, &server_status));
+  ph_raise(PhidgetDictionary_getServerStatus(handle, &server_status));
   return INT2FIX(server_status);
 }
 
 
-#ifdef PH_CALLBACK
 VALUE ph_dictionary_set_on_key_change_handler(VALUE self, VALUE handler) {
   ph_raise(EPHIDGET_NOTIMPLEMENTED);
   return Qnil;
@@ -232,13 +227,13 @@ VALUE ph_dictionary_set_on_server_connect_handler(VALUE self, VALUE handler) {
   ph_callback_data_t *callback_data = &ph->server_connect_callback;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetDictionary_set_OnServerConnect_Handler((CPhidgetDictionaryHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetDictionary_set_OnServerConnect_Handler((PhidgetDictionaryHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetDictionary_set_OnServerConnect_Handler((CPhidgetDictionaryHandle)ph->handle, ph_dictionary_on_server_connect, (void *)callback_data));
+    ph_raise(PhidgetDictionary_set_OnServerConnect_Handler((PhidgetDictionaryHandle)ph->handle, ph_dictionary_on_server_connect, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
@@ -249,30 +244,29 @@ VALUE ph_dictionary_set_on_server_disconnect_handler(VALUE self, VALUE handler) 
   ph_callback_data_t *callback_data = &ph->server_disconnect_callback;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetDictionary_set_OnServerDisconnect_Handler((CPhidgetDictionaryHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetDictionary_set_OnServerDisconnect_Handler((PhidgetDictionaryHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetDictionary_set_OnServerDisconnect_Handler((CPhidgetDictionaryHandle)ph->handle, ph_dictionary_on_server_disconnect, (void *)callback_data));
+    ph_raise(PhidgetDictionary_set_OnServerDisconnect_Handler((PhidgetDictionaryHandle)ph->handle, ph_dictionary_on_server_disconnect, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_dictionary_on_server_connect(CPhidgetDictionaryHandle phid, void *userPtr) {
+int ph_dictionary_on_server_connect(PhidgetDictionaryHandle phid, void *userPtr) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 
 
-int ph_dictionary_on_server_disconnect(CPhidgetDictionaryHandle phid, void *userPtr) {
+int ph_dictionary_on_server_disconnect(PhidgetDictionaryHandle phid, void *userPtr) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
 #endif
-

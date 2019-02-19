@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_analog_init(VALUE self);
 VALUE ph_analog_get_output_count(VALUE self);
 VALUE ph_analog_get_voltage(VALUE self, VALUE index);
@@ -86,54 +86,54 @@ void Init_analog() {
 
 VALUE ph_analog_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetAnalog_create((CPhidgetAnalogHandle *)(&(ph->handle))));
+  ph_raise(PhidgetAnalog_create((PhidgetAnalogHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_analog_get_output_count(VALUE self) {
-  CPhidgetAnalogHandle handle = (CPhidgetAnalogHandle)get_ph_handle(self);
+  PhidgetAnalogHandle handle = (PhidgetAnalogHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetAnalog_getOutputCount(handle, &count));
+  ph_raise(PhidgetAnalog_getOutputCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_analog_get_voltage(VALUE self, VALUE index) {
-  CPhidgetAnalogHandle handle = (CPhidgetAnalogHandle)get_ph_handle(self);
+  PhidgetAnalogHandle handle = (PhidgetAnalogHandle)get_ph_handle(self);
   double volts;
-  ph_raise(CPhidgetAnalog_getVoltage(handle, FIX2INT(index), &volts));
+  ph_raise(PhidgetAnalog_getVoltage(handle, FIX2INT(index), &volts));
   return rb_float_new(volts);
 }
 
 VALUE ph_analog_get_voltage_min(VALUE self, VALUE index) {
-  CPhidgetAnalogHandle handle = (CPhidgetAnalogHandle)get_ph_handle(self);
+  PhidgetAnalogHandle handle = (PhidgetAnalogHandle)get_ph_handle(self);
   double volts;
-  ph_raise(CPhidgetAnalog_getVoltageMin(handle, FIX2INT(index), &volts));
+  ph_raise(PhidgetAnalog_getVoltageMin(handle, FIX2INT(index), &volts));
   return rb_float_new(volts);
 }
 
 VALUE ph_analog_get_voltage_max(VALUE self, VALUE index) {
-  CPhidgetAnalogHandle handle = (CPhidgetAnalogHandle)get_ph_handle(self);
+  PhidgetAnalogHandle handle = (PhidgetAnalogHandle)get_ph_handle(self);
   double volts;
-  ph_raise(CPhidgetAnalog_getVoltageMax(handle, FIX2INT(index), &volts));
+  ph_raise(PhidgetAnalog_getVoltageMax(handle, FIX2INT(index), &volts));
   return rb_float_new(volts);
 }
 
 VALUE ph_analog_set_voltage(VALUE self, VALUE index, VALUE voltage) {
-  CPhidgetAnalogHandle handle = (CPhidgetAnalogHandle)get_ph_handle(self);
-  ph_raise(CPhidgetAnalog_setVoltage(handle, FIX2INT(index), NUM2DBL(voltage)));
+  PhidgetAnalogHandle handle = (PhidgetAnalogHandle)get_ph_handle(self);
+  ph_raise(PhidgetAnalog_setVoltage(handle, FIX2INT(index), NUM2DBL(voltage)));
   return Qnil;
 }
 
 VALUE ph_analog_get_enabled(VALUE self, VALUE index) {
-  CPhidgetAnalogHandle handle = (CPhidgetAnalogHandle)get_ph_handle(self);
+  PhidgetAnalogHandle handle = (PhidgetAnalogHandle)get_ph_handle(self);
   int state;
-  ph_raise(CPhidgetAnalog_getEnabled(handle, FIX2INT(index), &state));
+  ph_raise(PhidgetAnalog_getEnabled(handle, FIX2INT(index), &state));
   return state == PTRUE ? Qtrue : Qfalse;
 }
 
 VALUE ph_analog_set_enabled(VALUE self, VALUE index, VALUE state) {
-  CPhidgetAnalogHandle handle = (CPhidgetAnalogHandle)get_ph_handle(self);
-  ph_raise(CPhidgetAnalog_setEnabled(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  PhidgetAnalogHandle handle = (PhidgetAnalogHandle)get_ph_handle(self);
+  ph_raise(PhidgetAnalog_setEnabled(handle, FIX2INT(index), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
   return Qnil;
 }
-
+#endif

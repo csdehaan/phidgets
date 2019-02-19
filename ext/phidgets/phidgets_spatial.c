@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-
+#if 0
 VALUE ph_spatial_init(VALUE self);
 VALUE ph_spatial_get_acceleration_axis_count(VALUE self);
 VALUE ph_spatial_get_gyro_axis_count(VALUE self);
@@ -23,10 +23,8 @@ VALUE ph_spatial_zero_gyro(VALUE self);
 VALUE ph_spatial_set_compass_correction_parameters(VALUE self, VALUE mag_field, VALUE offset0, VALUE offset1, VALUE offset2, VALUE gain0, VALUE gain1, VALUE gain2, VALUE T0, VALUE T1, VALUE T2, VALUE T3, VALUE T4, VALUE T5);
 VALUE ph_spatial_reset_compass_correction_parameters(VALUE self);
 
-#ifdef PH_CALLBACK
 VALUE ph_spatial_set_on_spatial_data_handler(VALUE self, VALUE handler);
-int ph_spatial_on_spatial_data(CPhidgetSpatialHandle phid, void *userPtr, CPhidgetSpatial_SpatialEventDataHandle *data, int data_count);
-#endif
+int ph_spatial_on_spatial_data(PhidgetSpatialHandle phid, void *userPtr, PhidgetSpatial_SpatialEventDataHandle *data, int data_count);
 
 
 void Init_spatial() {
@@ -176,9 +174,7 @@ void Init_spatial() {
    */
   rb_define_method(ph_spatial, "resetCompassCorrectionParameters", ph_spatial_reset_compass_correction_parameters, 0);
 
-#ifdef PH_CALLBACK
   rb_define_private_method(ph_spatial, "ext_setOnSpatialDataHandler", ph_spatial_set_on_spatial_data_handler, 1);
-#endif
 
   rb_define_alias(ph_spatial, "acceleration_axis_count", "getAccelerationAxisCount");
   rb_define_alias(ph_spatial, "gyro_axis_count", "getGyroAxisCount");
@@ -205,165 +201,162 @@ void Init_spatial() {
 
 VALUE ph_spatial_init(VALUE self) {
   ph_data_t *ph = get_ph_data(self);
-  ph_raise(CPhidgetSpatial_create((CPhidgetSpatialHandle *)(&(ph->handle))));
+  ph_raise(PhidgetSpatial_create((PhidgetSpatialHandle *)(&(ph->handle))));
   return self;
 }
 
 VALUE ph_spatial_get_acceleration_axis_count(VALUE self) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetSpatial_getAccelerationAxisCount(handle, &count));
+  ph_raise(PhidgetSpatial_getAccelerationAxisCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_spatial_get_gyro_axis_count(VALUE self) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetSpatial_getGyroAxisCount(handle, &count));
+  ph_raise(PhidgetSpatial_getGyroAxisCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_spatial_get_compass_axis_count(VALUE self) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   int count;
-  ph_raise(CPhidgetSpatial_getCompassAxisCount(handle, &count));
+  ph_raise(PhidgetSpatial_getCompassAxisCount(handle, &count));
   return INT2FIX(count);
 }
 
 VALUE ph_spatial_get_acceleration(VALUE self, VALUE index) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetSpatial_getAcceleration(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetSpatial_getAcceleration(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_spatial_get_acceleration_min(VALUE self, VALUE index) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetSpatial_getAccelerationMin(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetSpatial_getAccelerationMin(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_spatial_get_acceleration_max(VALUE self, VALUE index) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetSpatial_getAccelerationMax(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetSpatial_getAccelerationMax(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_spatial_get_angular_rate(VALUE self, VALUE index) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetSpatial_getAngularRate(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetSpatial_getAngularRate(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_spatial_get_angular_rate_min(VALUE self, VALUE index) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetSpatial_getAngularRateMin(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetSpatial_getAngularRateMin(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_spatial_get_angular_rate_max(VALUE self, VALUE index) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetSpatial_getAngularRateMax(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetSpatial_getAngularRateMax(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_spatial_get_magnetic_field(VALUE self, VALUE index) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetSpatial_getMagneticField(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetSpatial_getMagneticField(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_spatial_get_magnetic_field_min(VALUE self, VALUE index) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetSpatial_getMagneticFieldMin(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetSpatial_getMagneticFieldMin(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_spatial_get_magnetic_field_max(VALUE self, VALUE index) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   double value;
-  ph_raise(CPhidgetSpatial_getMagneticFieldMax(handle, FIX2INT(index), &value));
+  ph_raise(PhidgetSpatial_getMagneticFieldMax(handle, FIX2INT(index), &value));
   return rb_float_new(value);
 }
 
 VALUE ph_spatial_get_data_rate(VALUE self) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetSpatial_getDataRate(handle, &value));
+  ph_raise(PhidgetSpatial_getDataRate(handle, &value));
   return INT2FIX(value);
 }
 
 VALUE ph_spatial_get_data_rate_min(VALUE self) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetSpatial_getDataRateMin(handle, &value));
+  ph_raise(PhidgetSpatial_getDataRateMin(handle, &value));
   return INT2FIX(value);
 }
 
 VALUE ph_spatial_get_data_rate_max(VALUE self) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
   int value;
-  ph_raise(CPhidgetSpatial_getDataRateMax(handle, &value));
+  ph_raise(PhidgetSpatial_getDataRateMax(handle, &value));
   return INT2FIX(value);
 }
 
 VALUE ph_spatial_set_data_rate(VALUE self, VALUE milliseconds) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
-  ph_raise(CPhidgetSpatial_setDataRate(handle, FIX2INT(milliseconds)));
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
+  ph_raise(PhidgetSpatial_setDataRate(handle, FIX2INT(milliseconds)));
   return Qnil;
 }
 
 VALUE ph_spatial_zero_gyro(VALUE self) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
-  ph_raise(CPhidgetSpatial_zeroGyro(handle));
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
+  ph_raise(PhidgetSpatial_zeroGyro(handle));
   return Qnil;
 }
 
 VALUE ph_spatial_set_compass_correction_parameters(VALUE self, VALUE mag_field, VALUE offset0, VALUE offset1, VALUE offset2, VALUE gain0, VALUE gain1, VALUE gain2, VALUE T0, VALUE T1, VALUE T2, VALUE T3, VALUE T4, VALUE T5) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
-  ph_raise(CPhidgetSpatial_setCompassCorrectionParameters(handle, NUM2DBL(mag_field), NUM2DBL(offset0), NUM2DBL(offset1), NUM2DBL(offset2),
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
+  ph_raise(PhidgetSpatial_setCompassCorrectionParameters(handle, NUM2DBL(mag_field), NUM2DBL(offset0), NUM2DBL(offset1), NUM2DBL(offset2),
       NUM2DBL(gain0), NUM2DBL(gain1), NUM2DBL(gain2), NUM2DBL(T0), NUM2DBL(T1), NUM2DBL(T2), NUM2DBL(T3), NUM2DBL(T4), NUM2DBL(T5)));
   return Qnil;
 }
 
 VALUE ph_spatial_reset_compass_correction_parameters(VALUE self) {
-  CPhidgetSpatialHandle handle = (CPhidgetSpatialHandle)get_ph_handle(self);
-  ph_raise(CPhidgetSpatial_resetCompassCorrectionParameters(handle));
+  PhidgetSpatialHandle handle = (PhidgetSpatialHandle)get_ph_handle(self);
+  ph_raise(PhidgetSpatial_resetCompassCorrectionParameters(handle));
   return Qnil;
 }
 
 
-#ifdef PH_CALLBACK
 VALUE ph_spatial_set_on_spatial_data_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
   ph_callback_data_t *callback_data = &ph->dev_callback_1;
   if( TYPE(handler) == T_NIL ) {
     callback_data->exit = true;
-    ph_raise(CPhidgetSpatial_set_OnSpatialData_Handler((CPhidgetSpatialHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetSpatial_set_OnSpatialData_Handler((PhidgetSpatialHandle)ph->handle, NULL, (void *)NULL));
   } else {
     callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(CPhidgetSpatial_set_OnSpatialData_Handler((CPhidgetSpatialHandle)ph->handle, ph_spatial_on_spatial_data, (void *)callback_data));
+    ph_raise(PhidgetSpatial_set_OnSpatialData_Handler((PhidgetSpatialHandle)ph->handle, ph_spatial_on_spatial_data, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_spatial_on_spatial_data(CPhidgetSpatialHandle phid, void *userPtr, CPhidgetSpatial_SpatialEventDataHandle *data, int data_count) {
+int ph_spatial_on_spatial_data(PhidgetSpatialHandle phid, void *userPtr, PhidgetSpatial_SpatialEventDataHandle *data, int data_count) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->called = true;
   return EPHIDGET_OK;
 }
-
 #endif
-
