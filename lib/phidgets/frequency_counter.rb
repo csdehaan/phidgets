@@ -3,22 +3,31 @@
 module Phidgets
   class FrequencyCounter < Common
 
-    unless RUBY_VERSION < '1.9.0'
-
-      # call-seq:
-      #   setOnCountHandler(proc=nil, &block)
-      #
-      # Sets a count event handler. This is called when ticks have been counted on an input, or when the timeout has passed.
-      #
-      def setOnCountHandler(cb_proc = nil, &cb_block)
-        @on_count_thread.kill if defined? @on_count_thread
-        callback = cb_proc || cb_block
-        @on_count_thread = Thread.new {ext_setOnCountHandler(callback)}
-      end
-
-      alias :on_count :setOnCountHandler
-
+    # call-seq:
+    #   setOnCountChangeHandler(proc=nil, &block)
+    #
+    # Assigns a handler that will be called when the CountChange event occurs.
+    #
+    def setOnCountChangeHandler(cb_proc = nil, &cb_block)
+      @on_count_change_thread.kill if defined? @on_count_change_thread and @on_count_change_thread.alive?
+      callback = cb_proc || cb_block
+      @on_count_change_thread = Thread.new {ext_setOnCountChangeHandler(callback)}
     end
+
+    alias :on_count_change :setOnCountChangeHandler
+
+    # call-seq:
+    #   setOnFrequencyChangeHandler(proc=nil, &block)
+    #
+    # Assigns a handler that will be called when the CountChange event occurs.
+    #
+    def setOnFrequencyChangeHandler(cb_proc = nil, &cb_block)
+      @on_frequency_change_thread.kill if defined? @on_frequency_change_thread and @on_frequency_change_thread.alive?
+      callback = cb_proc || cb_block
+      @on_frequency_change_thread = Thread.new {ext_setOnFrequencyChangeHandler(callback)}
+    end
+
+    alias :on_frequency_change :setOnFrequencyChangeHandler
 
   end
 end
