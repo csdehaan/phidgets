@@ -1,20 +1,147 @@
 
 #include "phidgets.h"
 
+#define DIGITAL_OUTPUT_DUTY_CYCLE_ASYNC_CALLBACK         0
+#define DIGITAL_OUTPUT_LED_CURRENT_LIMIT_ASYNC_CALLBACK  1
+#define DIGITAL_OUTPUT_STATE_ASYNC_CALLBACK              2
 
-VALUE ph_digital_output_init(VALUE self);
-VALUE ph_digital_output_get_duty_cycle(VALUE self);
-VALUE ph_digital_output_set_duty_cycle(VALUE self, VALUE duty_cycle);
-VALUE ph_digital_output_get_min_duty_cycle(VALUE self);
-VALUE ph_digital_output_get_max_duty_cycle(VALUE self);
-VALUE ph_digital_output_get_led_current_limit(VALUE self);
-VALUE ph_digital_output_set_led_current_limit(VALUE self, VALUE current_limit);
-VALUE ph_digital_output_get_min_led_current_limit(VALUE self);
-VALUE ph_digital_output_get_max_led_current_limit(VALUE self);
-VALUE ph_digital_output_get_led_forward_voltage(VALUE self);
-VALUE ph_digital_output_set_led_forward_voltage(VALUE self, VALUE forward_voltage);
-VALUE ph_digital_output_get_state(VALUE self);
-VALUE ph_digital_output_set_state(VALUE self, VALUE state);
+
+VALUE ph_digital_output_init(VALUE self) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_raise(PhidgetDigitalOutput_create((PhidgetDigitalOutputHandle *)(&(ph->handle))));
+  return self;
+}
+
+VALUE ph_digital_output_get_duty_cycle(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getDutyCycle);
+}
+
+VALUE ph_digital_output_set_duty_cycle(VALUE self, VALUE duty_cycle) {
+  ph_raise(PhidgetDigitalOutput_setDutyCycle((PhidgetDigitalOutputHandle)get_ph_handle(self), NUM2DBL(duty_cycle)));
+  return Qnil;
+}
+
+VALUE ph_digital_output_get_min_duty_cycle(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getMinDutyCycle);
+}
+
+VALUE ph_digital_output_get_max_duty_cycle(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getMaxDutyCycle);
+}
+
+VALUE ph_digital_output_get_led_current_limit(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getLEDCurrentLimit);
+}
+
+VALUE ph_digital_output_set_led_current_limit(VALUE self, VALUE current_limit) {
+  ph_raise(PhidgetDigitalOutput_setLEDCurrentLimit((PhidgetDigitalOutputHandle)get_ph_handle(self), NUM2DBL(current_limit)));
+  return Qnil;
+}
+
+VALUE ph_digital_output_get_min_led_current_limit(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getMinLEDCurrentLimit);
+}
+
+VALUE ph_digital_output_get_max_led_current_limit(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getMaxLEDCurrentLimit);
+}
+
+VALUE ph_digital_output_get_led_forward_voltage(VALUE self) {
+  return ph_get_int(get_ph_handle(self), PhidgetDigitalOutput_getLEDForwardVoltage);
+}
+
+VALUE ph_digital_output_set_led_forward_voltage(VALUE self, VALUE forward_voltage) {
+  ph_raise(PhidgetDigitalOutput_setLEDForwardVoltage((PhidgetDigitalOutputHandle)get_ph_handle(self), NUM2INT(forward_voltage)));
+  return Qnil;
+}
+
+VALUE ph_digital_output_get_state(VALUE self) {
+  return ph_get_bool(get_ph_handle(self), PhidgetDigitalOutput_getState);
+}
+
+VALUE ph_digital_output_set_state(VALUE self, VALUE state) {
+  ph_raise(PhidgetDigitalOutput_setState((PhidgetDigitalOutputHandle)get_ph_handle(self), TYPE(state) == T_TRUE ? PTRUE : PFALSE));
+  return Qnil;
+}
+
+
+
+void CCONV ph_digital_output_duty_cycle_async(PhidgetHandle phid, void *userPtr, PhidgetReturnCode res) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  callback_data->exit = true;
+  callback_data->arg1 = INT2NUM(res);
+  callback_data->arg2 = Qnil;
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->sem);
+}
+
+VALUE ph_digital_output_set_duty_cycle_async(VALUE self, VALUE duty_cycle, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->dev_callbacks[DIGITAL_OUTPUT_DUTY_CYCLE_ASYNC_CALLBACK];
+  if( TYPE(handler) == T_NIL ) {
+    PhidgetDigitalOutput_setDutyCycle_async((PhidgetDigitalOutputHandle)ph->handle, NUM2DBL(duty_cycle), NULL, (void *)NULL);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    PhidgetDigitalOutput_setDutyCycle_async((PhidgetDigitalOutputHandle)ph->handle, NUM2DBL(duty_cycle), ph_digital_output_duty_cycle_async, (void *)callback_data);
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
+
+
+void CCONV ph_digital_output_led_current_limit_async(PhidgetHandle phid, void *userPtr, PhidgetReturnCode res) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  callback_data->exit = true;
+  callback_data->arg1 = INT2NUM(res);
+  callback_data->arg2 = Qnil;
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->sem);
+}
+
+VALUE ph_digital_output_set_led_current_limit_async(VALUE self, VALUE current_limit, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->dev_callbacks[DIGITAL_OUTPUT_LED_CURRENT_LIMIT_ASYNC_CALLBACK];
+  if( TYPE(handler) == T_NIL ) {
+    PhidgetDigitalOutput_setLEDCurrentLimit_async((PhidgetDigitalOutputHandle)ph->handle, NUM2DBL(current_limit), NULL, (void *)NULL);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    PhidgetDigitalOutput_setLEDCurrentLimit_async((PhidgetDigitalOutputHandle)ph->handle, NUM2DBL(current_limit), ph_digital_output_led_current_limit_async, (void *)callback_data);
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
+
+
+void CCONV ph_digital_output_state_async(PhidgetHandle phid, void *userPtr, PhidgetReturnCode res) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  callback_data->exit = true;
+  callback_data->arg1 = INT2NUM(res);
+  callback_data->arg2 = Qnil;
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->sem);
+}
+
+VALUE ph_digital_output_set_state_async(VALUE self, VALUE state, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->dev_callbacks[DIGITAL_OUTPUT_STATE_ASYNC_CALLBACK];
+  if( TYPE(handler) == T_NIL ) {
+    PhidgetDigitalOutput_setState_async((PhidgetDigitalOutputHandle)ph->handle, TYPE(state) == T_TRUE ? PTRUE : PFALSE, NULL, (void *)NULL);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    PhidgetDigitalOutput_setState_async((PhidgetDigitalOutputHandle)ph->handle, TYPE(state) == T_TRUE ? PTRUE : PFALSE, ph_digital_output_state_async, (void *)callback_data);
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
 
 
 void Init_digital_output() {
@@ -143,93 +270,9 @@ void Init_digital_output() {
    */
   rb_define_method(ph_digital_output, "setState", ph_digital_output_set_state, 1);
   rb_define_alias(ph_digital_output, "state=", "setState");
-}
 
-
-
-VALUE ph_digital_output_init(VALUE self) {
-  ph_data_t *ph = get_ph_data(self);
-  ph_raise(PhidgetDigitalOutput_create((PhidgetDigitalOutputHandle *)(&(ph->handle))));
-  return self;
-}
-
-VALUE ph_digital_output_get_duty_cycle(VALUE self) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  double duty_cycle;
-  ph_raise(PhidgetDigitalOutput_getDutyCycle(handle, &duty_cycle));
-  return DBL2NUM(duty_cycle);
-}
-
-VALUE ph_digital_output_set_duty_cycle(VALUE self, VALUE duty_cycle) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  ph_raise(PhidgetDigitalOutput_setDutyCycle(handle, NUM2DBL(duty_cycle)));
-  return Qnil;
-}
-
-VALUE ph_digital_output_get_min_duty_cycle(VALUE self) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  double duty_cycle;
-  ph_raise(PhidgetDigitalOutput_getMinDutyCycle(handle, &duty_cycle));
-  return DBL2NUM(duty_cycle);
-}
-
-VALUE ph_digital_output_get_max_duty_cycle(VALUE self) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  double duty_cycle;
-  ph_raise(PhidgetDigitalOutput_getMaxDutyCycle(handle, &duty_cycle));
-  return DBL2NUM(duty_cycle);
-}
-
-VALUE ph_digital_output_get_led_current_limit(VALUE self) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  double current_limit;
-  ph_raise(PhidgetDigitalOutput_getLEDCurrentLimit(handle, &current_limit));
-  return DBL2NUM(current_limit);
-}
-
-VALUE ph_digital_output_set_led_current_limit(VALUE self, VALUE current_limit) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  ph_raise(PhidgetDigitalOutput_setLEDCurrentLimit(handle, NUM2DBL(current_limit)));
-  return Qnil;
-}
-
-VALUE ph_digital_output_get_min_led_current_limit(VALUE self) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  double current_limit;
-  ph_raise(PhidgetDigitalOutput_getMinLEDCurrentLimit(handle, &current_limit));
-  return DBL2NUM(current_limit);
-}
-
-VALUE ph_digital_output_get_max_led_current_limit(VALUE self) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  double current_limit;
-  ph_raise(PhidgetDigitalOutput_getMaxLEDCurrentLimit(handle, &current_limit));
-  return DBL2NUM(current_limit);
-}
-
-VALUE ph_digital_output_get_led_forward_voltage(VALUE self) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  PhidgetDigitalOutput_LEDForwardVoltage forward_voltage;
-  ph_raise(PhidgetDigitalOutput_getLEDForwardVoltage(handle, &forward_voltage));
-  return INT2NUM(forward_voltage);
-}
-
-VALUE ph_digital_output_set_led_forward_voltage(VALUE self, VALUE forward_voltage) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  ph_raise(PhidgetDigitalOutput_setLEDForwardVoltage(handle, NUM2INT(forward_voltage)));
-  return Qnil;
-}
-
-VALUE ph_digital_output_get_state(VALUE self) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  int state;
-  ph_raise(PhidgetDigitalOutput_getState(handle, &state));
-  return state == PTRUE ? Qtrue : Qfalse;
-}
-
-VALUE ph_digital_output_set_state(VALUE self, VALUE state) {
-  PhidgetDigitalOutputHandle handle = (PhidgetDigitalOutputHandle)get_ph_handle(self);
-  ph_raise(PhidgetDigitalOutput_setState(handle, TYPE(state) == T_TRUE ? PTRUE : PFALSE));
-  return Qnil;
+  rb_define_private_method(ph_digital_output, "ext_setDutyCycle_async", ph_digital_output_set_duty_cycle_async, 2);
+  rb_define_private_method(ph_digital_output, "ext_setLEDCurrentLimit_async", ph_digital_output_set_led_current_limit_async, 2);
+  rb_define_private_method(ph_digital_output, "ext_setState_async", ph_digital_output_set_state_async, 2);
 }
 
