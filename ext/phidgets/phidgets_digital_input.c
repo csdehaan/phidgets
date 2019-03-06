@@ -3,15 +3,62 @@
 
 #define DIGITAL_INPUT_STATE_CHANGE_CALLBACK  0
 
-VALUE ph_digital_input_init(VALUE self);
-VALUE ph_digital_input_get_input_mode(VALUE self);
-VALUE ph_digital_input_set_input_mode(VALUE self, VALUE mode);
-VALUE ph_digital_input_get_power_supply(VALUE self);
-VALUE ph_digital_input_set_power_supply(VALUE self, VALUE power_supply);
-VALUE ph_digital_input_get_state(VALUE self);
 
-VALUE ph_digital_input_set_on_state_change_handler(VALUE self, VALUE handler);
-void CCONV ph_digital_input_on_state_change(PhidgetDigitalInputHandle phid, void *userPtr, int state);
+VALUE ph_digital_input_init(VALUE self) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_raise(PhidgetDigitalInput_create((PhidgetDigitalInputHandle *)(&(ph->handle))));
+  return self;
+}
+
+VALUE ph_digital_input_get_input_mode(VALUE self) {
+  return ph_get_int(get_ph_handle(self), PhidgetDigitalInput_getInputMode);
+}
+
+VALUE ph_digital_input_set_input_mode(VALUE self, VALUE mode) {
+  ph_raise(PhidgetDigitalInput_setInputMode((PhidgetDigitalInputHandle)get_ph_handle(self), NUM2INT(mode)));
+  return Qnil;
+}
+
+VALUE ph_digital_input_get_power_supply(VALUE self) {
+  return ph_get_int(get_ph_handle(self), PhidgetDigitalInput_getPowerSupply);
+}
+
+VALUE ph_digital_input_set_power_supply(VALUE self, VALUE power_supply) {
+  ph_raise(PhidgetDigitalInput_setPowerSupply((PhidgetDigitalInputHandle)get_ph_handle(self), NUM2INT(power_supply)));
+  return Qnil;
+}
+
+VALUE ph_digital_input_get_state(VALUE self) {
+  return ph_get_bool(get_ph_handle(self), PhidgetDigitalInput_getState);
+}
+
+
+void CCONV ph_digital_input_on_state_change(PhidgetDigitalInputHandle phid, void *userPtr, int state) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  callback_data->arg1 = state == PTRUE ? Qtrue : Qfalse;
+  callback_data->arg2 = Qnil;
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->sem);
+}
+
+VALUE ph_digital_input_set_on_state_change_handler(VALUE self, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->dev_callbacks[DIGITAL_INPUT_STATE_CHANGE_CALLBACK];
+  if( TYPE(handler) == T_NIL ) {
+    callback_data->callback = T_NIL;
+    callback_data->exit = true;
+    ph_raise(PhidgetDigitalInput_setOnStateChangeHandler((PhidgetDigitalInputHandle)ph->handle, NULL, (void *)NULL));
+    sem_post(&callback_data->sem);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    ph_raise(PhidgetDigitalInput_setOnStateChangeHandler((PhidgetDigitalInputHandle)ph->handle, ph_digital_input_on_state_change, (void *)callback_data));
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
 
 
 void Init_digital_input() {
@@ -75,71 +122,5 @@ void Init_digital_input() {
 
 
   rb_define_private_method(ph_digital_input, "ext_setOnStateChangeHandler", ph_digital_input_set_on_state_change_handler, 1);
-}
-
-
-
-VALUE ph_digital_input_init(VALUE self) {
-  ph_data_t *ph = get_ph_data(self);
-  ph_raise(PhidgetDigitalInput_create((PhidgetDigitalInputHandle *)(&(ph->handle))));
-  return self;
-}
-
-VALUE ph_digital_input_get_input_mode(VALUE self) {
-  PhidgetDigitalInputHandle handle = (PhidgetDigitalInputHandle)get_ph_handle(self);
-  Phidget_InputMode mode;
-  ph_raise(PhidgetDigitalInput_getInputMode(handle, &mode));
-  return INT2NUM(mode);
-}
-
-VALUE ph_digital_input_set_input_mode(VALUE self, VALUE mode) {
-  PhidgetDigitalInputHandle handle = (PhidgetDigitalInputHandle)get_ph_handle(self);
-  ph_raise(PhidgetDigitalInput_setInputMode(handle, NUM2INT(mode)));
-  return Qnil;
-}
-
-VALUE ph_digital_input_get_power_supply(VALUE self) {
-  PhidgetDigitalInputHandle handle = (PhidgetDigitalInputHandle)get_ph_handle(self);
-  Phidget_PowerSupply power_supply;
-  ph_raise(PhidgetDigitalInput_getPowerSupply(handle, &power_supply));
-  return INT2NUM(power_supply);
-}
-
-VALUE ph_digital_input_set_power_supply(VALUE self, VALUE power_supply) {
-  PhidgetDigitalInputHandle handle = (PhidgetDigitalInputHandle)get_ph_handle(self);
-  ph_raise(PhidgetDigitalInput_setPowerSupply(handle, NUM2INT(power_supply)));
-  return Qnil;
-}
-
-VALUE ph_digital_input_get_state(VALUE self) {
-  PhidgetDigitalInputHandle handle = (PhidgetDigitalInputHandle)get_ph_handle(self);
-  int state;
-  ph_raise(PhidgetDigitalInput_getState(handle, &state));
-  return state == PTRUE ? Qtrue : Qfalse;
-}
-
-VALUE ph_digital_input_set_on_state_change_handler(VALUE self, VALUE handler) {
-  ph_data_t *ph = get_ph_data(self);
-  ph_callback_data_t *callback_data = &ph->dev_callbacks[DIGITAL_INPUT_STATE_CHANGE_CALLBACK];
-  if( TYPE(handler) == T_NIL ) {
-    callback_data->exit = true;
-    ph_raise(PhidgetDigitalInput_setOnStateChangeHandler((PhidgetDigitalInputHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
-  } else {
-    callback_data->exit = false;
-    callback_data->phidget = self;
-    callback_data->callback = handler;
-    ph_raise(PhidgetDigitalInput_setOnStateChangeHandler((PhidgetDigitalInputHandle)ph->handle, ph_digital_input_on_state_change, (void *)callback_data));
-    ph_callback_thread(callback_data);
-  }
-  return Qnil;
-}
-
-
-void CCONV ph_digital_input_on_state_change(PhidgetDigitalInputHandle phid, void *userPtr, int state) {
-  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
-  callback_data->arg1 = state == PTRUE ? Qtrue : Qfalse;
-  callback_data->arg2 = Qnil;
-  sem_post(&callback_data->sem);
 }
 
