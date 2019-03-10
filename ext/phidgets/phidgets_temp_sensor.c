@@ -1,162 +1,7 @@
 
 #include "phidgets.h"
 
-#if 0
-VALUE ph_temp_init(VALUE self);
-VALUE ph_temp_get_temperature_input_count(VALUE self);
-VALUE ph_temp_get_temperature(VALUE self, VALUE index);
-VALUE ph_temp_get_temperature_min(VALUE self, VALUE index);
-VALUE ph_temp_get_temperature_max(VALUE self, VALUE index);
-VALUE ph_temp_get_temperature_change_trigger(VALUE self, VALUE index);
-VALUE ph_temp_set_temperature_change_trigger(VALUE self, VALUE index, VALUE temperature);
-VALUE ph_temp_get_potential(VALUE self, VALUE index);
-VALUE ph_temp_get_potential_min(VALUE self, VALUE index);
-VALUE ph_temp_get_potential_max(VALUE self, VALUE index);
-VALUE ph_temp_get_ambient_temperature(VALUE self);
-VALUE ph_temp_get_ambient_temperature_min(VALUE self);
-VALUE ph_temp_get_ambient_temperature_max(VALUE self);
-VALUE ph_temp_get_thermocouple_type(VALUE self, VALUE index);
-VALUE ph_temp_set_thermocouple_type(VALUE self, VALUE index, VALUE thermocouple);
-
-VALUE ph_temp_set_on_temperature_change_handler(VALUE self, VALUE handler);
-int ph_temp_on_temperature_change(PhidgetTemperatureSensorHandle phid, void *userPtr, int index, double temperature);
-
-
-void Init_temperature_sensor() {
-  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
-  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
-  VALUE ph_temp = rb_define_class_under(ph_module, "TemperatureSensor", ph_common);
-
-  rb_define_const(ph_temp, "K_TYPE", INT2FIX(PHIDGET_TEMPERATURE_SENSOR_K_TYPE));
-  rb_define_const(ph_temp, "J_TYPE", INT2FIX(PHIDGET_TEMPERATURE_SENSOR_J_TYPE));
-  rb_define_const(ph_temp, "E_TYPE", INT2FIX(PHIDGET_TEMPERATURE_SENSOR_E_TYPE));
-  rb_define_const(ph_temp, "T_TYPE", INT2FIX(PHIDGET_TEMPERATURE_SENSOR_T_TYPE));
-
-  /* Document-method: new
-   * call-seq: new
-   *
-   * Creates a Phidget TemperatureSensor object.
-   */
-  rb_define_method(ph_temp, "initialize", ph_temp_init, 0);
-
-  /* Document-method: getTemperatureInputCount
-   * call-seq: getTemperatureInputCount -> count
-   *
-   * Gets the number of thermocouple inputs supported by this board.
-   */
-  rb_define_method(ph_temp, "getTemperatureInputCount", ph_temp_get_temperature_input_count, 0);
-
-  /* Document-method: getTemperature
-   * call-seq: getTemperature(index) -> temperature
-   *
-   * Gets the temperature measured by a thermocouple input.
-   */
-  rb_define_method(ph_temp, "getTemperature", ph_temp_get_temperature, 1);
-
-  /* Document-method: getTemperatureMin
-   * call-seq: getTemperatureMin(index) -> temperature
-   *
-   * Gets the minimum temperature that can be measured by a thermocouple input. This depends on the type
-   * of thermocouple attached, as well as the ambient temperature.
-   */
-  rb_define_method(ph_temp, "getTemperatureMin", ph_temp_get_temperature_min, 1);
-
-  /* Document-method: getTemperatureMax
-   * call-seq: getTemperatureMax(index) -> temperature
-   *
-   * Gets the maximum temperature that can be measured by a thermocouple input. This depends on the type
-   * of thermocouple attached, as well as the ambient temperature.
-   */
-  rb_define_method(ph_temp, "getTemperatureMax", ph_temp_get_temperature_max, 1);
-
-  /* Document-method: getTemperatureChangeTrigger
-   * call-seq: getTemperatureChangeTrigger(index) -> trigger
-   *
-   * Gets the change trigger for a thermocouple input.
-   */
-  rb_define_method(ph_temp, "getTemperatureChangeTrigger", ph_temp_get_temperature_change_trigger, 1);
-
-  /* Document-method: setTemperatureChangeTrigger
-   * call-seq: setTemperatureChangeTrigger(index, trigger)
-   *
-   * Sets the change trigger for a thermocouple input.
-   */
-  rb_define_method(ph_temp, "setTemperatureChangeTrigger", ph_temp_set_temperature_change_trigger, 2);
-
-  /* Document-method: getPotential
-   * call-seq: getPotential(index) -> potential
-   *
-   * Gets the currently sensed potential for a thermocouple input.
-   */
-  rb_define_method(ph_temp, "getPotential", ph_temp_get_potential, 1);
-
-  /* Document-method: getPotentialMin
-   * call-seq: getPotentialMin(index) -> potential
-   *
-   * Gets the minimum potential that a thermocouple input can measure.
-   */
-  rb_define_method(ph_temp, "getPotentialMin", ph_temp_get_potential_min, 1);
-
-  /* Document-method: getPotentialMax
-   * call-seq: getPotentialMax(index) -> potential
-   *
-   * Gets the maximum potential that a thermocouple input can measure.
-   */
-  rb_define_method(ph_temp, "getPotentialMax", ph_temp_get_potential_max, 1);
-
-  /* Document-method: getAmbientTemperature
-   * call-seq: getAmbientTemperature -> temperature
-   *
-   * Gets the ambient (board) temperature.
-   */
-  rb_define_method(ph_temp, "getAmbientTemperature", ph_temp_get_ambient_temperature, 0);
-
-  /* Document-method: getAmbientTemperatureMin
-   * call-seq: getAmbientTemperatureMin -> temperature
-   *
-   * Gets the minimum temperature that the ambient onboard temperature sensor can measure.
-   */
-  rb_define_method(ph_temp, "getAmbientTemperatureMin", ph_temp_get_ambient_temperature_min, 0);
-
-  /* Document-method: getAmbientTemperatureMax
-   * call-seq: getAmbientTemperatureMax -> temperature
-   *
-   * Gets the maximum temperature that the ambient onboard temperature sensor can measure.
-   */
-  rb_define_method(ph_temp, "getAmbientTemperatureMax", ph_temp_get_ambient_temperature_max, 0);
-
-  /* Document-method: getThermocoupleType
-   * call-seq: getThermocoupleType(index) -> type
-   *
-   * Gets the type of thermocouple set to be at a thermocouple input. By default this is K-Type.
-   */
-  rb_define_method(ph_temp, "getThermocoupleType", ph_temp_get_thermocouple_type, 1);
-
-  /* Document-method: setThermocoupleType
-   * call-seq: setThermocoupleType(index, type)
-   *
-   * Sets the type of thermocouple plugged into a thermocouple input. By default this is K-Type.
-   */
-  rb_define_method(ph_temp, "setThermocoupleType", ph_temp_set_thermocouple_type, 2);
-
-  rb_define_private_method(ph_temp, "ext_setOnTemperatureChangeHandler", ph_temp_set_on_temperature_change_handler, 1);
-
-  rb_define_alias(ph_temp, "temperature_input_count", "getTemperatureInputCount");
-  rb_define_alias(ph_temp, "temperature", "getTemperature");
-  rb_define_alias(ph_temp, "temperature_min", "getTemperatureMin");
-  rb_define_alias(ph_temp, "temperature_max", "getTemperatureMax");
-  rb_define_alias(ph_temp, "temperature_change_trigger", "getTemperatureChangeTrigger");
-  rb_define_alias(ph_temp, "set_temperature_change_trigger", "setTemperatureChangeTrigger");
-  rb_define_alias(ph_temp, "potential", "getPotential");
-  rb_define_alias(ph_temp, "potential_min", "getPotentialMin");
-  rb_define_alias(ph_temp, "potential_max", "getPotentialMax");
-  rb_define_alias(ph_temp, "ambient_temperature", "getAmbientTemperature");
-  rb_define_alias(ph_temp, "ambient_temperature_min", "getAmbientTemperatureMin");
-  rb_define_alias(ph_temp, "ambient_temperature_max", "getAmbientTemperatureMax");
-  rb_define_alias(ph_temp, "thermocouple_type", "getThermocoupleType");
-  rb_define_alias(ph_temp, "set_thermocouple_type", "setThermocoupleType");
-}
-
+#define TEMP_SENSOR_TEMPERATURE_CHANGE_CALLBACK  0
 
 
 VALUE ph_temp_init(VALUE self) {
@@ -165,124 +10,280 @@ VALUE ph_temp_init(VALUE self) {
   return self;
 }
 
-VALUE ph_temp_get_temperature_input_count(VALUE self) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  int count;
-  ph_raise(PhidgetTemperatureSensor_getTemperatureInputCount(handle, &count));
-  return INT2FIX(count);
+VALUE ph_temp_get_data_interval(VALUE self) {
+  return ph_get_uint(get_ph_handle(self), PhidgetTemperatureSensor_getDataInterval);
 }
 
-VALUE ph_temp_get_temperature(VALUE self, VALUE index) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  double temperature;
-  ph_raise(PhidgetTemperatureSensor_getTemperature(handle, FIX2INT(index), &temperature));
-  return rb_float_new(temperature);
-}
-
-VALUE ph_temp_get_temperature_min(VALUE self, VALUE index) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  double temperature;
-  ph_raise(PhidgetTemperatureSensor_getTemperatureMin(handle, FIX2INT(index), &temperature));
-  return rb_float_new(temperature);
-}
-
-VALUE ph_temp_get_temperature_max(VALUE self, VALUE index) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  double temperature;
-  ph_raise(PhidgetTemperatureSensor_getTemperatureMax(handle, FIX2INT(index), &temperature));
-  return rb_float_new(temperature);
-}
-
-VALUE ph_temp_get_temperature_change_trigger(VALUE self, VALUE index) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  double temperature;
-  ph_raise(PhidgetTemperatureSensor_getTemperatureChangeTrigger(handle, FIX2INT(index), &temperature));
-  return rb_float_new(temperature);
-}
-
-VALUE ph_temp_set_temperature_change_trigger(VALUE self, VALUE index, VALUE temperature) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  ph_raise(PhidgetTemperatureSensor_setTemperatureChangeTrigger(handle, FIX2INT(index), NUM2DBL(temperature)));
+VALUE ph_temp_set_data_interval(VALUE self, VALUE interval) {
+  ph_raise(PhidgetTemperatureSensor_setDataInterval((PhidgetTemperatureSensorHandle)get_ph_handle(self), NUM2UINT(interval)));
   return Qnil;
 }
 
-VALUE ph_temp_get_potential(VALUE self, VALUE index) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  double potential;
-  ph_raise(PhidgetTemperatureSensor_getPotential(handle, FIX2INT(index), &potential));
-  return rb_float_new(potential);
+VALUE ph_temp_get_min_data_interval(VALUE self) {
+  return ph_get_uint(get_ph_handle(self), PhidgetTemperatureSensor_getMinDataInterval);
 }
 
-VALUE ph_temp_get_potential_min(VALUE self, VALUE index) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  double potential;
-  ph_raise(PhidgetTemperatureSensor_getPotentialMin(handle, FIX2INT(index), &potential));
-  return rb_float_new(potential);
+VALUE ph_temp_get_max_data_interval(VALUE self) {
+  return ph_get_uint(get_ph_handle(self), PhidgetTemperatureSensor_getMaxDataInterval);
 }
 
-VALUE ph_temp_get_potential_max(VALUE self, VALUE index) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  double potential;
-  ph_raise(PhidgetTemperatureSensor_getPotentialMax(handle, FIX2INT(index), &potential));
-  return rb_float_new(potential);
+VALUE ph_temp_get_rtd_type(VALUE self) {
+  return ph_get_int(get_ph_handle(self), PhidgetTemperatureSensor_getRTDType);
 }
 
-VALUE ph_temp_get_ambient_temperature(VALUE self) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  double temperature;
-  ph_raise(PhidgetTemperatureSensor_getAmbientTemperature(handle, &temperature));
-  return rb_float_new(temperature);
-}
-
-VALUE ph_temp_get_ambient_temperature_min(VALUE self) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  double temperature;
-  ph_raise(PhidgetTemperatureSensor_getAmbientTemperatureMin(handle, &temperature));
-  return rb_float_new(temperature);
-}
-
-VALUE ph_temp_get_ambient_temperature_max(VALUE self) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  double temperature;
-  ph_raise(PhidgetTemperatureSensor_getAmbientTemperatureMax(handle, &temperature));
-  return rb_float_new(temperature);
-}
-
-VALUE ph_temp_get_thermocouple_type(VALUE self, VALUE index) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  PhidgetTemperatureSensor_ThermocoupleType type;
-  ph_raise(PhidgetTemperatureSensor_getThermocoupleType(handle, FIX2INT(index), &type));
-  return INT2FIX(type);
-}
-
-VALUE ph_temp_set_thermocouple_type(VALUE self, VALUE index, VALUE type) {
-  PhidgetTemperatureSensorHandle handle = (PhidgetTemperatureSensorHandle)get_ph_handle(self);
-  ph_raise(PhidgetTemperatureSensor_setThermocoupleType(handle, FIX2INT(index), (PhidgetTemperatureSensor_ThermocoupleType)FIX2INT(type)));
+VALUE ph_temp_set_rtd_type(VALUE self, VALUE rtd_type) {
+  ph_raise(PhidgetTemperatureSensor_setRTDType((PhidgetTemperatureSensorHandle)get_ph_handle(self), NUM2INT(rtd_type)));
   return Qnil;
+}
+
+VALUE ph_temp_get_rtd_wire_setup(VALUE self) {
+  return ph_get_int(get_ph_handle(self), PhidgetTemperatureSensor_getRTDWireSetup);
+}
+
+VALUE ph_temp_set_rtd_wire_setup(VALUE self, VALUE wire_setup) {
+  ph_raise(PhidgetTemperatureSensor_setRTDWireSetup((PhidgetTemperatureSensorHandle)get_ph_handle(self), NUM2INT(wire_setup)));
+  return Qnil;
+}
+
+VALUE ph_temp_get_temperature(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getTemperature);
+}
+
+VALUE ph_temp_get_min_temperature(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getMinTemperature);
+}
+
+VALUE ph_temp_get_max_temperature(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getMaxTemperature);
+}
+
+VALUE ph_temp_get_temperature_change_trigger(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getTemperatureChangeTrigger);
+}
+
+VALUE ph_temp_set_temperature_change_trigger(VALUE self, VALUE temperature) {
+  ph_raise(PhidgetTemperatureSensor_setTemperatureChangeTrigger((PhidgetTemperatureSensorHandle)get_ph_handle(self), NUM2DBL(temperature)));
+  return Qnil;
+}
+
+VALUE ph_temp_get_min_temperature_change_trigger(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getMinTemperatureChangeTrigger);
+}
+
+VALUE ph_temp_get_max_temperature_change_trigger(VALUE self) {
+  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getMaxTemperatureChangeTrigger);
+}
+
+VALUE ph_temp_get_thermocouple_type(VALUE self) {
+  return ph_get_int(get_ph_handle(self), PhidgetTemperatureSensor_getThermocoupleType);
+}
+
+VALUE ph_temp_set_thermocouple_type(VALUE self, VALUE type) {
+  ph_raise(PhidgetTemperatureSensor_setThermocoupleType((PhidgetTemperatureSensorHandle)get_ph_handle(self), (PhidgetTemperatureSensor_ThermocoupleType)NUM2INT(type)));
+  return Qnil;
+}
+
+
+int ph_temp_on_temperature_change(PhidgetTemperatureSensorHandle phid, void *userPtr, double temperature) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  callback_data->arg1 = DBL2NUM(temperature);
+  callback_data->arg2 = Qnil;
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->sem);
 }
 
 
 VALUE ph_temp_set_on_temperature_change_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
-  ph_callback_data_t *callback_data = &ph->dev_callback_1;
+  ph_callback_data_t *callback_data = &ph->dev_callbacks[TEMP_SENSOR_TEMPERATURE_CHANGE_CALLBACK];
   if( TYPE(handler) == T_NIL ) {
+    callback_data->callback = T_NIL;
     callback_data->exit = true;
-    ph_raise(PhidgetTemperatureSensor_set_OnTemperatureChange_Handler((PhidgetTemperatureSensorHandle)ph->handle, NULL, (void *)NULL));
+    ph_raise(PhidgetTemperatureSensor_setOnTemperatureChangeHandler((PhidgetTemperatureSensorHandle)ph->handle, NULL, (void *)NULL));
+    sem_post(&callback_data->sem);
   } else {
-    callback_data->called = false;
     callback_data->exit = false;
     callback_data->phidget = self;
     callback_data->callback = handler;
-    ph_raise(PhidgetTemperatureSensor_set_OnTemperatureChange_Handler((PhidgetTemperatureSensorHandle)ph->handle, ph_temp_on_temperature_change, (void *)callback_data));
+    ph_raise(PhidgetTemperatureSensor_setOnTemperatureChangeHandler((PhidgetTemperatureSensorHandle)ph->handle, ph_temp_on_temperature_change, (void *)callback_data));
     ph_callback_thread(callback_data);
   }
   return Qnil;
 }
 
 
-int ph_temp_on_temperature_change(PhidgetTemperatureSensorHandle phid, void *userPtr, int index, double temperature) {
-  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
-  callback_data->called = true;
-  return EPHIDGET_OK;
+void Init_temperature_sensor() {
+  VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
+  VALUE ph_temp = rb_define_class_under(ph_module, "TemperatureSensor", ph_common);
+
+  rb_define_const(ph_temp, "RTD_TYPE_PT100_3850", INT2NUM(RTD_TYPE_PT100_3850));
+  rb_define_const(ph_temp, "RTD_TYPE_PT1000_3850", INT2NUM(RTD_TYPE_PT1000_3850));
+  rb_define_const(ph_temp, "RTD_TYPE_PT100_3920", INT2NUM(RTD_TYPE_PT100_3920));
+  rb_define_const(ph_temp, "RTD_TYPE_PT1000_3920", INT2NUM(RTD_TYPE_PT1000_3920));
+
+  rb_define_const(ph_temp, "THERMOCOUPLE_TYPE_K", INT2NUM(THERMOCOUPLE_TYPE_K));
+  rb_define_const(ph_temp, "THERMOCOUPLE_TYPE_J", INT2NUM(THERMOCOUPLE_TYPE_J));
+  rb_define_const(ph_temp, "THERMOCOUPLE_TYPE_E", INT2NUM(THERMOCOUPLE_TYPE_E));
+  rb_define_const(ph_temp, "THERMOCOUPLE_TYPE_T", INT2NUM(THERMOCOUPLE_TYPE_T));
+
+  /* Document-method: new
+   * call-seq: new
+   *
+   * Creates a Phidget TemperatureSensor object.
+   */
+  rb_define_method(ph_temp, "initialize", ph_temp_init, 0);
+
+  /* Document-method: getDataInterval
+   * call-seq: getDataInterval -> interval
+   *
+   * The DataInterval is the time that must elapse before the channel will fire another TemperatureChange event.
+   * The data interval is bounded by MinDataInterval and MaxDataInterval.
+   * The timing between TemperatureChange events can also affected by the TemperatureChangeTrigger.
+   */
+  rb_define_method(ph_temp, "getDataInterval", ph_temp_get_data_interval, 0);
+  rb_define_alias(ph_temp, "data_interval", "getDataInterval");
+
+  /* Document-method: setDataInterval
+   * call-seq: setDataInterval(interval)
+   *
+   * The DataInterval is the time that must elapse before the channel will fire another TemperatureChange event.
+   * The data interval is bounded by MinDataInterval and MaxDataInterval.
+   * The timing between TemperatureChange events can also affected by the TemperatureChangeTrigger.
+   */
+  rb_define_method(ph_temp, "setDataInterval", ph_temp_set_data_interval, 1);
+  rb_define_alias(ph_temp, "data_interval=", "setDataInterval");
+
+  /* Document-method: getMinDataInterval
+   * call-seq: getMinDataInterval -> interval
+   *
+   * The minimum value that DataInterval can be set to.
+   */
+  rb_define_method(ph_temp, "getMinDataInterval", ph_temp_get_min_data_interval, 0);
+  rb_define_alias(ph_temp, "min_data_interval", "getMinDataInterval");
+
+  /* Document-method: getMaxDataInterval
+   * call-seq: getMaxDataInterval -> interval
+   *
+   * The maximum value that DataInterval can be set to.
+   */
+  rb_define_method(ph_temp, "getMaxDataInterval", ph_temp_get_max_data_interval, 0);
+  rb_define_alias(ph_temp, "max_data_interval", "getMaxDataInterval");
+
+  /* Document-method: getRTDType
+   * call-seq: getRTDType -> rtd_type
+   *
+   * The RTDType must correspond to the RTD type you are using in your application.
+   * If you are unsure which RTDType to use, visit your device's User Guide for more information.
+   */
+  rb_define_method(ph_temp, "getRTDType", ph_temp_get_rtd_type, 0);
+  rb_define_alias(ph_temp, "rtd_type", "getRTDType");
+
+  /* Document-method: setRTDType
+   * call-seq: setRTDType(rtd_type)
+   *
+   * The RTDType must correspond to the RTD type you are using in your application.
+   * If you are unsure which RTDType to use, visit your device's User Guide for more information.
+   */
+  rb_define_method(ph_temp, "setRTDType", ph_temp_set_rtd_type, 1);
+  rb_define_alias(ph_temp, "rtd_type=", "setRTDType");
+
+  /* Document-method: getRTDWireSetup
+   * call-seq: getRTDWireSetup -> wire_setup
+   *
+   * The RTDWireSetup must correspond to the wire configuration you are using in your application.
+   * If you are unsure which RTDWireSetup to use, visit your device's User Guide for more information.
+   */
+  rb_define_method(ph_temp, "getRTDWireSetup", ph_temp_get_rtd_wire_setup, 0);
+  rb_define_alias(ph_temp, "rtd_wire_setup", "getRTDWireSetup");
+
+  /* Document-method: setRTDWireSetup
+   * call-seq: setRTDWireSetup(wire_setup)
+   *
+   * The RTDWireSetup must correspond to the wire configuration you are using in your application.
+   * If you are unsure which RTDWireSetup to use, visit your device's User Guide for more information.
+   */
+  rb_define_method(ph_temp, "setRTDWireSetup", ph_temp_set_rtd_wire_setup, 1);
+  rb_define_alias(ph_temp, "rtd_wire_setup=", "setRTDWireSetup");
+
+  /* Document-method: getTemperature
+   * call-seq: getTemperature -> temperature
+   *
+   * The most recent temperature value that the channel has reported.
+   * This value will always be between MinTemperature and MaxTemperature.
+   */
+  rb_define_method(ph_temp, "getTemperature", ph_temp_get_temperature, 0);
+  rb_define_alias(ph_temp, "temperature", "getTemperature");
+
+  /* Document-method: getMinTemperature
+   * call-seq: getMinTemperature -> temperature
+   *
+   * The minimum value the TemperatureChange event will report.
+   */
+  rb_define_method(ph_temp, "getMinTemperature", ph_temp_get_min_temperature, 0);
+  rb_define_alias(ph_temp, "min_temperature", "getMinTemperature");
+
+  /* Document-method: getMaxTemperature
+   * call-seq: getMaxTemperature -> temperature
+   *
+   * The maximum value the TemperatureChange event will report.
+   */
+  rb_define_method(ph_temp, "getMaxTemperature", ph_temp_get_max_temperature, 0);
+  rb_define_alias(ph_temp, "max_temperature", "getMaxTemperature");
+
+  /* Document-method: getTemperatureChangeTrigger
+   * call-seq: getTemperatureChangeTrigger -> trigger
+   *
+   * The channel will not issue a TemperatureChange event until the temperature value has changed by the amount specified by the TemperatureChangeTrigger.
+   * Setting the TemperatureChangeTrigger to 0 will result in the channel firing events every DataInterval. This is useful for applications that implement their own data filtering.
+   */
+  rb_define_method(ph_temp, "getTemperatureChangeTrigger", ph_temp_get_temperature_change_trigger, 0);
+  rb_define_alias(ph_temp, "temperature_change_trigger", "getTemperatureChangeTrigger");
+
+  /* Document-method: setTemperatureChangeTrigger
+   * call-seq: setTemperatureChangeTrigger(trigger)
+   *
+   * The channel will not issue a TemperatureChange event until the temperature value has changed by the amount specified by the TemperatureChangeTrigger.
+   * Setting the TemperatureChangeTrigger to 0 will result in the channel firing events every DataInterval. This is useful for applications that implement their own data filtering.
+   */
+  rb_define_method(ph_temp, "setTemperatureChangeTrigger", ph_temp_set_temperature_change_trigger, 1);
+  rb_define_alias(ph_temp, "temperature_change_trigger=", "setTemperatureChangeTrigger");
+
+  /* Document-method: getMinTemperatureChangeTrigger
+   * call-seq: getMinTemperatureChangeTrigger -> trigger
+   *
+   * The minimum value that TemperatureChangeTrigger can be set to.
+   */
+  rb_define_method(ph_temp, "getMinTemperatureChangeTrigger", ph_temp_get_min_temperature_change_trigger, 0);
+  rb_define_alias(ph_temp, "min_temperature_change_trigger", "getMinTemperatureChangeTrigger");
+
+  /* Document-method: getMaxTemperatureChangeTrigger
+   * call-seq: getMaxTemperatureChangeTrigger -> trigger
+   *
+   * The maximum value that TemperatureChangeTrigger can be set to.
+   */
+  rb_define_method(ph_temp, "getMaxTemperatureChangeTrigger", ph_temp_get_max_temperature_change_trigger, 0);
+  rb_define_alias(ph_temp, "max_temperature_change_trigger", "getMaxTemperatureChangeTrigger");
+
+  /* Document-method: getThermocoupleType
+   * call-seq: getThermocoupleType -> type
+   *
+   * The ThermocoupleType must correspond to the thermocouple type you are using in your application.
+   * If you are unsure which ThermocoupleType to use, visit the Thermocouple Primer for more information.
+   */
+  rb_define_method(ph_temp, "getThermocoupleType", ph_temp_get_thermocouple_type, 0);
+  rb_define_alias(ph_temp, "thermocouple_type", "getThermocoupleType");
+
+  /* Document-method: setThermocoupleType
+   * call-seq: setThermocoupleType(type)
+   *
+   * The ThermocoupleType must correspond to the thermocouple type you are using in your application.
+   * If you are unsure which ThermocoupleType to use, visit the Thermocouple Primer for more information.
+   */
+  rb_define_method(ph_temp, "setThermocoupleType", ph_temp_set_thermocouple_type, 1);
+  rb_define_alias(ph_temp, "thermocouple_type=", "setThermocoupleType");
+
+  rb_define_private_method(ph_temp, "ext_setOnTemperatureChangeHandler", ph_temp_set_on_temperature_change_handler, 1);
 }
-#endif
+
