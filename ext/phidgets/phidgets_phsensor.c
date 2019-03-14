@@ -12,7 +12,7 @@ VALUE ph_phsensor_init(VALUE self) {
 }
 
 VALUE ph_phsensor_get_correction_temperature(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetPHSensor_getCorrectionTemperature);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetPHSensor_getCorrectionTemperature);
 }
 
 VALUE ph_phsensor_set_correction_temperature(VALUE self, VALUE temperature) {
@@ -21,15 +21,15 @@ VALUE ph_phsensor_set_correction_temperature(VALUE self, VALUE temperature) {
 }
 
 VALUE ph_phsensor_get_min_correction_temperature(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetPHSensor_getMinCorrectionTemperature);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetPHSensor_getMinCorrectionTemperature);
 }
 
 VALUE ph_phsensor_get_max_correction_temperature(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetPHSensor_getMaxCorrectionTemperature);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetPHSensor_getMaxCorrectionTemperature);
 }
 
 VALUE ph_phsensor_get_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetPHSensor_getDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetPHSensor_getDataInterval);
 }
 
 VALUE ph_phsensor_set_data_interval(VALUE self, VALUE interval) {
@@ -38,27 +38,27 @@ VALUE ph_phsensor_set_data_interval(VALUE self, VALUE interval) {
 }
 
 VALUE ph_phsensor_get_min_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetPHSensor_getMinDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetPHSensor_getMinDataInterval);
 }
 
 VALUE ph_phsensor_get_max_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetPHSensor_getMaxDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetPHSensor_getMaxDataInterval);
 }
 
 VALUE ph_phsensor_get_ph(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetPHSensor_getPH);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetPHSensor_getPH);
 }
 
 VALUE ph_phsensor_get_min_ph(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetPHSensor_getMinPH);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetPHSensor_getMinPH);
 }
 
 VALUE ph_phsensor_get_max_ph(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetPHSensor_getMaxPH);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetPHSensor_getMaxPH);
 }
 
 VALUE ph_phsensor_get_ph_change_trigger(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetPHSensor_getPHChangeTrigger);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetPHSensor_getPHChangeTrigger);
 }
 
 VALUE ph_phsensor_set_ph_change_trigger(VALUE self, VALUE trigger) {
@@ -67,11 +67,11 @@ VALUE ph_phsensor_set_ph_change_trigger(VALUE self, VALUE trigger) {
 }
 
 VALUE ph_phsensor_get_min_ph_change_trigger(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetPHSensor_getMinPHChangeTrigger);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetPHSensor_getMinPHChangeTrigger);
 }
 
 VALUE ph_phsensor_get_max_ph_change_trigger(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetPHSensor_getMaxPHChangeTrigger);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetPHSensor_getMaxPHChangeTrigger);
 }
 
 

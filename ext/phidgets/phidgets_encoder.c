@@ -11,7 +11,7 @@ VALUE ph_encoder_init(VALUE self) {
 }
 
 VALUE ph_encoder_get_enabled(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetEncoder_getEnabled);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetEncoder_getEnabled);
 }
 
 VALUE ph_encoder_set_enabled(VALUE self, VALUE state) {
@@ -20,7 +20,7 @@ VALUE ph_encoder_set_enabled(VALUE self, VALUE state) {
 }
 
 VALUE ph_encoder_get_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetEncoder_getDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetEncoder_getDataInterval);
 }
 
 VALUE ph_encoder_set_data_interval(VALUE self, VALUE interval) {
@@ -29,19 +29,19 @@ VALUE ph_encoder_set_data_interval(VALUE self, VALUE interval) {
 }
 
 VALUE ph_encoder_get_min_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetEncoder_getMinDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetEncoder_getMinDataInterval);
 }
 
 VALUE ph_encoder_get_max_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetEncoder_getMaxDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetEncoder_getMaxDataInterval);
 }
 
 VALUE ph_encoder_get_index_position(VALUE self) {
-  return ph_get_int64(get_ph_handle(self), PhidgetEncoder_getIndexPosition);
+  return ph_get_int64(get_ph_handle(self), (phidget_get_int64_func)PhidgetEncoder_getIndexPosition);
 }
 
 VALUE ph_encoder_get_io_mode(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetEncoder_getIOMode);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetEncoder_getIOMode);
 }
 
 VALUE ph_encoder_set_io_mode(VALUE self, VALUE mode) {
@@ -50,7 +50,7 @@ VALUE ph_encoder_set_io_mode(VALUE self, VALUE mode) {
 }
 
 VALUE ph_encoder_get_position(VALUE self) {
-  return ph_get_int64(get_ph_handle(self), PhidgetEncoder_getPosition);
+  return ph_get_int64(get_ph_handle(self), (phidget_get_int64_func)PhidgetEncoder_getPosition);
 }
 
 VALUE ph_encoder_set_position(VALUE self, VALUE position) {
@@ -59,7 +59,7 @@ VALUE ph_encoder_set_position(VALUE self, VALUE position) {
 }
 
 VALUE ph_encoder_get_position_change_trigger(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetEncoder_getPositionChangeTrigger);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetEncoder_getPositionChangeTrigger);
 }
 
 VALUE ph_encoder_set_position_change_trigger(VALUE self, VALUE trigger) {
@@ -68,11 +68,11 @@ VALUE ph_encoder_set_position_change_trigger(VALUE self, VALUE trigger) {
 }
 
 VALUE ph_encoder_get_min_position_change_trigger(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetEncoder_getMinPositionChangeTrigger);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetEncoder_getMinPositionChangeTrigger);
 }
 
 VALUE ph_encoder_get_max_position_change_trigger(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetEncoder_getMaxPositionChangeTrigger);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetEncoder_getMaxPositionChangeTrigger);
 }
 
 

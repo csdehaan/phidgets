@@ -13,7 +13,7 @@ VALUE ph_rfid_init(VALUE self) {
 }
 
 VALUE ph_rfid_get_antenna_enabled(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetRFID_getAntennaEnabled);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetRFID_getAntennaEnabled);
 }
 
 VALUE ph_rfid_set_antenna_enabled(VALUE self, VALUE on) {
@@ -22,15 +22,14 @@ VALUE ph_rfid_set_antenna_enabled(VALUE self, VALUE on) {
 }
 
 VALUE ph_rfid_get_last_tag(VALUE self) {
-  PhidgetRFIDHandle handle = (PhidgetRFIDHandle)get_ph_handle(self);
   char tag[256];
   PhidgetRFID_Protocol protocol;
-  ph_raise(PhidgetRFID_getLastTag(handle, &tag, 256, &protocol));
+  ph_raise(PhidgetRFID_getLastTag((PhidgetRFIDHandle)get_ph_handle(self), tag, 256, &protocol));
   return rb_ary_new3(2, rb_str_new2(tag), INT2NUM(protocol));
 }
 
 VALUE ph_rfid_get_tag_present(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetRFID_getTagPresent);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetRFID_getTagPresent);
 }
 
 VALUE ph_rfid_write(VALUE self, VALUE tag, VALUE protocol, VALUE lock) {
@@ -39,7 +38,7 @@ VALUE ph_rfid_write(VALUE self, VALUE tag, VALUE protocol, VALUE lock) {
 }
 
 
-void CCONV ph_rfid_on_tag(PhidgetRFIDHandle phid, void *userPtr, char *tagString, PhidgetRFID_Protocol protocol) {
+void CCONV ph_rfid_on_tag(PhidgetRFIDHandle phid, void *userPtr, const char *tagString, PhidgetRFID_Protocol protocol) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->arg1 = rb_str_new2(tagString);
   callback_data->arg2 = INT2NUM(protocol);
@@ -67,7 +66,7 @@ VALUE ph_rfid_set_on_tag_handler(VALUE self, VALUE handler) {
 }
 
 
-void CCONV ph_rfid_on_tag_lost(PhidgetRFIDHandle phid, void *userPtr, char *tagString, PhidgetRFID_Protocol protocol) {
+void CCONV ph_rfid_on_tag_lost(PhidgetRFIDHandle phid, void *userPtr, const char *tagString, PhidgetRFID_Protocol protocol) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->arg1 = rb_str_new2(tagString);
   callback_data->arg2 = INT2NUM(protocol);

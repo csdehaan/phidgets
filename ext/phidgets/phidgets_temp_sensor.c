@@ -11,7 +11,7 @@ VALUE ph_temp_init(VALUE self) {
 }
 
 VALUE ph_temp_get_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetTemperatureSensor_getDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetTemperatureSensor_getDataInterval);
 }
 
 VALUE ph_temp_set_data_interval(VALUE self, VALUE interval) {
@@ -20,15 +20,15 @@ VALUE ph_temp_set_data_interval(VALUE self, VALUE interval) {
 }
 
 VALUE ph_temp_get_min_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetTemperatureSensor_getMinDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetTemperatureSensor_getMinDataInterval);
 }
 
 VALUE ph_temp_get_max_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetTemperatureSensor_getMaxDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetTemperatureSensor_getMaxDataInterval);
 }
 
 VALUE ph_temp_get_rtd_type(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetTemperatureSensor_getRTDType);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetTemperatureSensor_getRTDType);
 }
 
 VALUE ph_temp_set_rtd_type(VALUE self, VALUE rtd_type) {
@@ -37,7 +37,7 @@ VALUE ph_temp_set_rtd_type(VALUE self, VALUE rtd_type) {
 }
 
 VALUE ph_temp_get_rtd_wire_setup(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetTemperatureSensor_getRTDWireSetup);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetTemperatureSensor_getRTDWireSetup);
 }
 
 VALUE ph_temp_set_rtd_wire_setup(VALUE self, VALUE wire_setup) {
@@ -46,19 +46,19 @@ VALUE ph_temp_set_rtd_wire_setup(VALUE self, VALUE wire_setup) {
 }
 
 VALUE ph_temp_get_temperature(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getTemperature);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetTemperatureSensor_getTemperature);
 }
 
 VALUE ph_temp_get_min_temperature(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getMinTemperature);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetTemperatureSensor_getMinTemperature);
 }
 
 VALUE ph_temp_get_max_temperature(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getMaxTemperature);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetTemperatureSensor_getMaxTemperature);
 }
 
 VALUE ph_temp_get_temperature_change_trigger(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getTemperatureChangeTrigger);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetTemperatureSensor_getTemperatureChangeTrigger);
 }
 
 VALUE ph_temp_set_temperature_change_trigger(VALUE self, VALUE temperature) {
@@ -67,15 +67,15 @@ VALUE ph_temp_set_temperature_change_trigger(VALUE self, VALUE temperature) {
 }
 
 VALUE ph_temp_get_min_temperature_change_trigger(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getMinTemperatureChangeTrigger);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetTemperatureSensor_getMinTemperatureChangeTrigger);
 }
 
 VALUE ph_temp_get_max_temperature_change_trigger(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetTemperatureSensor_getMaxTemperatureChangeTrigger);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetTemperatureSensor_getMaxTemperatureChangeTrigger);
 }
 
 VALUE ph_temp_get_thermocouple_type(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetTemperatureSensor_getThermocoupleType);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetTemperatureSensor_getThermocoupleType);
 }
 
 VALUE ph_temp_set_thermocouple_type(VALUE self, VALUE type) {
@@ -84,7 +84,7 @@ VALUE ph_temp_set_thermocouple_type(VALUE self, VALUE type) {
 }
 
 
-int ph_temp_on_temperature_change(PhidgetTemperatureSensorHandle phid, void *userPtr, double temperature) {
+void CCONV ph_temp_on_temperature_change(PhidgetTemperatureSensorHandle phid, void *userPtr, double temperature) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   callback_data->arg1 = DBL2NUM(temperature);
   callback_data->arg2 = Qnil;

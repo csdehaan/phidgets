@@ -12,7 +12,7 @@ VALUE ph_accel_init(VALUE self) {
 
 
 VALUE ph_accel_get_axis_count(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetAccelerometer_getAxisCount);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetAccelerometer_getAxisCount);
 }
 
 
@@ -38,7 +38,7 @@ VALUE ph_accel_get_max_acceleration(VALUE self) {
 
 
 VALUE ph_accel_get_acceleration_change_trigger(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetAccelerometer_getAccelerationChangeTrigger);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetAccelerometer_getAccelerationChangeTrigger);
 }
 
 
@@ -49,17 +49,17 @@ VALUE ph_accel_set_acceleration_change_trigger(VALUE self, VALUE trigger) {
 
 
 VALUE ph_accel_get_min_acceleration_change_trigger(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetAccelerometer_getMinAccelerationChangeTrigger);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetAccelerometer_getMinAccelerationChangeTrigger);
 }
 
 
 VALUE ph_accel_get_max_acceleration_change_trigger(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetAccelerometer_getMaxAccelerationChangeTrigger);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetAccelerometer_getMaxAccelerationChangeTrigger);
 }
 
 
 VALUE ph_accel_get_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetAccelerometer_getDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetAccelerometer_getDataInterval);
 }
 
 
@@ -70,17 +70,17 @@ VALUE ph_accel_set_data_interval(VALUE self, VALUE interval) {
 
 
 VALUE ph_accel_get_min_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetAccelerometer_getMinDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetAccelerometer_getMinDataInterval);
 }
 
 
 VALUE ph_accel_get_max_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetAccelerometer_getMaxDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetAccelerometer_getMaxDataInterval);
 }
 
 
 VALUE ph_accel_get_timestamp(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetAccelerometer_getTimestamp);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetAccelerometer_getTimestamp);
 }
 
 

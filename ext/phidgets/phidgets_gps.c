@@ -14,23 +14,23 @@ VALUE ph_gps_init(VALUE self) {
 }
 
 VALUE ph_gps_get_latitude(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetGPS_getLatitude);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetGPS_getLatitude);
 }
 
 VALUE ph_gps_get_longitude(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetGPS_getLongitude);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetGPS_getLongitude);
 }
 
 VALUE ph_gps_get_altitude(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetGPS_getAltitude);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetGPS_getAltitude);
 }
 
 VALUE ph_gps_get_heading(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetGPS_getHeading);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetGPS_getHeading);
 }
 
 VALUE ph_gps_get_velocity(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetGPS_getVelocity);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetGPS_getVelocity);
 }
 
 VALUE ph_gps_get_time(VALUE self) {
@@ -57,7 +57,7 @@ VALUE ph_gps_get_date(VALUE self) {
 }
 
 VALUE ph_gps_get_position_fix_state(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetGPS_getPositionFixState);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetGPS_getPositionFixState);
 }
 
 VALUE ph_gps_get_nmea_data(VALUE self) {

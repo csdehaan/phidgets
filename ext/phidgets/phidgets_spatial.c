@@ -11,7 +11,7 @@ VALUE ph_spatial_init(VALUE self) {
 }
 
 VALUE ph_spatial_get_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetSpatial_getDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetSpatial_getDataInterval);
 }
 
 VALUE ph_spatial_set_data_interval(VALUE self, VALUE interval) {
@@ -20,11 +20,11 @@ VALUE ph_spatial_set_data_interval(VALUE self, VALUE interval) {
 }
 
 VALUE ph_spatial_get_min_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetSpatial_getMinDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetSpatial_getMinDataInterval);
 }
 
 VALUE ph_spatial_get_max_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetSpatial_getMaxDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetSpatial_getMaxDataInterval);
 }
 
 VALUE ph_spatial_set_magnetometer_correction_parameters(VALUE self, VALUE mag_field, VALUE offset0, VALUE offset1, VALUE offset2, VALUE gain0, VALUE gain1, VALUE gain2, VALUE T0, VALUE T1, VALUE T2, VALUE T3, VALUE T4, VALUE T5) {

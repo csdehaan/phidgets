@@ -14,7 +14,7 @@ VALUE ph_motor_init(VALUE self) {
 }
 
 VALUE ph_motor_get_acceleration(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getAcceleration);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getAcceleration);
 }
 
 VALUE ph_motor_set_acceleration(VALUE self, VALUE accel) {
@@ -23,15 +23,15 @@ VALUE ph_motor_set_acceleration(VALUE self, VALUE accel) {
 }
 
 VALUE ph_motor_get_min_acceleration(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMinAcceleration);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMinAcceleration);
 }
 
 VALUE ph_motor_get_max_acceleration(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMaxAcceleration);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMaxAcceleration);
 }
 
 VALUE ph_motor_get_current_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getCurrentLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getCurrentLimit);
 }
 
 VALUE ph_motor_set_current_limit(VALUE self, VALUE current) {
@@ -40,15 +40,15 @@ VALUE ph_motor_set_current_limit(VALUE self, VALUE current) {
 }
 
 VALUE ph_motor_get_min_current_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMinCurrentLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMinCurrentLimit);
 }
 
 VALUE ph_motor_get_max_current_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMaxCurrentLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMaxCurrentLimit);
 }
 
 VALUE ph_motor_get_current_regulator_gain(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getCurrentRegulatorGain);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getCurrentRegulatorGain);
 }
 
 VALUE ph_motor_set_current_regulator_gain(VALUE self, VALUE gain) {
@@ -57,15 +57,15 @@ VALUE ph_motor_set_current_regulator_gain(VALUE self, VALUE gain) {
 }
 
 VALUE ph_motor_get_min_current_regulator_gain(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMinCurrentRegulatorGain);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMinCurrentRegulatorGain);
 }
 
 VALUE ph_motor_get_max_current_regulator_gain(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMaxCurrentRegulatorGain);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMaxCurrentRegulatorGain);
 }
 
 VALUE ph_motor_get_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetMotorPositionController_getDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetMotorPositionController_getDataInterval);
 }
 
 VALUE ph_motor_set_data_interval(VALUE self, VALUE interval) {
@@ -74,15 +74,15 @@ VALUE ph_motor_set_data_interval(VALUE self, VALUE interval) {
 }
 
 VALUE ph_motor_get_min_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetMotorPositionController_getMinDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetMotorPositionController_getMinDataInterval);
 }
 
 VALUE ph_motor_get_max_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetMotorPositionController_getMaxDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetMotorPositionController_getMaxDataInterval);
 }
 
 VALUE ph_motor_get_dead_band(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getDeadBand);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getDeadBand);
 }
 
 VALUE ph_motor_set_dead_band(VALUE self, VALUE dead_band) {
@@ -91,11 +91,11 @@ VALUE ph_motor_set_dead_band(VALUE self, VALUE dead_band) {
 }
 
 VALUE ph_motor_get_duty_cycle(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getDutyCycle);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getDutyCycle);
 }
 
 VALUE ph_motor_get_engaged(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetMotorPositionController_getEngaged);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetMotorPositionController_getEngaged);
 }
 
 VALUE ph_motor_set_engaged(VALUE self, VALUE engaged) {
@@ -104,7 +104,7 @@ VALUE ph_motor_set_engaged(VALUE self, VALUE engaged) {
 }
 
 VALUE ph_motor_get_fan_mode(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetMotorPositionController_getFanMode);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetMotorPositionController_getFanMode);
 }
 
 VALUE ph_motor_set_fan_mode(VALUE self, VALUE fan_mode) {
@@ -113,7 +113,7 @@ VALUE ph_motor_set_fan_mode(VALUE self, VALUE fan_mode) {
 }
 
 VALUE ph_motor_get_io_mode(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetMotorPositionController_getIOMode);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetMotorPositionController_getIOMode);
 }
 
 VALUE ph_motor_set_io_mode(VALUE self, VALUE io_mode) {
@@ -122,7 +122,7 @@ VALUE ph_motor_set_io_mode(VALUE self, VALUE io_mode) {
 }
 
 VALUE ph_motor_get_kd(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getKd);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getKd);
 }
 
 VALUE ph_motor_set_kd(VALUE self, VALUE kd) {
@@ -131,7 +131,7 @@ VALUE ph_motor_set_kd(VALUE self, VALUE kd) {
 }
 
 VALUE ph_motor_get_ki(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getKi);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getKi);
 }
 
 VALUE ph_motor_set_ki(VALUE self, VALUE ki) {
@@ -140,7 +140,7 @@ VALUE ph_motor_set_ki(VALUE self, VALUE ki) {
 }
 
 VALUE ph_motor_get_kp(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getKp);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getKp);
 }
 
 VALUE ph_motor_set_kp(VALUE self, VALUE kp) {
@@ -149,15 +149,15 @@ VALUE ph_motor_set_kp(VALUE self, VALUE kp) {
 }
 
 VALUE ph_motor_get_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getPosition);
 }
 
 VALUE ph_motor_get_min_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMinPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMinPosition);
 }
 
 VALUE ph_motor_get_max_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMaxPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMaxPosition);
 }
 
 VALUE ph_motor_add_position_offset(VALUE self, VALUE offset) {
@@ -166,7 +166,7 @@ VALUE ph_motor_add_position_offset(VALUE self, VALUE offset) {
 }
 
 VALUE ph_motor_get_rescale_factor(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getRescaleFactor);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getRescaleFactor);
 }
 
 VALUE ph_motor_set_rescale_factor(VALUE self, VALUE rescale_factor) {
@@ -175,7 +175,7 @@ VALUE ph_motor_set_rescale_factor(VALUE self, VALUE rescale_factor) {
 }
 
 VALUE ph_motor_get_stall_velocity(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getStallVelocity);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getStallVelocity);
 }
 
 VALUE ph_motor_set_stall_velocity(VALUE self, VALUE stall_velocity) {
@@ -184,15 +184,15 @@ VALUE ph_motor_set_stall_velocity(VALUE self, VALUE stall_velocity) {
 }
 
 VALUE ph_motor_get_min_stall_velocity(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMinStallVelocity);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMinStallVelocity);
 }
 
 VALUE ph_motor_get_max_stall_velocity(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMaxStallVelocity);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMaxStallVelocity);
 }
 
 VALUE ph_motor_get_target_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getTargetPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getTargetPosition);
 }
 
 VALUE ph_motor_set_target_position(VALUE self, VALUE target_position) {
@@ -201,7 +201,7 @@ VALUE ph_motor_set_target_position(VALUE self, VALUE target_position) {
 }
 
 VALUE ph_motor_get_velocity_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getVelocityLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getVelocityLimit);
 }
 
 VALUE ph_motor_set_velocity_limit(VALUE self, VALUE velocity) {
@@ -210,11 +210,11 @@ VALUE ph_motor_set_velocity_limit(VALUE self, VALUE velocity) {
 }
 
 VALUE ph_motor_get_min_velocity_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMinVelocityLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMinVelocityLimit);
 }
 
 VALUE ph_motor_get_max_velocity_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetMotorPositionController_getMaxVelocityLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetMotorPositionController_getMaxVelocityLimit);
 }
 
 

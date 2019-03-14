@@ -14,7 +14,7 @@ VALUE ph_stepper_init(VALUE self) {
 }
 
 VALUE ph_stepper_get_acceleration(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getAcceleration);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getAcceleration);
 }
 
 VALUE ph_stepper_set_acceleration(VALUE self, VALUE accel) {
@@ -23,15 +23,15 @@ VALUE ph_stepper_set_acceleration(VALUE self, VALUE accel) {
 }
 
 VALUE ph_stepper_get_min_acceleration(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getMinAcceleration);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getMinAcceleration);
 }
 
 VALUE ph_stepper_get_max_acceleration(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getMaxAcceleration);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getMaxAcceleration);
 }
 
 VALUE ph_stepper_get_control_mode(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetStepper_getControlMode);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetStepper_getControlMode);
 }
 
 VALUE ph_stepper_set_control_mode(VALUE self, VALUE mode) {
@@ -40,7 +40,7 @@ VALUE ph_stepper_set_control_mode(VALUE self, VALUE mode) {
 }
 
 VALUE ph_stepper_get_current_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getCurrentLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getCurrentLimit);
 }
 
 VALUE ph_stepper_set_current_limit(VALUE self, VALUE limit) {
@@ -49,15 +49,15 @@ VALUE ph_stepper_set_current_limit(VALUE self, VALUE limit) {
 }
 
 VALUE ph_stepper_get_min_current_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getMinCurrentLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getMinCurrentLimit);
 }
 
 VALUE ph_stepper_get_max_current_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getMaxCurrentLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getMaxCurrentLimit);
 }
 
 VALUE ph_stepper_get_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetStepper_getDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetStepper_getDataInterval);
 }
 
 VALUE ph_stepper_set_data_interval(VALUE self, VALUE interval) {
@@ -66,15 +66,15 @@ VALUE ph_stepper_set_data_interval(VALUE self, VALUE interval) {
 }
 
 VALUE ph_stepper_get_min_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetStepper_getMinDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetStepper_getMinDataInterval);
 }
 
 VALUE ph_stepper_get_max_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetStepper_getMaxDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetStepper_getMaxDataInterval);
 }
 
 VALUE ph_stepper_get_engaged(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetStepper_getEngaged);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetStepper_getEngaged);
 }
 
 VALUE ph_stepper_set_engaged(VALUE self, VALUE state) {
@@ -83,7 +83,7 @@ VALUE ph_stepper_set_engaged(VALUE self, VALUE state) {
 }
 
 VALUE ph_stepper_get_holding_current_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getHoldingCurrentLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getHoldingCurrentLimit);
 }
 
 VALUE ph_stepper_set_holding_current_limit(VALUE self, VALUE limit) {
@@ -92,19 +92,19 @@ VALUE ph_stepper_set_holding_current_limit(VALUE self, VALUE limit) {
 }
 
 VALUE ph_stepper_get_is_moving(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetStepper_getIsMoving);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetStepper_getIsMoving);
 }
 
 VALUE ph_stepper_get_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getPosition);
 }
 
 VALUE ph_stepper_get_min_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getMinPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getMinPosition);
 }
 
 VALUE ph_stepper_get_max_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getMaxPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getMaxPosition);
 }
 
 VALUE ph_stepper_add_position_offset(VALUE self, VALUE offset) {
@@ -113,7 +113,7 @@ VALUE ph_stepper_add_position_offset(VALUE self, VALUE offset) {
 }
 
 VALUE ph_stepper_get_rescale_factor(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getRescaleFactor);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getRescaleFactor);
 }
 
 VALUE ph_stepper_set_rescale_factor(VALUE self, VALUE rescale_factor) {
@@ -122,7 +122,7 @@ VALUE ph_stepper_set_rescale_factor(VALUE self, VALUE rescale_factor) {
 }
 
 VALUE ph_stepper_get_target_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getTargetPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getTargetPosition);
 }
 
 VALUE ph_stepper_set_target_position(VALUE self, VALUE position) {
@@ -131,11 +131,11 @@ VALUE ph_stepper_set_target_position(VALUE self, VALUE position) {
 }
 
 VALUE ph_stepper_get_velocity(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getVelocity);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getVelocity);
 }
 
 VALUE ph_stepper_get_velocity_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getVelocityLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getVelocityLimit);
 }
 
 VALUE ph_stepper_set_velocity_limit(VALUE self, VALUE limit) {
@@ -144,11 +144,11 @@ VALUE ph_stepper_set_velocity_limit(VALUE self, VALUE limit) {
 }
 
 VALUE ph_stepper_get_min_velocity_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getMinVelocityLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getMinVelocityLimit);
 }
 
 VALUE ph_stepper_get_max_velocity_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetStepper_getMaxVelocityLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetStepper_getMaxVelocityLimit);
 }
 
 

@@ -15,7 +15,7 @@ VALUE ph_rc_servo_init(VALUE self) {
 }
 
 VALUE ph_rc_servo_get_acceleration(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getAcceleration);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getAcceleration);
 }
 
 VALUE ph_rc_servo_set_acceleration(VALUE self, VALUE acceleration) {
@@ -24,15 +24,15 @@ VALUE ph_rc_servo_set_acceleration(VALUE self, VALUE acceleration) {
 }
 
 VALUE ph_rc_servo_get_min_acceleration(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMinAcceleration);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMinAcceleration);
 }
 
 VALUE ph_rc_servo_get_max_acceleration(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMaxAcceleration);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMaxAcceleration);
 }
 
 VALUE ph_rc_servo_get_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetRCServo_getDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetRCServo_getDataInterval);
 }
 
 VALUE ph_rc_servo_set_data_interval(VALUE self, VALUE interval) {
@@ -41,15 +41,15 @@ VALUE ph_rc_servo_set_data_interval(VALUE self, VALUE interval) {
 }
 
 VALUE ph_rc_servo_get_min_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetRCServo_getMinDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetRCServo_getMinDataInterval);
 }
 
 VALUE ph_rc_servo_get_max_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetRCServo_getMaxDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetRCServo_getMaxDataInterval);
 }
 
 VALUE ph_rc_servo_get_engaged(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetRCServo_getEngaged);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetRCServo_getEngaged);
 }
 
 VALUE ph_rc_servo_set_engaged(VALUE self, VALUE engaged) {
@@ -58,15 +58,15 @@ VALUE ph_rc_servo_set_engaged(VALUE self, VALUE engaged) {
 }
 
 VALUE ph_rc_servo_get_is_moving(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetRCServo_getIsMoving);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetRCServo_getIsMoving);
 }
 
 VALUE ph_rc_servo_get_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getPosition);
 }
 
 VALUE ph_rc_servo_get_min_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMinPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMinPosition);
 }
 
 VALUE ph_rc_servo_set_min_position(VALUE self, VALUE position) {
@@ -75,7 +75,7 @@ VALUE ph_rc_servo_set_min_position(VALUE self, VALUE position) {
 }
 
 VALUE ph_rc_servo_get_max_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMaxPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMaxPosition);
 }
 
 VALUE ph_rc_servo_set_max_position(VALUE self, VALUE position) {
@@ -84,7 +84,7 @@ VALUE ph_rc_servo_set_max_position(VALUE self, VALUE position) {
 }
 
 VALUE ph_rc_servo_get_min_pulse_width(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMinPulseWidth);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMinPulseWidth);
 }
 
 VALUE ph_rc_servo_set_min_pulse_width(VALUE self, VALUE pulse_width) {
@@ -93,7 +93,7 @@ VALUE ph_rc_servo_set_min_pulse_width(VALUE self, VALUE pulse_width) {
 }
 
 VALUE ph_rc_servo_get_max_pulse_width(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMaxPulseWidth);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMaxPulseWidth);
 }
 
 VALUE ph_rc_servo_set_max_pulse_width(VALUE self, VALUE pulse_width) {
@@ -102,15 +102,15 @@ VALUE ph_rc_servo_set_max_pulse_width(VALUE self, VALUE pulse_width) {
 }
 
 VALUE ph_rc_servo_get_min_pulse_width_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMinPulseWidthLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMinPulseWidthLimit);
 }
 
 VALUE ph_rc_servo_get_max_pulse_width_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMaxPulseWidthLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMaxPulseWidthLimit);
 }
 
 VALUE ph_rc_servo_get_speed_ramping_state(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetRCServo_getSpeedRampingState);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetRCServo_getSpeedRampingState);
 }
 
 VALUE ph_rc_servo_set_speed_ramping_state(VALUE self, VALUE speed_ramping_state) {
@@ -119,7 +119,7 @@ VALUE ph_rc_servo_set_speed_ramping_state(VALUE self, VALUE speed_ramping_state)
 }
 
 VALUE ph_rc_servo_get_target_position(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getTargetPosition);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getTargetPosition);
 }
 
 VALUE ph_rc_servo_set_target_position(VALUE self, VALUE position) {
@@ -128,7 +128,7 @@ VALUE ph_rc_servo_set_target_position(VALUE self, VALUE position) {
 }
 
 VALUE ph_rc_servo_get_torque(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getTorque);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getTorque);
 }
 
 VALUE ph_rc_servo_set_torque(VALUE self, VALUE torque) {
@@ -137,19 +137,19 @@ VALUE ph_rc_servo_set_torque(VALUE self, VALUE torque) {
 }
 
 VALUE ph_rc_servo_get_min_torque(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMinTorque);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMinTorque);
 }
 
 VALUE ph_rc_servo_get_max_torque(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMaxTorque);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMaxTorque);
 }
 
 VALUE ph_rc_servo_get_velocity(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getVelocity);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getVelocity);
 }
 
 VALUE ph_rc_servo_get_velocity_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getVelocityLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getVelocityLimit);
 }
 
 VALUE ph_rc_servo_set_velocity_limit(VALUE self, VALUE velocity_limit) {
@@ -158,15 +158,15 @@ VALUE ph_rc_servo_set_velocity_limit(VALUE self, VALUE velocity_limit) {
 }
 
 VALUE ph_rc_servo_get_min_velocity_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMinVelocityLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMinVelocityLimit);
 }
 
 VALUE ph_rc_servo_get_max_velocity_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getMaxVelocityLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getMaxVelocityLimit);
 }
 
 VALUE ph_rc_servo_get_voltage(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetRCServo_getVoltage);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetRCServo_getVoltage);
 }
 
 VALUE ph_rc_servo_set_voltage(VALUE self, VALUE voltage) {
@@ -289,7 +289,7 @@ VALUE ph_rc_servo_set_target_position_async(VALUE self, VALUE position, VALUE ha
 }
 
 
-void Init_servo() {
+void Init_rc_servo() {
   VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
   VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_rc_servo = rb_define_class_under(ph_module, "RCServo", ph_common);

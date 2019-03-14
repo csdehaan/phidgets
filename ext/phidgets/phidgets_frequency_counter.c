@@ -13,11 +13,11 @@ VALUE ph_freq_init(VALUE self) {
 }
 
 VALUE ph_freq_get_count(VALUE self) {
-  return ph_get_uint64(get_ph_handle(self), PhidgetFrequencyCounter_getCount);
+  return ph_get_uint64(get_ph_handle(self), (phidget_get_uint64_func)PhidgetFrequencyCounter_getCount);
 }
 
 VALUE ph_freq_get_enabled(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetFrequencyCounter_getEnabled);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetFrequencyCounter_getEnabled);
 }
 
 VALUE ph_freq_set_enabled(VALUE self, VALUE state) {
@@ -26,7 +26,7 @@ VALUE ph_freq_set_enabled(VALUE self, VALUE state) {
 }
 
 VALUE ph_freq_get_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetFrequencyCounter_getDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetFrequencyCounter_getDataInterval);
 }
 
 VALUE ph_freq_set_data_interval(VALUE self, VALUE interval) {
@@ -35,15 +35,15 @@ VALUE ph_freq_set_data_interval(VALUE self, VALUE interval) {
 }
 
 VALUE ph_freq_get_min_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetFrequencyCounter_getMinDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetFrequencyCounter_getMinDataInterval);
 }
 
 VALUE ph_freq_get_max_data_interval(VALUE self) {
-  return ph_get_uint(get_ph_handle(self), PhidgetFrequencyCounter_getMaxDataInterval);
+  return ph_get_uint(get_ph_handle(self), (phidget_get_uint_func)PhidgetFrequencyCounter_getMaxDataInterval);
 }
 
 VALUE ph_freq_get_filter_type(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetFrequencyCounter_getFilterType);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetFrequencyCounter_getFilterType);
 }
 
 VALUE ph_freq_set_filter_type(VALUE self, VALUE filter) {
@@ -52,15 +52,15 @@ VALUE ph_freq_set_filter_type(VALUE self, VALUE filter) {
 }
 
 VALUE ph_freq_get_frequency(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetFrequencyCounter_getFrequency);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetFrequencyCounter_getFrequency);
 }
 
 VALUE ph_freq_get_max_frequency(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetFrequencyCounter_getMaxFrequency);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetFrequencyCounter_getMaxFrequency);
 }
 
 VALUE ph_freq_get_frequency_cutoff(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetFrequencyCounter_getFrequencyCutoff);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetFrequencyCounter_getFrequencyCutoff);
 }
 
 VALUE ph_freq_set_frequency_cutoff(VALUE self, VALUE cutoff) {
@@ -69,15 +69,15 @@ VALUE ph_freq_set_frequency_cutoff(VALUE self, VALUE cutoff) {
 }
 
 VALUE ph_freq_get_min_frequency_cutoff(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetFrequencyCounter_getMinFrequencyCutoff);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetFrequencyCounter_getMinFrequencyCutoff);
 }
 
 VALUE ph_freq_get_max_frequency_cutoff(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetFrequencyCounter_getMaxFrequencyCutoff);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetFrequencyCounter_getMaxFrequencyCutoff);
 }
 
 VALUE ph_freq_get_input_mode(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetFrequencyCounter_getInputMode);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetFrequencyCounter_getInputMode);
 }
 
 VALUE ph_freq_set_input_mode(VALUE self, VALUE mode) {
@@ -86,7 +86,7 @@ VALUE ph_freq_set_input_mode(VALUE self, VALUE mode) {
 }
 
 VALUE ph_freq_get_power_supply(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetFrequencyCounter_getPowerSupply);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetFrequencyCounter_getPowerSupply);
 }
 
 VALUE ph_freq_set_power_supply(VALUE self, VALUE power_supply) {
@@ -100,7 +100,7 @@ VALUE ph_freq_reset(VALUE self) {
 }
 
 VALUE ph_freq_get_time_elapsed(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetFrequencyCounter_getTimeElapsed);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetFrequencyCounter_getTimeElapsed);
 }
 
 

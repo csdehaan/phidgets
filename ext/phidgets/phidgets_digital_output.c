@@ -13,7 +13,7 @@ VALUE ph_digital_output_init(VALUE self) {
 }
 
 VALUE ph_digital_output_get_duty_cycle(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getDutyCycle);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetDigitalOutput_getDutyCycle);
 }
 
 VALUE ph_digital_output_set_duty_cycle(VALUE self, VALUE duty_cycle) {
@@ -22,15 +22,15 @@ VALUE ph_digital_output_set_duty_cycle(VALUE self, VALUE duty_cycle) {
 }
 
 VALUE ph_digital_output_get_min_duty_cycle(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getMinDutyCycle);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetDigitalOutput_getMinDutyCycle);
 }
 
 VALUE ph_digital_output_get_max_duty_cycle(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getMaxDutyCycle);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetDigitalOutput_getMaxDutyCycle);
 }
 
 VALUE ph_digital_output_get_led_current_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getLEDCurrentLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetDigitalOutput_getLEDCurrentLimit);
 }
 
 VALUE ph_digital_output_set_led_current_limit(VALUE self, VALUE current_limit) {
@@ -39,15 +39,15 @@ VALUE ph_digital_output_set_led_current_limit(VALUE self, VALUE current_limit) {
 }
 
 VALUE ph_digital_output_get_min_led_current_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getMinLEDCurrentLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetDigitalOutput_getMinLEDCurrentLimit);
 }
 
 VALUE ph_digital_output_get_max_led_current_limit(VALUE self) {
-  return ph_get_double(get_ph_handle(self), PhidgetDigitalOutput_getMaxLEDCurrentLimit);
+  return ph_get_double(get_ph_handle(self), (phidget_get_double_func)PhidgetDigitalOutput_getMaxLEDCurrentLimit);
 }
 
 VALUE ph_digital_output_get_led_forward_voltage(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetDigitalOutput_getLEDForwardVoltage);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetDigitalOutput_getLEDForwardVoltage);
 }
 
 VALUE ph_digital_output_set_led_forward_voltage(VALUE self, VALUE forward_voltage) {
@@ -56,7 +56,7 @@ VALUE ph_digital_output_set_led_forward_voltage(VALUE self, VALUE forward_voltag
 }
 
 VALUE ph_digital_output_get_state(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetDigitalOutput_getState);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetDigitalOutput_getState);
 }
 
 VALUE ph_digital_output_set_state(VALUE self, VALUE state) {

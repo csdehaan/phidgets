@@ -11,7 +11,7 @@ VALUE ph_digital_input_init(VALUE self) {
 }
 
 VALUE ph_digital_input_get_input_mode(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetDigitalInput_getInputMode);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetDigitalInput_getInputMode);
 }
 
 VALUE ph_digital_input_set_input_mode(VALUE self, VALUE mode) {
@@ -20,7 +20,7 @@ VALUE ph_digital_input_set_input_mode(VALUE self, VALUE mode) {
 }
 
 VALUE ph_digital_input_get_power_supply(VALUE self) {
-  return ph_get_int(get_ph_handle(self), PhidgetDigitalInput_getPowerSupply);
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetDigitalInput_getPowerSupply);
 }
 
 VALUE ph_digital_input_set_power_supply(VALUE self, VALUE power_supply) {
@@ -29,7 +29,7 @@ VALUE ph_digital_input_set_power_supply(VALUE self, VALUE power_supply) {
 }
 
 VALUE ph_digital_input_get_state(VALUE self) {
-  return ph_get_bool(get_ph_handle(self), PhidgetDigitalInput_getState);
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)PhidgetDigitalInput_getState);
 }
 
 
