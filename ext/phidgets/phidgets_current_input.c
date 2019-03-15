@@ -130,7 +130,7 @@ void Init_current_input() {
    * The maximum value the CurrentChange event will report.
    */
   rb_define_method(ph_current_input, "getMaxCurrent", ph_current_input_get_max_current, 0);
-  rb_define_alias(ph_current_input, "max_current", "getCgetMaxCurrenturrent");
+  rb_define_alias(ph_current_input, "max_current", "getMaxCurrent");
 
   /* Document-method: getCurrentChangeTrigger
    * call-seq: getCurrentChangeTrigger -> trigger
