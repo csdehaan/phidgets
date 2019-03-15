@@ -230,7 +230,7 @@ void Init_bldc_motor() {
   /* Document-method: new
    * call-seq: new
    *
-   * Creates a Phidget Stepper object.
+   * Creates a Phidget BLDCMotor object.
    */
   rb_define_method(ph_bldc_motor, "initialize", ph_bldc_motor_init, 0);
 
