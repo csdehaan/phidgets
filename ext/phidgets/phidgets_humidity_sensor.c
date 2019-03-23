@@ -1,7 +1,7 @@
 
 #include "phidgets.h"
 
-#define HUMIDITY_SENSOR_HuMIDITY_CHANGE_CALLBACK    0
+#define HUMIDITY_SENSOR_HUMIDITY_CHANGE_CALLBACK    0
 
 
 VALUE ph_humidity_init(VALUE self) {
@@ -69,7 +69,7 @@ void CCONV ph_humidity_on_humidity_change(PhidgetHumiditySensorHandle phid, void
 
 VALUE ph_humidity_set_on_humidity_change_handler(VALUE self, VALUE handler) {
   ph_data_t *ph = get_ph_data(self);
-  ph_callback_data_t *callback_data = &ph->dev_callbacks[HUMIDITY_SENSOR_HuMIDITY_CHANGE_CALLBACK];
+  ph_callback_data_t *callback_data = &ph->dev_callbacks[HUMIDITY_SENSOR_HUMIDITY_CHANGE_CALLBACK];
   if( TYPE(handler) == T_NIL ) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
