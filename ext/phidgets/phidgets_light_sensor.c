@@ -174,7 +174,7 @@ void Init_light() {
    * The channel will not issue a IlluminanceChange event until the illuminance value has changed by the amount specified by the IlluminanceChangeTrigger.
    * Setting the IlluminanceChangeTrigger to 0 will result in the channel firing events every DataInterval. This is useful for applications that implement their own data filtering.
    */
-  rb_define_method(ph_light, "setIlluminanceChangeTrigger", ph_light_set_illuminance_change_trigger, 0);
+  rb_define_method(ph_light, "setIlluminanceChangeTrigger", ph_light_set_illuminance_change_trigger, 1);
   rb_define_alias(ph_light, "illuminance_change_trigger=", "setIlluminanceChangeTrigger");
 
   /* Document-method: getMinIlluminanceChangeTrigger
