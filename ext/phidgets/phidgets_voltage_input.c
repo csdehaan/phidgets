@@ -47,7 +47,13 @@ VALUE ph_voltage_input_set_sensor_type(VALUE self, VALUE sensor_type) {
 }
 
 VALUE ph_voltage_input_get_sensor_unit(VALUE self) {
-  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetVoltageInput_getSensorUnit);
+  VALUE unit_info = rb_hash_new();
+  Phidget_UnitInfo sensorUnit;
+  ph_raise(PhidgetVoltageInput_getSensorUnit((PhidgetVoltageInputHandle)get_ph_handle(self), &sensorUnit));
+  rb_hash_aset(unit_info, rb_str_new2("unit"), INT2NUM(sensorUnit.unit));
+  rb_hash_aset(unit_info, rb_str_new2("name"), rb_str_new2(sensorUnit.name));
+  rb_hash_aset(unit_info, rb_str_new2("symbol"), rb_str_new2(sensorUnit.symbol));
+  return unit_info;
 }
 
 VALUE ph_voltage_input_get_sensor_value(VALUE self) {
