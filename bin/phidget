@@ -1,84 +1,30 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
 require 'phidgets'
 
-def usage
-  $stdout.puts 'phidget [[host:]id] cmd [args]'
-  $stdout.puts '    host  = host name if connecting through web service'
-  $stdout.puts '    id    = serial # of phidget board (-1 for any)'
-  $stdout.puts '    cmd   = list | method'
-  $stdout.puts '    args  = arguments are dependent on the command'
-  $stdout.puts
-  $stdout.puts '  Examples:'
-  $stdout.puts '    phidget list'
-  $stdout.puts '    phidget -1 set_output_state 0 true'
-  $stdout.puts '    phidget 34619 device_name'
-end
-
 begin
-  args = {:port => 5001, :password => ''}
-
-  case ARGV[0]
-  when /^(-1|\d+)$/
-    args[:serial_number] = $1.to_i
-  when /^(\w|.+):(-1|\d+)$/
-    args[:address] = $1
-    args[:serial_number] = $2.to_i
-  when /^list$/i
-    args[:list] = true
-  when /^(\w|.+)$/
-    if ARGV[1].downcase == 'list'
-      args[:list] = true
-      args[:address] = $1
-    else
-      raise "Invalid Arguments."
-    end
-  else
-    raise "Invalid Arguments."
-  end
-
   manager = Phidgets::Manager.new
-  manager.open(args)
-
-  # give the manager some time to find the devices
-  args[:address] ? sleep(2) : sleep(1)
-
-  devices = manager.attached_devices
+  manager.on_attach do |phid, serial, hub_port, index, ch_name|
+    str = "| #{serial}"
+    str += ' ' * (18 - str.length)
+    str += "| #{ch_name}"
+    str += ' ' * (57 - str.length)
+    str += "| #{hub_port}"
+    str += ' ' * (66 - str.length)
+    str += "| #{index}"
+    str += ' ' * (75 - str.length) + '|'
+    $stdout.puts str
+  end
+  $stdout.puts "\n----------------------------------------------------------------------------"
+  $stdout.puts "| SerialNumber    | Class                                | Hub    | Index  |"
+  $stdout.puts "----------------------------------------------------------------------------"
+  manager.open
+  sleep 0.5
+  $stdout.puts "----------------------------------------------------------------------------\n"
   manager.close
-
-  if devices.size == 0
-    $stdout.puts "\nThere are no phidgets attached.\n\n"
-    exit
-  end
-
-  if args[:list]
-    $stdout.puts "\n----------------------------------------------------------------------"
-    $stdout.puts "| SerialNumber          | Device Name                                |"
-    $stdout.puts "----------------------------------------------------------------------"
-    devices.each_pair { |serial,phidget|
-      args[:serial_number] = serial
-      phidget.open(args)
-      phidget.wait_for_attachment(2000)
-      d_str = "| #{serial}"
-      d_str += " " * (24 - d_str.length) + "| #{phidget.device_name}"
-      d_str += " " * (69 - d_str.length) + "|"
-      $stdout.puts d_str
-      phidget.close
-    }
-    $stdout.puts "----------------------------------------------------------------------\n"
   
-  else
-    phidget = args[:serial_number] > 0 ? devices[args[:serial_number]] : devices.values[0]
-    args[:serial_number] = devices.keys[0] unless args[:serial_number] > 0
-    phidget.open(args)
-    phidget.wait_for_attachment(2000)
-    $stdout.puts eval("phidget.#{ARGV[1]}(#{ARGV[2..-1].join(',')})")
-    phidget.close
-  end
-
 rescue SystemExit
 rescue Exception => e
-  $stdout.puts "#{e}\n#{e.backtrace.join("\n")}\n#{usage}\n"
+  $stdout.puts "#{e}\n#{e.backtrace.join("\n")}\n"
 end
 
