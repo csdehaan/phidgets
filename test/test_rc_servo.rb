@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 
-class TestPhidgetsStepper < Test::Unit::TestCase
+class TestPhidgetsRCServo < Test::Unit::TestCase
 
   def setup
-    @phidget = Phidgets::Stepper.new
+    @phidget = Phidgets::RCServo.new
   end
 
   def test_get_acceleration
@@ -11,7 +11,7 @@ class TestPhidgetsStepper < Test::Unit::TestCase
   end
 
   def test_set_acceleration
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.acceleration = 0.14}
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.acceleration = 58.9}
   end
 
   def test_get_min_acceleration
@@ -20,30 +20,6 @@ class TestPhidgetsStepper < Test::Unit::TestCase
 
   def test_get_max_acceleration
     assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_acceleration}
-  end
-
-  def test_get_control_mode
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.control_mode}
-  end
-
-  def test_set_control_mode
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.control_mode = Phidgets::Stepper::CONTROL_MODE_STEP}
-  end
-
-  def test_get_current_limit
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.current_limit}
-  end
-
-  def test_set_current_limit
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.current_limit = 2.5}
-  end
-
-  def test_get_min_current_limit
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_current_limit}
-  end
-
-  def test_get_max_current_limit
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_current_limit}
   end
 
   def test_get_data_interval
@@ -70,14 +46,6 @@ class TestPhidgetsStepper < Test::Unit::TestCase
     assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.engaged = true}
   end
 
-  def test_get_holding_current_limit
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.holding_current_limit}
-  end
-
-  def test_set_holding_current_limit
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.holding_current_limit = 2.5}
-  end
-
   def test_get_is_moving
     assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.is_moving?}
   end
@@ -90,20 +58,48 @@ class TestPhidgetsStepper < Test::Unit::TestCase
     assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_position}
   end
 
+  def test_set_min_position
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_position = 2.14}
+  end
+
   def test_get_max_position
     assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_position}
   end
 
-  def test_add_position_offset
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.add_position_offset(5.2)}
+  def test_set_max_position
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_position = 12.14}
   end
 
-  def test_get_rescale_factor
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.rescale_factor}
+  def test_get_min_pulse_width
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_pulse_width}
   end
 
-  def test_set_rescale_factor
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.rescale_factor = 2.5}
+  def test_set_min_pulse_width
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_pulse_width = 2.5}
+  end
+
+  def test_get_max_pulse_width
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_pulse_width}
+  end
+
+  def test_set_max_pulse_width
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_pulse_width = 2.5}
+  end
+
+  def test_get_min_pulse_width_limit
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_pulse_width_limit}
+  end
+
+  def test_get_max_pulse_width_limit
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_pulse_width_limit}
+  end
+
+  def test_get_speed_ramping_state
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.speed_ramping_state}
+  end
+
+  def test_set_speed_ramping_state
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.speed_ramping_state = true}
   end
 
   def test_get_target_position
@@ -116,6 +112,22 @@ class TestPhidgetsStepper < Test::Unit::TestCase
 
   def test_set_target_position_async
     assert_nothing_raised {@phidget.set_target_position_async(3.3) {puts 'target_position_set'}}
+  end
+
+  def test_get_torque
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.torque}
+  end
+
+  def test_set_torque
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.torque = 2.5}
+  end
+
+  def test_get_min_torque
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_torque}
+  end
+
+  def test_get_max_torque
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_torque}
   end
 
   def test_get_velocity
@@ -138,12 +150,20 @@ class TestPhidgetsStepper < Test::Unit::TestCase
     assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_velocity_limit}
   end
 
+  def test_get_voltage
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.voltage}
+  end
+
+  def test_set_voltage
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.voltage = 2.5}
+  end
+
   def test_set_on_position_change
     assert_nothing_raised {@phidget.on_position_change {puts 'position_changed'}}
   end
 
-  def test_set_on_stopped
-    assert_nothing_raised {@phidget.on_stopped {puts 'stopped'}}
+  def test_set_on_target_position_reached
+    assert_nothing_raised {@phidget.on_target_position_reached {puts 'target_position_reached'}}
   end
 
   def test_set_on_velocity_change

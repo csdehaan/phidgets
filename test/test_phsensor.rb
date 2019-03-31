@@ -2,60 +2,72 @@ require File.dirname(__FILE__) + '/test_helper.rb'
 
 class TestPhidgetsPHSensor < Test::Unit::TestCase
 
-  def test_create
-    assert_nothing_raised {Phidgets::PHSensor.new}
+  def setup
+    @phidget = Phidgets::PHSensor.new
+  end
+
+  def test_get_correction_temperature
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.correction_temperature}
+  end
+
+  def test_set_correction_temperature
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.correction_temperature = 26.5}
+  end
+
+  def test_get_min_correction_temperature
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_correction_temperature}
+  end
+
+  def test_get_max_correction_temperature
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_correction_temperature}
+  end
+
+  def test_get_data_interval
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.data_interval}
+  end
+
+  def test_set_data_interval
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.data_interval = 2}
+  end
+
+  def test_get_min_data_interval
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_data_interval}
+  end
+
+  def test_get_max_data_interval
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_data_interval}
   end
 
   def test_get_ph
-    sensor = Phidgets::PHSensor.new
-    assert_raise(Phidgets::Error::NotAttached) {sensor.ph}
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.ph}
   end
 
-  def test_get_ph_min
-    sensor = Phidgets::PHSensor.new
-    assert_raise(Phidgets::Error::NotAttached) {sensor.ph_min}
+  def test_get_min_ph
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_ph}
   end
 
-  def test_get_ph_max
-    sensor = Phidgets::PHSensor.new
-    assert_raise(Phidgets::Error::NotAttached) {sensor.ph_max}
+  def test_get_max_ph
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_ph}
   end
 
   def test_get_ph_change_trigger
-    sensor = Phidgets::PHSensor.new
-    assert_raise(Phidgets::Error::NotAttached) {sensor.ph_change_trigger}
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.ph_change_trigger}
   end
 
   def test_set_ph_change_trigger
-    sensor = Phidgets::PHSensor.new
-    assert_raise(Phidgets::Error::NotAttached) {sensor.ph_change_trigger = 0.50}
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.ph_change_trigger = 0.50}
   end
 
-  def test_get_potential
-    sensor = Phidgets::PHSensor.new
-    assert_raise(Phidgets::Error::NotAttached) {sensor.potential}
+  def test_get_min_ph_change_trigger
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_ph_change_trigger}
   end
 
-  def test_get_potential_min
-    sensor = Phidgets::PHSensor.new
-    assert_raise(Phidgets::Error::NotAttached) {sensor.potential_min}
+  def test_get_max_ph_change_trigger
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_ph_change_trigger}
   end
 
-  def test_get_potential_max
-    sensor = Phidgets::PHSensor.new
-    assert_raise(Phidgets::Error::NotAttached) {sensor.potential_max}
-  end
-
-  def test_set_temperature
-    sensor = Phidgets::PHSensor.new
-    assert_raise(Phidgets::Error::NotAttached) {sensor.temperature = 26.5}
-  end
-
-  unless RUBY_VERSION < '1.9.0'
-    def test_set_on_ph_change
-      sensor = Phidgets::PHSensor.new
-      assert_nothing_raised {sensor.on_ph_change {puts 'hello'}}
-    end
+  def test_set_on_ph_change
+    assert_nothing_raised {@phidget.on_ph_change {puts 'ph_changed'}}
   end
 
 end

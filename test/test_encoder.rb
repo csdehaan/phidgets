@@ -2,65 +2,72 @@ require File.dirname(__FILE__) + '/test_helper.rb'
 
 class TestPhidgetsEncoder < Test::Unit::TestCase
 
-  def test_create
-    assert_nothing_raised {Phidgets::Encoder.new}
-  end
-
-  def test_get_input_count
-    encoder = Phidgets::Encoder.new
-    assert_raise(Phidgets::Error::NotAttached) {encoder.input_count}
-  end
-
-  def test_get_input_state
-    encoder = Phidgets::Encoder.new
-    assert_raise(Phidgets::Error::NotAttached) {encoder.input_state 1}
-  end
-
-  def test_get_encoder_count
-    encoder = Phidgets::Encoder.new
-    assert_raise(Phidgets::Error::NotAttached) {encoder.encoder_count}
-  end
-
-  def test_get_position
-    encoder = Phidgets::Encoder.new
-    assert_raise(Phidgets::Error::NotAttached) {encoder.position 1}
-  end
-
-  def test_set_position
-    encoder = Phidgets::Encoder.new
-    assert_raise(Phidgets::Error::NotAttached) {encoder.set_position 1, 1500}
-  end
-
-  def test_get_index_position
-    encoder = Phidgets::Encoder.new
-    assert_raise(Phidgets::Error::NotAttached) {encoder.index_position 1}
+  def setup
+    @phidget = Phidgets::Encoder.new
   end
 
   def test_get_enabled
-    encoder = Phidgets::Encoder.new
-    assert_raise(Phidgets::Error::NotAttached) {encoder.enabled? 1}
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.enabled?}
   end
 
   def test_set_enabled
-    encoder = Phidgets::Encoder.new
-    assert_raise(Phidgets::Error::NotAttached) {encoder.set_enabled 1, true}
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.enabled = true}
   end
 
-  unless RUBY_VERSION < '1.9.0'
-    def test_set_on_input_change
-      encoder = Phidgets::Encoder.new
-      assert_nothing_raised {encoder.on_input_change {puts 'hello'}}
-    end
+  def test_get_data_interval
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.data_interval}
+  end
 
-    def test_set_on_position_change
-      encoder = Phidgets::Encoder.new
-      assert_nothing_raised {encoder.on_position_change {puts 'hello'}}
-    end
+  def test_set_data_interval
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.data_interval = 2}
+  end
 
-    def test_set_on_index
-      encoder = Phidgets::Encoder.new
-      assert_nothing_raised {encoder.on_index {puts 'hello'}}
-    end
+  def test_get_min_data_interval
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_data_interval}
+  end
+
+  def test_get_max_data_interval
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_data_interval}
+  end
+
+  def test_get_index_position
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.index_position}
+  end
+
+  def test_get_io_mode
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.io_mode}
+  end
+
+  def test_set_io_mode
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.io_mode = Phidgets::Encoder::IO_MODE_LINE_DRIVER_2K2}
+  end
+
+  def test_get_position
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.position}
+  end
+
+  def test_set_position
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.position = 1500}
+  end
+
+  def test_get_position_change_trigger
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.position_change_trigger}
+  end
+
+  def test_set_position_change_trigger
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.position_change_trigger = 500}
+  end
+
+  def test_get_min_position_change_trigger
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.min_position_change_trigger}
+  end
+
+  def test_get_max_position_change_trigger
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.max_position_change_trigger}
+  end
+
+  def test_on_position_change
+    assert_nothing_raised {@phidget.on_position_change {puts 'position_changed'}}
   end
 
 end
