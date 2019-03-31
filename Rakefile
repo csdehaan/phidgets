@@ -3,6 +3,7 @@
 require 'rubygems'
 require 'rake/extensiontask'
 require 'rake/packagetask'
+require 'rake/testtask'
 require 'rdoc/task'
 
 spec = Gem::Specification.load('phidgets.gemspec')
@@ -10,8 +11,10 @@ spec = Gem::Specification.load('phidgets.gemspec')
 Rake::ExtensionTask.new 'phidgets', spec
 
 Gem::PackageTask.new(spec) do |pkg|
-  
+end
 
+Rake::TestTask.new do |task|
+  task.pattern = 'test/test_*.rb'
 end
 
 RDOC_FILES = FileList["README.rdoc", "ext/phidgets/*.c", "lib/phidgets/*.rb"]
@@ -28,4 +31,3 @@ Rake::RDocTask.new(:ri) do |rd|
   rd.options << "--ri-system"
   rd.rdoc_files.include(RDOC_FILES)
 end
-

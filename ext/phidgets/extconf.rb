@@ -9,7 +9,6 @@ have_library('phidget22')
 dir_config("phidgets")
 
 have_header('ruby/thread.h')
-have_func('rb_thread_blocking_region')
 have_func('rb_thread_call_without_gvl')
 
 create_makefile("phidgets")

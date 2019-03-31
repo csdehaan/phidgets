@@ -9,7 +9,6 @@
 VALUE ph_get_library_version(VALUE self);
 
 
-
 void Init_phidgets() {
   VALUE ph_module = rb_define_module("Phidgets");
   VALUE ph_error;
@@ -228,14 +227,13 @@ void Init_phidgets() {
   rb_define_const(ph_module, "POWER_SUPPLY_12V", INT2NUM(POWER_SUPPLY_12V));
   rb_define_const(ph_module, "POWER_SUPPLY_24V", INT2NUM(POWER_SUPPLY_24V));
 
-  rb_define_const(ph_module, "LED_FORWARD_VOLTAGE_1_7V", INT2NUM(LED_FORWARD_VOLTAGE_1_7V));
-  rb_define_const(ph_module, "LED_FORWARD_VOLTAGE_2_75V", INT2NUM(LED_FORWARD_VOLTAGE_2_75V));
-  rb_define_const(ph_module, "LED_FORWARD_VOLTAGE_3_2V", INT2NUM(LED_FORWARD_VOLTAGE_3_2V));
-  rb_define_const(ph_module, "LED_FORWARD_VOLTAGE_3_9V", INT2NUM(LED_FORWARD_VOLTAGE_3_9V));
-  rb_define_const(ph_module, "LED_FORWARD_VOLTAGE_4_0V", INT2NUM(LED_FORWARD_VOLTAGE_4_0V));
-  rb_define_const(ph_module, "LED_FORWARD_VOLTAGE_4_8V", INT2NUM(LED_FORWARD_VOLTAGE_4_8V));
-  rb_define_const(ph_module, "LED_FORWARD_VOLTAGE_5_0V", INT2NUM(LED_FORWARD_VOLTAGE_5_0V));
-  rb_define_const(ph_module, "LED_FORWARD_VOLTAGE_5_6V", INT2NUM(LED_FORWARD_VOLTAGE_5_6V));
+  rb_define_const(ph_module, "RTD_WIRE_SETUP_2WIRE", INT2NUM(RTD_WIRE_SETUP_2WIRE));
+  rb_define_const(ph_module, "RTD_WIRE_SETUP_3WIRE", INT2NUM(RTD_WIRE_SETUP_3WIRE));
+  rb_define_const(ph_module, "RTD_WIRE_SETUP_4WIRE", INT2NUM(RTD_WIRE_SETUP_4WIRE));
+
+  rb_define_const(ph_module, "FAN_MODE_OFF", INT2NUM(FAN_MODE_OFF));
+  rb_define_const(ph_module, "FAN_MODE_ON", INT2NUM(FAN_MODE_ON));
+  rb_define_const(ph_module, "FAN_MODE_AUTO", INT2NUM(FAN_MODE_AUTO));
 
   ph_error = rb_define_class_under(ph_module, "Error", rb_eStandardError);
   rb_define_class_under(ph_error, "NotPermitted", ph_error);
@@ -294,30 +292,41 @@ void Init_phidgets() {
   rb_define_singleton_method(ph_module, "library_version", ph_get_library_version, 0);
 
   Init_logging();
-//  Init_dictionary();
-//  Init_manager();
+  Init_manager();
   Init_common();
-//  Init_accelerometer();
-//  Init_advanced_servo();
-//  Init_analog();
-//  Init_bridge();
-//  Init_encoder();
-//  Init_frequency_counter();
-//  Init_gps();
+  Init_accelerometer();
+  Init_bldc_motor();
+  Init_capacitive_touch();
+  Init_current_input();
+  Init_dc_motor();
+  Init_dictionary();
   Init_digital_input();
   Init_digital_output();
-//  Init_ir();
-//  Init_led();
-//  Init_motor_control();
-//  Init_ph_sensor();
-//  Init_rfid();
-//  Init_servo();
-//  Init_spatial();
-//  Init_stepper();
-//  Init_temperature_sensor();
-//  Init_text_lcd();
-//  Init_text_led();
-//  Init_weight_sensor();
+  Init_distance();
+  Init_encoder();
+  Init_frequency_counter();
+  Init_gps();
+  Init_gyroscope();
+  Init_hub();
+  Init_humidity();
+  Init_ir();
+  Init_lcd();
+  Init_light();
+  Init_magnetometer();
+  Init_motor_position_controller();
+  Init_ph_sensor();
+  Init_power_guard();
+  Init_pressure();
+  Init_rc_servo();
+  Init_rfid();
+  Init_resistance();
+  Init_sound();
+  Init_spatial();
+  Init_stepper();
+  Init_temperature_sensor();
+  Init_voltage_input();
+  Init_voltage_output();
+  Init_voltage_ratio_input();
 }
 
 
@@ -503,12 +512,6 @@ VALUE ph_get_instance_from_handle(PhidgetHandle ph_handle) {
     case PHIDCHCLASS_CURRENTINPUT:
       klass = rb_const_get(ph_module, rb_intern("CurrentInput"));
       break;
-    case PHIDCHCLASS_CURRENTOUTPUT:
-      klass = rb_const_get(ph_module, rb_intern("CurrentOutput"));
-      break;
-    case PHIDCHCLASS_DATAADAPTER:
-      klass = rb_const_get(ph_module, rb_intern("DataAdapter"));
-      break;
     case PHIDCHCLASS_DCMOTOR:
       klass = rb_const_get(ph_module, rb_intern("DCMotor"));
       break;
@@ -523,9 +526,6 @@ VALUE ph_get_instance_from_handle(PhidgetHandle ph_handle) {
       break;
     case PHIDCHCLASS_ENCODER:
       klass = rb_const_get(ph_module, rb_intern("Encoder"));
-      break;
-    case PHIDCHCLASS_FIRMWAREUPGRADE:
-      klass = rb_const_get(ph_module, rb_intern("FirmwareUpgrade"));
       break;
     case PHIDCHCLASS_FREQUENCYCOUNTER:
       klass = rb_const_get(ph_module, rb_intern("FrequencyCounter"));
@@ -553,9 +553,6 @@ VALUE ph_get_instance_from_handle(PhidgetHandle ph_handle) {
       break;
     case PHIDCHCLASS_MAGNETOMETER:
       klass = rb_const_get(ph_module, rb_intern("Magnetometer"));
-      break;
-    case PHIDCHCLASS_MESHDONGLE:
-      klass = rb_const_get(ph_module, rb_intern("MeshDongle"));
       break;
     case PHIDCHCLASS_MOTORPOSITIONCONTROLLER:
       klass = rb_const_get(ph_module, rb_intern("MotorPositionController"));
@@ -599,9 +596,6 @@ VALUE ph_get_instance_from_handle(PhidgetHandle ph_handle) {
     case PHIDCHCLASS_VOLTAGERATIOINPUT:
       klass = rb_const_get(ph_module, rb_intern("VoltageRatioInput"));
       break;
-    case PHIDCHCLASS_GENERIC:
-      klass = rb_const_get(ph_module, rb_intern("Generic"));
-      break;
     case PHIDCHCLASS_DICTIONARY:
       klass = rb_const_get(ph_module, rb_intern("Dictionary"));
       break;
@@ -613,17 +607,75 @@ VALUE ph_get_instance_from_handle(PhidgetHandle ph_handle) {
 }
 
 
+VALUE ph_get_int(PhidgetHandle handle, PhidgetReturnCode (*func)(PhidgetHandle, int *))
+{
+  int value;
+  ph_raise(func(handle, &value));
+  return INT2NUM(value);
+}
+
+
+VALUE ph_get_uint(PhidgetHandle handle, PhidgetReturnCode (*func)(PhidgetHandle, uint32_t *))
+{
+  uint32_t value;
+  ph_raise(func(handle, &value));
+  return UINT2NUM(value);
+}
+
+
+VALUE ph_get_int64(PhidgetHandle handle, PhidgetReturnCode (*func)(PhidgetHandle, int64_t *))
+{
+  int64_t value;
+  ph_raise(func(handle, &value));
+  return LL2NUM(value);
+}
+
+
+VALUE ph_get_uint64(PhidgetHandle handle, PhidgetReturnCode (*func)(PhidgetHandle, uint64_t *))
+{
+  uint64_t value;
+  ph_raise(func(handle, &value));
+  return ULL2NUM(value);
+}
+
+
+VALUE ph_get_bool(PhidgetHandle handle, PhidgetReturnCode (*func)(PhidgetHandle, int *))
+{
+  int value;
+  ph_raise(func(handle, &value));
+  return value == PTRUE ? Qtrue : Qfalse;
+}
+
+
+VALUE ph_get_double(PhidgetHandle handle, PhidgetReturnCode (*func)(PhidgetHandle, double *))
+{
+  double value;
+  ph_raise(func(handle, &value));
+  return DBL2NUM(value);
+}
+
+
+VALUE ph_get_string(PhidgetHandle handle, PhidgetReturnCode (*func)(PhidgetHandle, const char **))
+{
+  const char *value;
+  ph_raise(func(handle, &value));
+  if(value == NULL) return Qnil;
+  return rb_str_new2(value);
+}
+
+
 void ph_callback_thread(ph_callback_data_t *callback_data) {
   while(! callback_data->exit) {
     rb_thread_call_without_gvl(wait_for_callback, (void *)callback_data, cancel_wait_for_callback, (void *)callback_data);
-    if(TYPE(callback_data->callback) != T_NIL && !callback_data->exit) rb_funcall(callback_data->callback, rb_intern("call"), 3, callback_data->phidget, callback_data->arg1, callback_data->arg2);
+    if(TYPE(callback_data->callback) != T_NIL) rb_funcall(callback_data->callback, rb_intern("call"), 5, callback_data->phidget, callback_data->arg1, callback_data->arg2, callback_data->arg3, callback_data->arg4);
   };
 }
 
 void *wait_for_callback(void *arg) {
   ph_callback_data_t *callback_data = (ph_callback_data_t *)arg;
   while(! callback_data->exit) {
-    while(sem_wait(&callback_data->sem)!=0) {};
+    sem_post(&callback_data->handler_ready);
+    while(sem_wait(&callback_data->callback_called)!=0) {};
     return (void *)Qnil;
   };
   return (void *)Qnil;
@@ -631,7 +683,9 @@ void *wait_for_callback(void *arg) {
 
 void cancel_wait_for_callback(void *arg) {
   ph_callback_data_t *callback_data = (ph_callback_data_t *)arg;
+  callback_data->callback = T_NIL;
   callback_data->exit = true;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->handler_ready);
+  sem_post(&callback_data->callback_called);
 }
 
