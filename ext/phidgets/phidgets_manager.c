@@ -49,16 +49,16 @@ VALUE ph_manager_close(VALUE self) {
 void CCONV ph_manager_on_attach(PhidgetManagerHandle phid, void *userPtr, PhidgetHandle channel) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
   int32_t device_serial_number;
-  Phidget_ChannelClass channel_class;
+  int hub_port;
   int channel_index;
   const char *channel_name;
   Phidget_getDeviceSerialNumber(channel, &device_serial_number);
-  Phidget_getChannelClass(channel, &channel_class);
+  Phidget_getHubPort(channel, &hub_port);
   Phidget_getChannel(channel, &channel_index);
   Phidget_getChannelName(channel, &channel_name);
   while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = INT2NUM(device_serial_number);
-  callback_data->arg2 = INT2NUM(channel_class);
+  callback_data->arg2 = INT2NUM(hub_port);
   callback_data->arg3 = INT2NUM(channel_index);
   callback_data->arg4 = rb_str_new2(channel_name);
   sem_post(&callback_data->callback_called);
