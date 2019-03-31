@@ -7,6 +7,7 @@ require 'phidgets/version'
 Gem::Specification.new do |s|
   s.name = "phidgets"
   s.version = Phidgets::VERSION
+  s.license = 'GPL-2.0'
   s.authors = ["Craig DeHaan"]
   s.email = ["cdehaan2@cfl.rr.com"]
   s.homepage = "https://github.com/csdehaan/phidgets"

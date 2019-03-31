@@ -9,27 +9,26 @@ This gem provides a ruby interface to the phidgets library.
 
 == FEATURES/PROBLEMS:
 
+* Version 1.0 of this gem if sor Phidget Lib 2.2. For the older Phidget Lib 2.1, use version 0.1.3 of the gem.
 * This gem compiles a c extension for the phidget library, so the library must be installed and the development files must be located
   in a place that the compiler can find them. For windows the DevKit is required.
 * The gem has been tested to work on both Linux and Windows.
-* Tested with Phidget Library version 2.1.8.20130618
-* Callbacks do not work on Ruby versions earlier than 1.9. This is because native threads are required for them to work.
-* Method names follow the naming convention of the C library (getOutputState, setOutputState, etc). In addition, more "rubyish" aliases are provided (output_state, set_output_state, etc)
+* Tested with Phidget Library 2.2 Version 1.0.0
+* Method names follow the naming convention of the C library (getState, setState, etc). In addition, more "rubyish" aliases are provided (state, state=, etc)
 
 == SYNOPSIS:
 
   require 'phidgets'
 
   begin
-    ik = Phidgets::InterfaceKit.new
-    ik.open -1
-    ik.wait_for_attachment
+    di = Phidgets::DigitalInput.new
+    di.open_wait_for_attachment 500
 
-    puts "Device Name     = #{ik.device_name}"
-    puts "Serial Number   = #{ik.serial_number}"
-    puts "Device Version  = #{ik.device_version}"
+    puts "Device Name     = #{di.device_name}"
+    puts "Serial Number   = #{di.device_serial_number}"
+    puts "Device Version  = #{di.device_version}"
 
-    ik.close
+    di.close
 
   rescue Phidgets::Error => e
     puts e
@@ -38,45 +37,35 @@ This gem provides a ruby interface to the phidgets library.
 
   # Or using callbacks:
 
-  ik = Phidgets::InterfaceKit.new
-  ik.on_attach { |phid|
+  di = Phidgets::DigitalInput.new
+  di.on_attach { |phid|
     puts "Device Name     = #{phid.device_name}"
-    puts "Serial Number   = #{phid.serial_number}"
+    puts "Serial Number   = #{phid.device_serial_number}"
     puts "Device Version  = #{phid.device_version}"
   }
 
-  ik.open -1
-  sleep 5
-  ik.close
+  di.open
+  sleep 3
+  di.close
 
 
-  # The gem also installs a command line program that will list all phidget devices that are attached, as well as allowing any
-  # valid method for a given phidget type to be called. For example:
-  
-  # To list all phidgets attached to the local computer:
+  # The gem also installs a command line program that will list all phidget devices
+  # that are attached. For example:
 
-    => phidget list
-       ----------------------------------------------------------------------
-       | SerialNumber          | Device Name                                |
-       ----------------------------------------------------------------------
-       | 73723                 | Phidget InterfaceKit 0/0/8                 |
-       | 88103                 | Phidget InterfaceKit 0/0/4                 |
-       ----------------------------------------------------------------------
+    => phidget
+    ----------------------------------------------------------------------------
+    | SerialNumber    | Class                                | Hub    | Index  |
+    ----------------------------------------------------------------------------
+    | 269819          | Voltage Input                        | 0      | 0      |
+    | 269819          | Voltage Input                        | 0      | 1      |
+    | 269819          | Voltage Ratio Input                  | 0      | 0      |
+    | 269819          | Voltage Ratio Input                  | 0      | 1      |
+    | 269819          | Digital Input                        | 0      | 0      |
+    | 269819          | Digital Input                        | 0      | 1      |
+    | 269819          | Digital Output                       | 0      | 0      |
+    | 269819          | Digital Output                       | 0      | 1      |
+    ----------------------------------------------------------------------------
 
-  # To list all phidgets attached to a remote computer:
-
-    => phidget 192.168.100.67 list
-       ----------------------------------------------------------------------
-       | SerialNumber          | Device Name                                |
-       ----------------------------------------------------------------------
-       | 73782                 | Phidget InterfaceKit 0/0/8                 |
-       ----------------------------------------------------------------------
-
-  # To call a method for a specific local phidget:
-    => phidget 73723 set_output_state 0 true
-    
-  # To call a method for a specific remote phidget:
-    => phidget 192.168.100.67:73782 set_output_state 2 false
 
 
 == REQUIREMENTS:
@@ -85,8 +74,8 @@ This gem provides a ruby interface to the phidgets library.
 * For Windows the ruby DevKit is required
 * The development header file and library must be placed in a location where the compiler can find them.
   For Linux this should be done when running "make install" for the Phidget Library. For Windows the files
-  need to be copied from the install directory (\\Program Files\\Phidgets). phidget21.h can be copied to
-  RUBY_DIR\\include\\ruby-1.9.1. phidget21.lib can be copied to RUBY_DIR\\lib.
+  need to be copied from the install directory (\\Program Files\\Phidgets). phidget22.h can be copied to
+  RUBY_DIR\\include\\ruby-1.9.1. phidget22.lib can be copied to RUBY_DIR\\lib.
 
 == INSTALL:
 
