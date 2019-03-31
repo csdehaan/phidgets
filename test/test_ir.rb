@@ -2,55 +2,55 @@ require File.dirname(__FILE__) + '/test_helper.rb'
 
 class TestPhidgetsIR < Test::Unit::TestCase
 
-  def test_create
-    assert_nothing_raised {Phidgets::IR.new}
-  end
-
-  def test_transmit
-    ir = Phidgets::IR.new
-    assert_raise(Phidgets::Error::NotImplemented) {ir.transmit(:data, :info)}
-  end
-
-  def test_transmit_repeat
-    ir = Phidgets::IR.new
-    assert_raise(Phidgets::Error::NotAttached) {ir.transmit_repeat}
-  end
-
-  def test_transmit_raw
-    ir = Phidgets::IR.new
-    assert_raise(Phidgets::Error::NotAttached) {ir.transmit_raw([1,2,3], 33000, 50, 100)}
-  end
-
-  def test_get_raw_data
-    ir = Phidgets::IR.new
-    assert_raise(Phidgets::Error::NotAttached) {ir.raw_data 100}
+  def setup
+    @phidget = Phidgets::IR.new
   end
 
   def test_get_last_code
-    ir = Phidgets::IR.new
-    assert_raise(Phidgets::Error::NotImplemented) {ir.last_code}
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.last_code}
   end
 
   def test_get_last_learned_code
-    ir = Phidgets::IR.new
-    assert_raise(Phidgets::Error::NotImplemented) {ir.last_learned_code}
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.last_learned_code}
   end
 
-  unless RUBY_VERSION < '1.9.0'
-    def test_set_on_code
-      ir = Phidgets::IR.new
-      assert_nothing_raised {ir.on_code {puts 'hello'}}
-    end
+  def test_transmit
+    code_info = {
+      'bitCount' => 256,
+      'encoding' => Phidgets::IR::ENCODING_PULSE,
+      'length' => Phidgets::IR::LENGTH_CONSTANT,
+      'gap' => 10,
+      'trail' => 15,
+      'header' => [10,20],
+      'one' => [30,40],
+      'zero' => [50,60],
+      'repeat' => [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],
+      'minRepeat' => 30,
+      'dutyCycle' => 2.5,
+      'carrierFrequency' => 500,
+      'toggleMask' => [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33]
+    }
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.transmit('123456', code_info)}
+  end
 
-    def test_set_on_learn
-      ir = Phidgets::IR.new
-      assert_nothing_raised {ir.on_learn {puts 'hello'}}
-    end
+  def test_transmit_repeat
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.transmit_repeat}
+  end
 
-    def test_set_on_raw_data
-      ir = Phidgets::IR.new
-      assert_nothing_raised {ir.on_raw_data {puts 'hello'}}
-    end
+  def test_transmit_raw
+    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.transmit_raw([1,2,3], 33000, 50, 100)}
+  end
+
+  def test_set_on_code
+    assert_nothing_raised {@phidget.on_code {puts 'ir_code'}}
+  end
+
+  def test_set_on_learn
+    assert_nothing_raised {@phidget.on_learn {puts 'ir_learn'}}
+  end
+
+  def test_set_on_raw_data
+    assert_nothing_raised {@phidget.on_raw_data {puts 'raw_data'}}
   end
 
 end
