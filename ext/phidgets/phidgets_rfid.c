@@ -40,11 +40,12 @@ VALUE ph_rfid_write(VALUE self, VALUE tag, VALUE protocol, VALUE lock) {
 
 void CCONV ph_rfid_on_tag(PhidgetRFIDHandle phid, void *userPtr, const char *tagString, PhidgetRFID_Protocol protocol) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = rb_str_new2(tagString);
   callback_data->arg2 = INT2NUM(protocol);
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 VALUE ph_rfid_set_on_tag_handler(VALUE self, VALUE handler) {
@@ -54,7 +55,7 @@ VALUE ph_rfid_set_on_tag_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetRFID_setOnTagHandler((PhidgetRFIDHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -68,11 +69,12 @@ VALUE ph_rfid_set_on_tag_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_rfid_on_tag_lost(PhidgetRFIDHandle phid, void *userPtr, const char *tagString, PhidgetRFID_Protocol protocol) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = rb_str_new2(tagString);
   callback_data->arg2 = INT2NUM(protocol);
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 VALUE ph_rfid_set_on_tag_lost_handler(VALUE self, VALUE handler) {
@@ -82,7 +84,7 @@ VALUE ph_rfid_set_on_tag_lost_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetRFID_setOnTagLostHandler((PhidgetRFIDHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

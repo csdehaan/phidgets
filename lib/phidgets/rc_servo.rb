@@ -37,10 +37,22 @@ module Phidgets
       @on_velocity_change_thread = Thread.new {ext_setOnVelocityChangeHandler(callback)}
     end
 
+    # call-seq:
+    #   setTargetPosition_async(proc=nil, &block)
+    #
+    # If the controller is configured and the TargetPosition is set, the motor will try to reach the TargetPostiion.
+    #
+    def setTargetPosition_async(position, cb_proc = nil, &cb_block)
+      @target_position_async_thread.kill if defined? @target_position_async_thread and @target_position_async_thread.alive?
+      callback = cb_proc || cb_block
+      @target_position_async_thread = Thread.new {ext_setTargetPosition_async(position, callback)}
+    end
+
 
     alias :on_position_change :setOnPositionChangeHandler
     alias :on_target_position_reached :setOnTargetPositionReachedHandler
     alias :on_velocity_change :setOnVelocityChangeHandler
+    alias :set_target_position_async :setTargetPosition_async
 
   end
 end

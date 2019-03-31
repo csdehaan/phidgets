@@ -114,11 +114,12 @@ VALUE ph_ir_get_last_learned_code(VALUE self) {
 
 void CCONV ph_ir_on_code(PhidgetIRHandle phid, void *userPtr, const char *code, uint32_t bitCount, int repeat) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = rb_str_new2(code);
   callback_data->arg2 = UINT2NUM(bitCount);
   callback_data->arg3 = INT2NUM(repeat);
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -129,7 +130,7 @@ VALUE ph_ir_set_on_code_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetIR_setOnCodeHandler((PhidgetIRHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -143,11 +144,12 @@ VALUE ph_ir_set_on_code_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_ir_on_learn(PhidgetIRHandle phid, void *userPtr, const char *code, PhidgetIR_CodeInfo *codeInfo) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = Qnil;
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -158,7 +160,7 @@ VALUE ph_ir_set_on_learn_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetIR_setOnLearnHandler((PhidgetIRHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -172,11 +174,12 @@ VALUE ph_ir_set_on_learn_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_ir_on_raw_data(PhidgetIRHandle phid, void *userPtr, const uint32_t *data, size_t dataLen) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = Qnil;
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -187,7 +190,7 @@ VALUE ph_ir_set_on_raw_data_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetIR_setOnRawDataHandler((PhidgetIRHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

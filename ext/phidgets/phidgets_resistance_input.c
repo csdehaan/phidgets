@@ -68,11 +68,12 @@ VALUE ph_resistance_set_rtd_wire_setup(VALUE self, VALUE wire_setup) {
 
 void CCONV ph_resistance_on_resistance_change(PhidgetResistanceInputHandle phid, void *userPtr, double resistance) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(resistance);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -83,7 +84,7 @@ VALUE ph_resistance_set_on_resistance_change_handler(VALUE self, VALUE handler) 
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetResistanceInput_setOnResistanceChangeHandler((PhidgetResistanceInputHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

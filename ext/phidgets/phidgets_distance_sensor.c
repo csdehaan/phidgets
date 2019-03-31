@@ -87,11 +87,12 @@ VALUE ph_distance_get_sonar_reflections(VALUE self) {
 
 void CCONV ph_distance_on_distance_change(PhidgetDistanceSensorHandle phid, void *userPtr, uint32_t distance) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = UINT2NUM(distance);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -102,7 +103,7 @@ VALUE ph_distance_set_on_distance_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetDistanceSensor_setOnDistanceChangeHandler((PhidgetDistanceSensorHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -123,11 +124,12 @@ void CCONV ph_distance_on_sonar_reflections_update(PhidgetDistanceSensorHandle p
     rb_ary_push(rb_distances, UINT2NUM(distances[i]));
     rb_ary_push(rb_amplitudes, UINT2NUM(amplitudes[i]));
   }
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = rb_distances;
   callback_data->arg2 = rb_amplitudes;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -138,7 +140,7 @@ VALUE ph_distance_set_on_sonar_reflections_update_handler(VALUE self, VALUE hand
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetDistanceSensor_setOnSonarReflectionsUpdateHandler((PhidgetDistanceSensorHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

@@ -177,11 +177,12 @@ VALUE ph_rc_servo_set_voltage(VALUE self, VALUE voltage) {
 
 void CCONV ph_rc_servo_on_position_change(PhidgetRCServoHandle phid, void *userPtr, double position) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(position);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -192,7 +193,7 @@ VALUE ph_rc_servo_set_on_position_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetRCServo_setOnPositionChangeHandler((PhidgetRCServoHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -206,11 +207,12 @@ VALUE ph_rc_servo_set_on_position_change_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_rc_servo_on_target_position_reached(PhidgetRCServoHandle phid, void *userPtr, double position) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(position);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -221,7 +223,7 @@ VALUE ph_rc_servo_set_on_target_position_reached_handler(VALUE self, VALUE handl
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetRCServo_setOnTargetPositionReachedHandler((PhidgetRCServoHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -235,11 +237,12 @@ VALUE ph_rc_servo_set_on_target_position_reached_handler(VALUE self, VALUE handl
 
 void CCONV ph_rc_servo_on_velocity_change(PhidgetRCServoHandle phid, void *userPtr, double velocity) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(velocity);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -250,7 +253,7 @@ VALUE ph_rc_servo_set_on_velocity_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetRCServo_setOnVelocityChangeHandler((PhidgetRCServoHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -269,7 +272,7 @@ void CCONV ph_rc_servo_target_position_async(PhidgetHandle phid, void *userPtr, 
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 

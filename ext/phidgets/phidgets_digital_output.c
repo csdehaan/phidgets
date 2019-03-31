@@ -73,7 +73,7 @@ void CCONV ph_digital_output_duty_cycle_async(PhidgetHandle phid, void *userPtr,
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 VALUE ph_digital_output_set_duty_cycle_async(VALUE self, VALUE duty_cycle, VALUE handler) {
@@ -99,7 +99,7 @@ void CCONV ph_digital_output_led_current_limit_async(PhidgetHandle phid, void *u
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 VALUE ph_digital_output_set_led_current_limit_async(VALUE self, VALUE current_limit, VALUE handler) {
@@ -125,7 +125,7 @@ void CCONV ph_digital_output_state_async(PhidgetHandle phid, void *userPtr, Phid
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 VALUE ph_digital_output_set_state_async(VALUE self, VALUE state, VALUE handler) {
@@ -148,6 +148,16 @@ void Init_digital_output() {
   VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
   VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_digital_output = rb_define_class_under(ph_module, "DigitalOutput", ph_common);
+
+
+  rb_define_const(ph_digital_output, "LED_FORWARD_VOLTAGE_1_7V", INT2NUM(LED_FORWARD_VOLTAGE_1_7V));
+  rb_define_const(ph_digital_output, "LED_FORWARD_VOLTAGE_2_75V", INT2NUM(LED_FORWARD_VOLTAGE_2_75V));
+  rb_define_const(ph_digital_output, "LED_FORWARD_VOLTAGE_3_2V", INT2NUM(LED_FORWARD_VOLTAGE_3_2V));
+  rb_define_const(ph_digital_output, "LED_FORWARD_VOLTAGE_3_9V", INT2NUM(LED_FORWARD_VOLTAGE_3_9V));
+  rb_define_const(ph_digital_output, "LED_FORWARD_VOLTAGE_4_0V", INT2NUM(LED_FORWARD_VOLTAGE_4_0V));
+  rb_define_const(ph_digital_output, "LED_FORWARD_VOLTAGE_4_8V", INT2NUM(LED_FORWARD_VOLTAGE_4_8V));
+  rb_define_const(ph_digital_output, "LED_FORWARD_VOLTAGE_5_0V", INT2NUM(LED_FORWARD_VOLTAGE_5_0V));
+  rb_define_const(ph_digital_output, "LED_FORWARD_VOLTAGE_5_6V", INT2NUM(LED_FORWARD_VOLTAGE_5_6V));
 
 
   /* Document-method: new

@@ -59,11 +59,12 @@ VALUE ph_light_get_max_illuminance_change_trigger(VALUE self) {
 
 void CCONV ph_light_on_illuminance_change(PhidgetLightSensorHandle phid, void *userPtr, double illuminance) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(illuminance);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -74,7 +75,7 @@ VALUE ph_light_set_on_illuminance_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetLightSensor_setOnIlluminanceChangeHandler((PhidgetLightSensorHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

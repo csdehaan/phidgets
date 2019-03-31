@@ -89,11 +89,12 @@ VALUE ph_magnetometer_get_timestamp(VALUE self) {
 
 void CCONV ph_magnetometer_on_magnetic_field_change(PhidgetMagnetometerHandle phid, void *userPtr, const double mag_field[3], double timestamp) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = rb_ary_new3(3, DBL2NUM(mag_field[0]), DBL2NUM(mag_field[1]), DBL2NUM(mag_field[2]));
   callback_data->arg2 = DBL2NUM(timestamp);
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -104,7 +105,7 @@ VALUE ph_magnetometer_set_on_magnetic_field_change_handler(VALUE self, VALUE han
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetMagnetometer_setOnMagneticFieldChangeHandler((PhidgetMagnetometerHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

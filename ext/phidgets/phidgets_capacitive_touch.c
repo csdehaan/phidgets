@@ -81,11 +81,12 @@ VALUE ph_capacitive_touch_get_max_touch_value_change_trigger(VALUE self) {
 
 void CCONV ph_capacitive_touch_on_touch_end(PhidgetCapacitiveTouchHandle phid, void *userPtr) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = Qnil;
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -96,7 +97,7 @@ VALUE ph_capacitive_touch_set_on_touch_end_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetCapacitiveTouch_setOnTouchEndHandler((PhidgetCapacitiveTouchHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -110,11 +111,12 @@ VALUE ph_capacitive_touch_set_on_touch_end_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_capacitive_touch_on_touch(PhidgetCapacitiveTouchHandle phid, void *userPtr, double touch_value) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(touch_value);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -125,7 +127,7 @@ VALUE ph_capacitive_touch_set_on_touch_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetCapacitiveTouch_setOnTouchHandler((PhidgetCapacitiveTouchHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

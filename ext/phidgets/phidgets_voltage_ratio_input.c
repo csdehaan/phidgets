@@ -110,11 +110,12 @@ VALUE ph_voltage_ratio_input_get_max_voltage_ratio_change_trigger(VALUE self) {
 
 void CCONV ph_voltage_ratio_input_on_sensor_change(PhidgetVoltageRatioInputHandle phid, void *userPtr, double sensor_value, Phidget_UnitInfo *sensor_unit) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(sensor_value);
   callback_data->arg2 = INT2NUM(sensor_unit->unit);
   callback_data->arg3 = rb_str_new2(sensor_unit->name);
   callback_data->arg4 = rb_str_new2(sensor_unit->symbol);
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 VALUE ph_voltage_ratio_input_set_on_sensor_change_handler(VALUE self, VALUE handler) {
@@ -124,7 +125,7 @@ VALUE ph_voltage_ratio_input_set_on_sensor_change_handler(VALUE self, VALUE hand
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetVoltageRatioInput_setOnSensorChangeHandler((PhidgetVoltageRatioInputHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -138,11 +139,12 @@ VALUE ph_voltage_ratio_input_set_on_sensor_change_handler(VALUE self, VALUE hand
 
 void CCONV ph_voltage_ratio_input_on_voltage_ratio_change(PhidgetVoltageRatioInputHandle phid, void *userPtr, double voltage_ratio) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(voltage_ratio);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 VALUE ph_voltage_ratio_input_set_on_voltage_ratio_change_handler(VALUE self, VALUE handler) {
@@ -152,7 +154,7 @@ VALUE ph_voltage_ratio_input_set_on_voltage_ratio_change_handler(VALUE self, VAL
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetVoltageRatioInput_setOnVoltageRatioChangeHandler((PhidgetVoltageRatioInputHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

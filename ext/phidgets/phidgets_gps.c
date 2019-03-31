@@ -117,11 +117,12 @@ VALUE ph_gps_get_nmea_data(VALUE self) {
 
 void CCONV ph_gps_on_heading_change(PhidgetGPSHandle phid, void *userPtr, double heading, double velocity) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(heading);
   callback_data->arg2 = DBL2NUM(velocity);
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -132,7 +133,7 @@ VALUE ph_gps_set_on_heading_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetGPS_setOnHeadingChangeHandler((PhidgetGPSHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -146,11 +147,12 @@ VALUE ph_gps_set_on_heading_change_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_gps_on_position_change(PhidgetGPSHandle phid, void *userPtr, double latitude, double longitude, double altitude) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(latitude);
   callback_data->arg2 = DBL2NUM(longitude);
   callback_data->arg3 = DBL2NUM(altitude);
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -161,7 +163,7 @@ VALUE ph_gps_set_on_position_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetGPS_setOnPositionChangeHandler((PhidgetGPSHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -175,11 +177,12 @@ VALUE ph_gps_set_on_position_change_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_gps_on_position_fix_state_change(PhidgetGPSHandle phid, void *userPtr, int state) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = state == PTRUE ? Qtrue : Qfalse;
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -190,7 +193,7 @@ VALUE ph_gps_set_on_position_fix_state_change_handler(VALUE self, VALUE handler)
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetGPS_setOnPositionFixStateChangeHandler((PhidgetGPSHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

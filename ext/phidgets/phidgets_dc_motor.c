@@ -147,11 +147,12 @@ VALUE ph_dc_motor_get_max_velocity(VALUE self) {
 
 void CCONV ph_dc_motor_on_back_emf_change(PhidgetDCMotorHandle phid, void *userPtr, double back_emf) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(back_emf);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -162,7 +163,7 @@ VALUE ph_dc_motor_set_on_back_emf_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetDCMotor_setOnBackEMFChangeHandler((PhidgetDCMotorHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -176,11 +177,12 @@ VALUE ph_dc_motor_set_on_back_emf_change_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_dc_motor_on_braking_strength_change(PhidgetDCMotorHandle phid, void *userPtr, double braking_strength) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(braking_strength);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -191,7 +193,7 @@ VALUE ph_dc_motor_set_on_braking_strength_change_handler(VALUE self, VALUE handl
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetDCMotor_setOnBrakingStrengthChangeHandler((PhidgetDCMotorHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -205,11 +207,12 @@ VALUE ph_dc_motor_set_on_braking_strength_change_handler(VALUE self, VALUE handl
 
 void CCONV ph_dc_motor_on_velocity_update(PhidgetDCMotorHandle phid, void *userPtr, double velocity) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(velocity);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -220,7 +223,7 @@ VALUE ph_dc_motor_set_on_velocity_update_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetDCMotor_setOnVelocityUpdateHandler((PhidgetDCMotorHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

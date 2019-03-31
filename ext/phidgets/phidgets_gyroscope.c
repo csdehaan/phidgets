@@ -11,21 +11,18 @@ VALUE ph_gyroscope_init(VALUE self) {
 }
 
 VALUE ph_gyroscope_get_angular_rate(VALUE self) {
-  PhidgetGyroscopeHandle handle = (PhidgetGyroscopeHandle)get_ph_handle(self);
   double angular_rate[3];
   ph_raise(PhidgetGyroscope_getAngularRate((PhidgetGyroscopeHandle)get_ph_handle(self), &angular_rate));
   return rb_ary_new3(3, DBL2NUM(angular_rate[0]), DBL2NUM(angular_rate[1]), DBL2NUM(angular_rate[2]));
 }
 
 VALUE ph_gyroscope_get_min_angular_rate(VALUE self) {
-  PhidgetGyroscopeHandle handle = (PhidgetGyroscopeHandle)get_ph_handle(self);
   double angular_rate[3];
   ph_raise(PhidgetGyroscope_getMinAngularRate((PhidgetGyroscopeHandle)get_ph_handle(self), &angular_rate));
   return rb_ary_new3(3, DBL2NUM(angular_rate[0]), DBL2NUM(angular_rate[1]), DBL2NUM(angular_rate[2]));
 }
 
 VALUE ph_gyroscope_get_max_angular_rate(VALUE self) {
-  PhidgetGyroscopeHandle handle = (PhidgetGyroscopeHandle)get_ph_handle(self);
   double angular_rate[3];
   ph_raise(PhidgetGyroscope_getMaxAngularRate((PhidgetGyroscopeHandle)get_ph_handle(self), &angular_rate));
   return rb_ary_new3(3, DBL2NUM(angular_rate[0]), DBL2NUM(angular_rate[1]), DBL2NUM(angular_rate[2]));
@@ -64,11 +61,12 @@ VALUE ph_gyroscope_zero(VALUE self) {
 
 void CCONV ph_gyroscope_on_angular_rate_update(PhidgetGyroscopeHandle phid, void *userPtr, const double angularRate[3], double timestamp) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = rb_ary_new3(3, DBL2NUM(angularRate[0]), DBL2NUM(angularRate[1]), DBL2NUM(angularRate[2]));
   callback_data->arg2 = DBL2NUM(timestamp);
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -79,7 +77,7 @@ VALUE ph_gyroscope_set_on_angular_rate_update_handler(VALUE self, VALUE handler)
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetGyroscope_setOnAngularRateUpdateHandler((PhidgetGyroscopeHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

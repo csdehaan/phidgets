@@ -2,57 +2,345 @@
 #include "phidgets.h"
 
 
-VALUE ph_common_allocate(VALUE klass);
-void  ph_common_free(ph_data_t *ph);
-VALUE ph_common_open(VALUE self);
-VALUE ph_common_open_wait_for_attachment(VALUE self, VALUE milliseconds);
-VALUE ph_common_get_attached(VALUE self);
-VALUE ph_common_close(VALUE self);
-VALUE ph_common_get_device_channel_count(VALUE self, VALUE channel_class);
-VALUE ph_common_get_device_class(VALUE self);
-VALUE ph_common_get_device_class_name(VALUE self);
-VALUE ph_common_get_device_id(VALUE self);
-VALUE ph_common_get_device_name(VALUE self);
-VALUE ph_common_get_device_serial_number(VALUE self);
-VALUE ph_common_set_device_serial_number(VALUE self, VALUE serial_number);
-VALUE ph_common_get_device_sku(VALUE self);
-VALUE ph_common_get_device_version(VALUE self);
-VALUE ph_common_get_device_label(VALUE self);
-VALUE ph_common_set_device_label(VALUE self, VALUE label);
-VALUE ph_common_write_device_label(VALUE self, VALUE label);
-VALUE ph_common_get_channel(VALUE self);
-VALUE ph_common_set_channel(VALUE self, VALUE channel);
-VALUE ph_common_get_channel_name(VALUE self);
-VALUE ph_common_get_channel_class(VALUE self);
-VALUE ph_common_get_channel_class_name(VALUE self);
-VALUE ph_common_get_channel_subclass(VALUE self);
-VALUE ph_common_get_data_interval(VALUE self);
-VALUE ph_common_set_data_interval(VALUE self, VALUE interval);
-VALUE ph_common_get_hub_port(VALUE self);
-VALUE ph_common_set_hub_port(VALUE self, VALUE hub_port);
-VALUE ph_common_get_hub_port_count(VALUE self);
-VALUE ph_common_get_is_channel(VALUE self);
-VALUE ph_common_get_is_hub_port_device(VALUE self);
-VALUE ph_common_set_is_hub_port_device(VALUE self, VALUE is_hub_port_device);
-VALUE ph_common_get_is_local(VALUE self);
-VALUE ph_common_set_is_local(VALUE self, VALUE is_local);
-VALUE ph_common_get_is_remote(VALUE self);
-VALUE ph_common_set_is_remote(VALUE self, VALUE is_remote);
+void ph_common_free(ph_data_t *ph) {
+  if (ph && ph->handle) {
+    Phidget_close(ph->handle);
+    Phidget_delete(&ph->handle);
+    ph->handle = NULL;
+  }
+  if(ph) {
+    sem_destroy(&ph->attach_callback.handler_ready);
+    sem_destroy(&ph->attach_callback.callback_called);
+    sem_destroy(&ph->detach_callback.handler_ready);
+    sem_destroy(&ph->detach_callback.callback_called);
+    sem_destroy(&ph->error_callback.handler_ready);
+    sem_destroy(&ph->error_callback.callback_called);
+    sem_destroy(&ph->property_change_callback.handler_ready);
+    sem_destroy(&ph->property_change_callback.callback_called);
+    sem_destroy(&ph->dev_callbacks[0].handler_ready);
+    sem_destroy(&ph->dev_callbacks[0].callback_called);
+    sem_destroy(&ph->dev_callbacks[1].handler_ready);
+    sem_destroy(&ph->dev_callbacks[1].callback_called);
+    sem_destroy(&ph->dev_callbacks[2].handler_ready);
+    sem_destroy(&ph->dev_callbacks[2].callback_called);
+    sem_destroy(&ph->dev_callbacks[3].handler_ready);
+    sem_destroy(&ph->dev_callbacks[3].callback_called);
+    xfree(ph);
+  }
+}
 
-VALUE ph_common_get_server_hostname(VALUE self);
-VALUE ph_common_get_server_name(VALUE self);
-VALUE ph_common_set_server_name(VALUE self, VALUE server_name);
-VALUE ph_common_get_server_peer_name(VALUE self);
-VALUE ph_common_get_server_unique_name(VALUE self);
 
-VALUE ph_common_set_on_attach_handler(VALUE self, VALUE handler);
-VALUE ph_common_set_on_detach_handler(VALUE self, VALUE handler);
-VALUE ph_common_set_on_error_handler(VALUE self, VALUE handler);
-VALUE ph_common_set_on_property_change_handler(VALUE self, VALUE handler);
-void CCONV ph_common_on_attach(PhidgetHandle phid, void *userPtr);
-void CCONV ph_common_on_detach(PhidgetHandle phid, void *userPtr);
-void CCONV ph_common_on_error(PhidgetHandle phid, void *userPtr, Phidget_ErrorEventCode code, const char* description);
-void CCONV ph_common_on_property_change(PhidgetHandle phid, void *userPtr, const char *propertyName);
+VALUE ph_common_allocate(VALUE klass) {
+  ph_data_t *ph;
+  VALUE self = Data_Make_Struct(klass, ph_data_t, 0, ph_common_free, ph);
+  memset(ph, 0, sizeof(ph_data_t));
+  sem_init(&ph->attach_callback.handler_ready, 0, 0);
+  sem_init(&ph->attach_callback.callback_called, 0, 0);
+  sem_init(&ph->detach_callback.handler_ready, 0, 0);
+  sem_init(&ph->detach_callback.callback_called, 0, 0);
+  sem_init(&ph->error_callback.handler_ready, 0, 0);
+  sem_init(&ph->error_callback.callback_called, 0, 0);
+  sem_init(&ph->property_change_callback.handler_ready, 0, 0);
+  sem_init(&ph->property_change_callback.callback_called, 0, 0);
+  sem_init(&ph->dev_callbacks[0].handler_ready, 0, 0);
+  sem_init(&ph->dev_callbacks[0].callback_called, 0, 0);
+  sem_init(&ph->dev_callbacks[1].handler_ready, 0, 0);
+  sem_init(&ph->dev_callbacks[1].callback_called, 0, 0);
+  sem_init(&ph->dev_callbacks[2].handler_ready, 0, 0);
+  sem_init(&ph->dev_callbacks[2].callback_called, 0, 0);
+  sem_init(&ph->dev_callbacks[3].handler_ready, 0, 0);
+  sem_init(&ph->dev_callbacks[3].callback_called, 0, 0);
+  return self;
+}
+
+
+VALUE ph_common_open(VALUE self) {
+  ph_raise(Phidget_open(get_ph_handle(self)));
+  return Qnil;
+}
+
+VALUE ph_common_open_wait_for_attachment(VALUE self, VALUE milliseconds) {
+  ph_raise(Phidget_openWaitForAttachment(get_ph_handle(self), NUM2UINT(milliseconds)));
+  return Qnil;
+}
+
+VALUE ph_common_get_attached(VALUE self) {
+  return ph_get_bool(get_ph_handle(self), (phidget_get_bool_func)Phidget_getAttached);
+}
+
+VALUE ph_common_close(VALUE self) {
+  ph_raise(Phidget_close(get_ph_handle(self)));
+  return Qnil;
+}
+
+VALUE ph_common_get_device_channel_count(VALUE self, VALUE channel_class) {
+  uint32_t count;
+  ph_raise(Phidget_getDeviceChannelCount(get_ph_handle(self), NUM2INT(channel_class), &count));
+  return UINT2NUM(count);
+}
+
+VALUE ph_common_get_device_class(VALUE self) {
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)Phidget_getDeviceClass);
+}
+
+VALUE ph_common_get_device_class_name(VALUE self) {
+  return ph_get_string(get_ph_handle(self), (phidget_get_string_func)Phidget_getDeviceClassName);
+}
+
+VALUE ph_common_get_device_id(VALUE self) {
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)Phidget_getDeviceID);
+}
+
+VALUE ph_common_get_device_name(VALUE self) {
+  return ph_get_string(get_ph_handle(self), Phidget_getDeviceName);
+}
+
+VALUE ph_common_get_device_serial_number(VALUE self) {
+  return ph_get_int(get_ph_handle(self), Phidget_getDeviceSerialNumber);
+}
+
+VALUE ph_common_set_device_serial_number(VALUE self, VALUE serial_number) {
+  ph_raise(Phidget_setDeviceSerialNumber(get_ph_handle(self), NUM2INT(serial_number)));
+  return Qnil;
+}
+
+VALUE ph_common_get_device_sku(VALUE self) {
+  return ph_get_string(get_ph_handle(self), Phidget_getDeviceSKU);
+}
+
+VALUE ph_common_get_device_version(VALUE self) {
+  return ph_get_int(get_ph_handle(self), Phidget_getDeviceVersion);
+}
+
+VALUE ph_common_get_device_label(VALUE self) {
+  return ph_get_string(get_ph_handle(self), Phidget_getDeviceLabel);
+}
+
+VALUE ph_common_set_device_label(VALUE self, VALUE label) {
+  ph_raise(Phidget_setDeviceLabel(get_ph_handle(self), StringValueCStr(label)));
+  return Qnil;
+}
+
+VALUE ph_common_write_device_label(VALUE self, VALUE label) {
+  ph_raise(Phidget_writeDeviceLabel(get_ph_handle(self), StringValueCStr(label)));
+  return Qnil;
+}
+
+VALUE ph_common_get_channel(VALUE self) {
+  return ph_get_int(get_ph_handle(self), Phidget_getChannel);
+}
+
+VALUE ph_common_set_channel(VALUE self, VALUE channel) {
+  ph_raise(Phidget_setChannel(get_ph_handle(self), NUM2INT(channel)));
+  return Qnil;
+}
+
+VALUE ph_common_get_channel_name(VALUE self) {
+  return ph_get_string(get_ph_handle(self), Phidget_getChannelName);
+}
+
+VALUE ph_common_get_channel_class(VALUE self) {
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)Phidget_getChannelClass);
+}
+
+VALUE ph_common_get_channel_class_name(VALUE self) {
+  return ph_get_string(get_ph_handle(self), Phidget_getChannelClassName);
+}
+
+VALUE ph_common_get_channel_subclass(VALUE self) {
+  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)Phidget_getChannelSubclass);
+}
+
+VALUE ph_common_get_data_interval(VALUE self) {
+  return ph_get_uint(get_ph_handle(self), Phidget_getDataInterval);
+}
+
+VALUE ph_common_set_data_interval(VALUE self, VALUE interval) {
+  ph_raise(Phidget_setDataInterval(get_ph_handle(self), NUM2UINT(interval)));
+  return Qnil;
+}
+
+VALUE ph_common_get_hub_port(VALUE self) {
+  return ph_get_int(get_ph_handle(self), Phidget_getHubPort);
+}
+
+VALUE ph_common_set_hub_port(VALUE self, VALUE hub_port) {
+  ph_raise(Phidget_setHubPort(get_ph_handle(self), NUM2INT(hub_port)));
+  return Qnil;
+}
+
+VALUE ph_common_get_hub_port_count(VALUE self) {
+  return ph_get_int(get_ph_handle(self), Phidget_getHubPortCount);
+}
+
+VALUE ph_common_get_is_channel(VALUE self) {
+  return ph_get_bool(get_ph_handle(self), Phidget_getIsChannel);
+}
+
+VALUE ph_common_get_is_hub_port_device(VALUE self) {
+  return ph_get_bool(get_ph_handle(self), Phidget_getIsHubPortDevice);
+}
+
+VALUE ph_common_set_is_hub_port_device(VALUE self, VALUE is_hub_port_device) {
+  ph_raise(Phidget_setIsHubPortDevice(get_ph_handle(self), TYPE(is_hub_port_device) == T_TRUE ? PTRUE : PFALSE));
+  return Qnil;
+}
+
+VALUE ph_common_get_is_local(VALUE self) {
+  return ph_get_bool(get_ph_handle(self), Phidget_getIsLocal);
+}
+
+VALUE ph_common_set_is_local(VALUE self, VALUE is_local) {
+  ph_raise(Phidget_setIsLocal(get_ph_handle(self), TYPE(is_local) == T_TRUE ? PTRUE : PFALSE));
+  return Qnil;
+}
+
+VALUE ph_common_get_is_remote(VALUE self) {
+  return ph_get_bool(get_ph_handle(self), Phidget_getIsRemote);
+}
+
+VALUE ph_common_set_is_remote(VALUE self, VALUE is_remote) {
+  ph_raise(Phidget_setIsRemote(get_ph_handle(self), TYPE(is_remote) == T_TRUE ? PTRUE : PFALSE));
+  return Qnil;
+}
+
+VALUE ph_common_get_server_hostname(VALUE self) {
+  return ph_get_string(get_ph_handle(self), Phidget_getServerHostname);
+}
+
+VALUE ph_common_get_server_name(VALUE self) {
+  return ph_get_string(get_ph_handle(self), Phidget_getServerName);
+}
+
+VALUE ph_common_set_server_name(VALUE self, VALUE server_name) {
+  ph_raise(Phidget_setServerName(get_ph_handle(self), StringValueCStr(server_name)));
+  return Qnil;
+}
+
+VALUE ph_common_get_server_peer_name(VALUE self) {
+  return ph_get_string(get_ph_handle(self), Phidget_getServerPeerName);
+}
+
+VALUE ph_common_get_server_unique_name(VALUE self) {
+  return ph_get_string(get_ph_handle(self), Phidget_getServerUniqueName);
+}
+
+
+void CCONV ph_common_on_attach(PhidgetHandle phid, void *userPtr) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
+  callback_data->arg1 = Qnil;
+  callback_data->arg2 = Qnil;
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->callback_called);
+}
+
+
+void CCONV ph_common_on_detach(PhidgetHandle phid, void *userPtr) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
+  callback_data->arg1 = Qnil;
+  callback_data->arg2 = Qnil;
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->callback_called);
+}
+
+
+void CCONV ph_common_on_error(PhidgetHandle phid, void *userPtr, Phidget_ErrorEventCode code, const char* description) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
+  callback_data->arg1 = INT2NUM(code);
+  callback_data->arg2 = rb_str_new2(description);
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->callback_called);
+}
+
+
+void CCONV ph_common_on_property_change(PhidgetHandle phid, void *userPtr, const char *propertyName) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
+  callback_data->arg1 = rb_str_new2(propertyName);
+  callback_data->arg2 = Qnil;
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->callback_called);
+}
+
+
+VALUE ph_common_set_on_attach_handler(VALUE self, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->attach_callback;
+  if( TYPE(handler) == T_NIL ) {
+    callback_data->callback = T_NIL;
+    callback_data->exit = true;
+    ph_raise(Phidget_setOnAttachHandler(ph->handle, NULL, (void *)NULL));
+    sem_post(&callback_data->callback_called);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    ph_raise(Phidget_setOnAttachHandler(ph->handle, ph_common_on_attach, (void *)callback_data));
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
+
+VALUE ph_common_set_on_detach_handler(VALUE self, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->detach_callback;
+  if( TYPE(handler) == T_NIL ) {
+    callback_data->callback = T_NIL;
+    callback_data->exit = true;
+    ph_raise(Phidget_setOnDetachHandler(ph->handle, NULL, (void *)NULL));
+    sem_post(&callback_data->callback_called);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    ph_raise(Phidget_setOnDetachHandler(ph->handle, ph_common_on_detach, (void *)callback_data));
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
+
+VALUE ph_common_set_on_error_handler(VALUE self, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->error_callback;
+  if( TYPE(handler) == T_NIL ) {
+    callback_data->callback = T_NIL;
+    callback_data->exit = true;
+    ph_raise(Phidget_setOnErrorHandler(ph->handle, NULL, (void *)NULL));
+    sem_post(&callback_data->callback_called);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    ph_raise(Phidget_setOnErrorHandler(ph->handle, ph_common_on_error, (void *)callback_data));
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
+
+VALUE ph_common_set_on_property_change_handler(VALUE self, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->property_change_callback;
+  if( TYPE(handler) == T_NIL ) {
+    callback_data->callback = T_NIL;
+    callback_data->exit = true;
+    ph_raise(Phidget_setOnPropertyChangeHandler(ph->handle, NULL, (void *)NULL));
+    sem_post(&callback_data->callback_called);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    ph_raise(Phidget_setOnPropertyChangeHandler(ph->handle, ph_common_on_property_change, (void *)callback_data));
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
 
 
 void Init_common() {
@@ -224,7 +512,6 @@ void Init_common() {
    * call-seq: setChannel(channel)
    *
    * Specifies the channel index to be opened. The default channel is 0. Set to PHIDGET_CHANNEL_ANY to open any channel on the specified device.
-   *
    * If setting this property, it must be set before the channel is opened. The behaviour of setting this property while the channel is open is undefined.
    */
   rb_define_method(ph_common, "setChannel", ph_common_set_channel, 1);
@@ -346,7 +633,7 @@ void Init_common() {
    * Set to true if the channel is to be opened locally, and not over a network. If both this and IsRemote are set to False (the default),
    * the channel will be opened either locally or remotely, on whichever matching channel is found first.
    */
-  rb_define_method(ph_common, "setIsLocal", ph_common_set_is_local, 0);
+  rb_define_method(ph_common, "setIsLocal", ph_common_set_is_local, 1);
   rb_define_alias(ph_common, "is_local=", "setIsLocal");
 
   /* Document-method: getIsRemote
@@ -363,7 +650,7 @@ void Init_common() {
    * Set to true if the channel is to be opened remotely, rather than locally. If both this and IsLocal are set to False (the default),
    * the channel will be opened either locally or remotely, on whichever matching channel is found first.
    */
-  rb_define_method(ph_common, "setIsRemote", ph_common_set_is_remote, 0);
+  rb_define_method(ph_common, "setIsRemote", ph_common_set_is_remote, 1);
   rb_define_alias(ph_common, "is_remote=", "setIsRemote");
 
   /* Document-method: getServerHostname
@@ -417,401 +704,5 @@ void Init_common() {
   rb_define_private_method(ph_common, "ext_setOnDetachHandler", ph_common_set_on_detach_handler, 1);
   rb_define_private_method(ph_common, "ext_setOnErrorHandler", ph_common_set_on_error_handler, 1);
   rb_define_private_method(ph_common, "ext_setOnPropertyChangeHandler", ph_common_set_on_property_change_handler, 1);
-}
-
-
-
-VALUE ph_common_allocate(VALUE klass) {
-  ph_data_t *ph;
-  VALUE self = Data_Make_Struct(klass, ph_data_t, 0, ph_common_free, ph);
-  memset(ph, 0, sizeof(ph_data_t));
-  sem_init(&ph->attach_callback.sem, 0, 0);
-  sem_init(&ph->detach_callback.sem, 0, 0);
-  sem_init(&ph->error_callback.sem, 0, 0);
-  sem_init(&ph->property_change_callback.sem, 0, 0);
-  sem_init(&ph->dev_callbacks[0].sem, 0, 0);
-  sem_init(&ph->dev_callbacks[1].sem, 0, 0);
-  sem_init(&ph->dev_callbacks[2].sem, 0, 0);
-  sem_init(&ph->dev_callbacks[3].sem, 0, 0);
-  return self;
-}
-
-void ph_common_free(ph_data_t *ph) {
-  if (ph && ph->handle) {
-    Phidget_close(ph->handle);
-    Phidget_delete(&ph->handle);
-    ph->handle = NULL;
-  }
-  if(ph) {
-    sem_destroy(&ph->attach_callback.sem);
-    sem_destroy(&ph->detach_callback.sem);
-    sem_destroy(&ph->error_callback.sem);
-    sem_destroy(&ph->property_change_callback.sem);
-    sem_destroy(&ph->dev_callbacks[0].sem);
-    sem_destroy(&ph->dev_callbacks[1].sem);
-    sem_destroy(&ph->dev_callbacks[2].sem);
-    sem_destroy(&ph->dev_callbacks[3].sem);
-    xfree(ph);
-  }
-}
-
-VALUE ph_common_open(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_open(handle));
-  return Qnil;
-}
-
-VALUE ph_common_open_wait_for_attachment(VALUE self, VALUE milliseconds) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_openWaitForAttachment(handle, NUM2UINT(milliseconds)));
-  return Qnil;
-}
-
-VALUE ph_common_get_attached(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  int device_status;
-  ph_raise(Phidget_getAttached(handle, &device_status));
-  return (device_status == PTRUE) ? Qtrue : Qfalse;
-}
-
-VALUE ph_common_close(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_close(handle));
-  return Qnil;
-}
-
-VALUE ph_common_get_device_channel_count(VALUE self, VALUE channel_class) {
-  PhidgetHandle handle = get_ph_handle(self);
-  uint32_t count;
-  ph_raise(Phidget_getDeviceChannelCount(handle, NUM2INT(channel_class), &count));
-  return UINT2NUM(count);
-}
-
-VALUE ph_common_get_device_class(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  Phidget_DeviceClass device_class;
-  ph_raise(Phidget_getDeviceClass(handle, &device_class));
-  return INT2NUM(device_class);
-}
-
-VALUE ph_common_get_device_class_name(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  const char *device_class_name;
-  ph_raise(Phidget_getDeviceClassName(handle, &device_class_name));
-  return rb_str_new2(device_class_name);
-}
-
-VALUE ph_common_get_device_id(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  Phidget_DeviceID device_id;
-  ph_raise(Phidget_getDeviceID(handle, &device_id));
-  return INT2NUM(device_id);
-}
-
-VALUE ph_common_get_device_name(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  const char *device_name;
-  ph_raise(Phidget_getDeviceName(handle, &device_name));
-  return rb_str_new2(device_name);
-}
-
-VALUE ph_common_get_device_serial_number(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  int32_t serial;
-  ph_raise(Phidget_getDeviceSerialNumber(handle, &serial));
-  return INT2NUM(serial);
-}
-
-VALUE ph_common_set_device_serial_number(VALUE self, VALUE serial_number) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_setDeviceSerialNumber(handle, NUM2INT(serial_number)));
-  return Qnil;
-}
-
-VALUE ph_common_get_device_sku(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  const char *sku;
-  ph_raise(Phidget_getDeviceSKU(handle, &sku));
-  return rb_str_new2(sku);
-}
-
-VALUE ph_common_get_device_version(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  int device_version;
-  ph_raise(Phidget_getDeviceVersion(handle, &device_version));
-  return INT2NUM(device_version);
-}
-
-VALUE ph_common_get_device_label(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  const char *device_label;
-  ph_raise(Phidget_getDeviceLabel(handle, &device_label));
-  return rb_str_new2(device_label);
-}
-
-VALUE ph_common_set_device_label(VALUE self, VALUE label) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_setDeviceLabel(handle, StringValueCStr(label)));
-  return Qnil;
-}
-
-VALUE ph_common_write_device_label(VALUE self, VALUE label) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_writeDeviceLabel(handle, StringValueCStr(label)));
-  return Qnil;
-}
-
-VALUE ph_common_get_channel(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  int channel;
-  ph_raise(Phidget_getChannel(handle, &channel));
-  return INT2NUM(channel);
-}
-
-VALUE ph_common_set_channel(VALUE self, VALUE channel) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_setChannel(handle, NUM2INT(channel)));
-  return Qnil;
-}
-
-VALUE ph_common_get_channel_name(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  const char *name;
-  ph_raise(Phidget_getChannelName(handle, &name));
-  return rb_str_new2(name);
-}
-
-VALUE ph_common_get_channel_class(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  Phidget_ChannelClass class;
-  ph_raise(Phidget_getChannelClass(handle, &class));
-  return INT2NUM(class);
-}
-
-VALUE ph_common_get_channel_class_name(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  const char *name;
-  ph_raise(Phidget_getChannelClassName(handle, &name));
-  return rb_str_new2(name);
-}
-
-VALUE ph_common_get_channel_subclass(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  Phidget_ChannelSubclass subclass;
-  ph_raise(Phidget_getChannelSubclass(handle, &subclass));
-  return INT2NUM(subclass);
-}
-
-VALUE ph_common_get_data_interval(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  uint32_t interval;
-  ph_raise(Phidget_getDataInterval(handle, &interval));
-  return UINT2NUM(interval);
-}
-
-VALUE ph_common_set_data_interval(VALUE self, VALUE interval) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_setDataInterval(handle, NUM2UINT(interval)));
-  return Qnil;
-}
-
-VALUE ph_common_get_hub_port(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  int port;
-  ph_raise(Phidget_getHubPort(handle, &port));
-  return INT2NUM(port);
-}
-
-VALUE ph_common_set_hub_port(VALUE self, VALUE hub_port) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_setHubPort(handle, NUM2INT(hub_port)));
-  return Qnil;
-}
-
-VALUE ph_common_get_hub_port_count(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  int port_count;
-  ph_raise(Phidget_getHubPortCount(handle, &port_count));
-  return INT2NUM(port_count);
-}
-
-VALUE ph_common_get_is_channel(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  int is_channel;
-  ph_raise(Phidget_getIsChannel(handle, &is_channel));
-  return (is_channel == PTRUE) ? Qtrue : Qfalse;
-}
-
-VALUE ph_common_get_is_hub_port_device(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  int is_hub_port_device;
-  ph_raise(Phidget_getIsHubPortDevice(handle, &is_hub_port_device));
-  return (is_hub_port_device == PTRUE) ? Qtrue : Qfalse;
-}
-
-VALUE ph_common_set_is_hub_port_device(VALUE self, VALUE is_hub_port_device) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_setIsHubPortDevice(handle, NUM2INT(is_hub_port_device)));
-  return Qnil;
-}
-
-VALUE ph_common_get_is_local(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  int is_local;
-  ph_raise(Phidget_getIsLocal(handle, &is_local));
-  return (is_local == PTRUE) ? Qtrue : Qfalse;
-}
-
-VALUE ph_common_set_is_local(VALUE self, VALUE is_local) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_setIsLocal(handle, NUM2INT(is_local)));
-  return Qnil;
-}
-
-VALUE ph_common_get_is_remote(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  int is_remote;
-  ph_raise(Phidget_getIsRemote(handle, &is_remote));
-  return (is_remote == PTRUE) ? Qtrue : Qfalse;
-}
-
-VALUE ph_common_set_is_remote(VALUE self, VALUE is_remote) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_setIsRemote(handle, NUM2INT(is_remote)));
-  return Qnil;
-}
-
-VALUE ph_common_get_server_hostname(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  const char *server_hostname;
-  ph_raise(Phidget_getServerHostname(handle, &server_hostname));
-  return rb_str_new2(server_hostname);
-}
-
-VALUE ph_common_get_server_name(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  const char *server_name;
-  ph_raise(Phidget_getServerName(handle, &server_name));
-  return rb_str_new2(server_name);
-}
-
-VALUE ph_common_set_server_name(VALUE self, VALUE server_name) {
-  PhidgetHandle handle = get_ph_handle(self);
-  ph_raise(Phidget_setServerName(handle, StringValueCStr(server_name)));
-  return Qnil;
-}
-
-VALUE ph_common_get_server_peer_name(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  const char *peer_name;
-  ph_raise(Phidget_getServerPeerName(handle, &peer_name));
-  return rb_str_new2(peer_name);
-}
-
-VALUE ph_common_get_server_unique_name(VALUE self) {
-  PhidgetHandle handle = get_ph_handle(self);
-  const char *unique_name;
-  ph_raise(Phidget_getServerUniqueName(handle, &unique_name));
-  return rb_str_new2(unique_name);
-}
-
-VALUE ph_common_set_on_attach_handler(VALUE self, VALUE handler) {
-  ph_data_t *ph = get_ph_data(self);
-  ph_callback_data_t *callback_data = &ph->attach_callback;
-  if( TYPE(handler) == T_NIL ) {
-    callback_data->exit = true;
-    ph_raise(Phidget_setOnAttachHandler(ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
-  } else {
-    callback_data->exit = false;
-    callback_data->phidget = self;
-    callback_data->callback = handler;
-    ph_raise(Phidget_setOnAttachHandler(ph->handle, ph_common_on_attach, (void *)callback_data));
-    ph_callback_thread(callback_data);
-  }
-  return Qnil;
-}
-
-VALUE ph_common_set_on_detach_handler(VALUE self, VALUE handler) {
-  ph_data_t *ph = get_ph_data(self);
-  ph_callback_data_t *callback_data = &ph->detach_callback;
-  if( TYPE(handler) == T_NIL ) {
-    callback_data->exit = true;
-    ph_raise(Phidget_setOnDetachHandler(ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
-  } else {
-    callback_data->exit = false;
-    callback_data->phidget = self;
-    callback_data->callback = handler;
-    ph_raise(Phidget_setOnDetachHandler(ph->handle, ph_common_on_detach, (void *)callback_data));
-    ph_callback_thread(callback_data);
-  }
-  return Qnil;
-}
-
-VALUE ph_common_set_on_error_handler(VALUE self, VALUE handler) {
-  ph_data_t *ph = get_ph_data(self);
-  ph_callback_data_t *callback_data = &ph->error_callback;
-  if( TYPE(handler) == T_NIL ) {
-    callback_data->exit = true;
-    ph_raise(Phidget_setOnErrorHandler(ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
-  } else {
-    callback_data->exit = false;
-    callback_data->phidget = self;
-    callback_data->callback = handler;
-    ph_raise(Phidget_setOnErrorHandler(ph->handle, ph_common_on_error, (void *)callback_data));
-    ph_callback_thread(callback_data);
-  }
-  return Qnil;
-}
-
-VALUE ph_common_set_on_property_change_handler(VALUE self, VALUE handler) {
-  ph_data_t *ph = get_ph_data(self);
-  ph_callback_data_t *callback_data = &ph->property_change_callback;
-  if( TYPE(handler) == T_NIL ) {
-    callback_data->exit = true;
-    ph_raise(Phidget_setOnPropertyChangeHandler(ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
-  } else {
-    callback_data->exit = false;
-    callback_data->phidget = self;
-    callback_data->callback = handler;
-    ph_raise(Phidget_setOnPropertyChangeHandler(ph->handle, ph_common_on_property_change, (void *)callback_data));
-    ph_callback_thread(callback_data);
-  }
-  return Qnil;
-}
-
-
-void CCONV ph_common_on_attach(PhidgetHandle phid, void *userPtr) {
-  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
-  callback_data->arg1 = Qnil;
-  callback_data->arg2 = Qnil;
-  sem_post(&callback_data->sem);
-}
-
-
-void CCONV ph_common_on_detach(PhidgetHandle phid, void *userPtr) {
-  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
-  callback_data->arg1 = Qnil;
-  callback_data->arg2 = Qnil;
-  sem_post(&callback_data->sem);
-}
-
-
-void CCONV ph_common_on_error(PhidgetHandle phid, void *userPtr, Phidget_ErrorEventCode code, const char* description) {
-  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
-  callback_data->arg1 = INT2NUM(code);
-  callback_data->arg2 = rb_str_new2(description);
-  sem_post(&callback_data->sem);
-}
-
-
-void CCONV ph_common_on_property_change(PhidgetHandle phid, void *userPtr, const char *propertyName) {
-  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
-  callback_data->arg1 = rb_str_new2(propertyName);
-  callback_data->arg2 = Qnil;
-  sem_post(&callback_data->sem);
 }
 

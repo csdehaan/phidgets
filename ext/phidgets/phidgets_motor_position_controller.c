@@ -220,11 +220,12 @@ VALUE ph_motor_get_max_velocity_limit(VALUE self) {
 
 void CCONV ph_motor_on_duty_cycle_update(PhidgetMotorPositionControllerHandle phid, void *userPtr, double duty_cycle) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(duty_cycle);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -235,7 +236,7 @@ VALUE ph_motor_set_on_duty_cycle_update_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetMotorPositionController_setOnDutyCycleUpdateHandler((PhidgetMotorPositionControllerHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -249,11 +250,12 @@ VALUE ph_motor_set_on_duty_cycle_update_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_motor_on_position_change(PhidgetMotorPositionControllerHandle phid, void *userPtr, double position) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(position);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -264,7 +266,7 @@ VALUE ph_motor_set_on_position_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetMotorPositionController_setOnPositionChangeHandler((PhidgetMotorPositionControllerHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -283,7 +285,7 @@ void CCONV ph_motor_target_position_async(PhidgetHandle phid, void *userPtr, Phi
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -505,7 +507,7 @@ void Init_motor_position_controller() {
    * This function is useful for completely relaxing a motor once it has reached the target position.
    */
   rb_define_method(ph_motor, "getEngaged", ph_motor_get_engaged, 0);
-  rb_define_alias(ph_motor, "engaged", "getEngaged");
+  rb_define_alias(ph_motor, "engaged?", "getEngaged");
 
   /* Document-method: setEngaged
    * call-seq: setEngaged(engaged)

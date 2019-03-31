@@ -154,11 +154,12 @@ VALUE ph_stepper_get_max_velocity_limit(VALUE self) {
 
 void CCONV ph_stepper_on_position_change(PhidgetStepperHandle phid, void *userPtr, double position) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(position);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -169,7 +170,7 @@ VALUE ph_stepper_set_on_position_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetStepper_setOnPositionChangeHandler((PhidgetStepperHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -183,11 +184,12 @@ VALUE ph_stepper_set_on_position_change_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_stepper_on_stopped(PhidgetStepperHandle phid, void *userPtr) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = Qnil;
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -198,7 +200,7 @@ VALUE ph_stepper_set_on_stopped_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetStepper_setOnStoppedHandler((PhidgetStepperHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -212,11 +214,12 @@ VALUE ph_stepper_set_on_stopped_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_stepper_on_velocity_change(PhidgetStepperHandle phid, void *userPtr, double velocity) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(velocity);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -227,7 +230,7 @@ VALUE ph_stepper_set_on_velocity_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetStepper_setOnVelocityChangeHandler((PhidgetStepperHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -246,7 +249,7 @@ void CCONV ph_stepper_target_position_async(PhidgetHandle phid, void *userPtr, P
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 

@@ -78,11 +78,12 @@ VALUE ph_encoder_get_max_position_change_trigger(VALUE self) {
 
 void CCONV ph_encoder_on_position_change(PhidgetEncoderHandle phid, void *userPtr, int position_change, double time_change, int index_triggered) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = INT2NUM(position_change);
   callback_data->arg2 = DBL2NUM(time_change);
   callback_data->arg3 = INT2NUM(index_triggered);
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -93,7 +94,7 @@ VALUE ph_encoder_set_on_position_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetEncoder_setOnPositionChangeHandler((PhidgetEncoderHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

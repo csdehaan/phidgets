@@ -82,11 +82,12 @@ VALUE ph_sound_set_spl_range(VALUE self, VALUE spl_range) {
 
 void CCONV ph_sound_on_spl_change(PhidgetSoundSensorHandle phid, void *userPtr, double db, double dba, double dbc, const double octaves[10]) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(db);
   callback_data->arg2 = DBL2NUM(dba);
   callback_data->arg3 = DBL2NUM(dbc);
   callback_data->arg4 = rb_ary_new3(10, DBL2NUM(octaves[0]), DBL2NUM(octaves[1]), DBL2NUM(octaves[2]), DBL2NUM(octaves[3]), DBL2NUM(octaves[4]), DBL2NUM(octaves[5]), DBL2NUM(octaves[6]), DBL2NUM(octaves[7]), DBL2NUM(octaves[8]), DBL2NUM(octaves[9]));
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -97,7 +98,7 @@ VALUE ph_sound_set_on_spl_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetSoundSensor_setOnSPLChangeHandler((PhidgetSoundSensorHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

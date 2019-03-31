@@ -89,7 +89,7 @@ class TestPhidgetsCommon < Test::Unit::TestCase
   end
 
   def test_get_channel_class_name
-    assert_raise(Phidgets::Error::DeviceNotAttached) {@phidget.channel_class_name}
+    assert_equal('PhidgetCapacitiveTouch', @phidget.channel_class_name)
   end
 
   def test_get_channel_subclass

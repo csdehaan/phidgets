@@ -59,11 +59,12 @@ VALUE ph_humidity_get_max_humidity_change_trigger(VALUE self) {
 
 void CCONV ph_humidity_on_humidity_change(PhidgetHumiditySensorHandle phid, void *userPtr, double humidity) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(humidity);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -74,7 +75,7 @@ VALUE ph_humidity_set_on_humidity_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetHumiditySensor_setOnHumidityChangeHandler((PhidgetHumiditySensorHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -174,7 +175,7 @@ void Init_humidity() {
    * The channel will not issue a HumidityChange event until the humidity value has changed by the amount specified by the HumidityChangeTrigger.
    * Setting the HumidityChangeTrigger to 0 will result in the channel firing events every DataInterval. This is useful for applications that implement their own data filtering.
    */
-  rb_define_method(ph_humidity, "setHumidityChangeTrigger", ph_humidity_set_humidity_change_trigger, 0);
+  rb_define_method(ph_humidity, "setHumidityChangeTrigger", ph_humidity_set_humidity_change_trigger, 1);
   rb_define_alias(ph_humidity, "humidity_change_trigger=", "setHumidityChangeTrigger");
 
   /* Document-method: getMinHumidityChangeTrigger

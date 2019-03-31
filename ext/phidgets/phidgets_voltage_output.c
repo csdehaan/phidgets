@@ -54,7 +54,7 @@ void CCONV ph_voltage_output_voltage_async(PhidgetHandle phid, void *userPtr, Ph
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 VALUE ph_voltage_output_set_voltage_async(VALUE self, VALUE voltage, VALUE handler) {

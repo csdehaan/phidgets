@@ -86,11 +86,12 @@ VALUE ph_temp_set_thermocouple_type(VALUE self, VALUE type) {
 
 void CCONV ph_temp_on_temperature_change(PhidgetTemperatureSensorHandle phid, void *userPtr, double temperature) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(temperature);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -101,7 +102,7 @@ VALUE ph_temp_set_on_temperature_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetTemperatureSensor_setOnTemperatureChangeHandler((PhidgetTemperatureSensorHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;

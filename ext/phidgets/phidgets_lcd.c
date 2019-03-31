@@ -34,8 +34,10 @@ VALUE ph_lcd_set_character_bitmap(VALUE self, VALUE font, VALUE character, VALUE
   return Qnil;
 }
 
-VALUE ph_lcd_get_max_characters(VALUE self) {
-  return ph_get_int(get_ph_handle(self), (phidget_get_int_func)PhidgetLCD_getMaxCharacters);
+VALUE ph_lcd_get_max_characters(VALUE self, VALUE font) {
+  int max_chars;
+  ph_raise(PhidgetLCD_getMaxCharacters((PhidgetLCDHandle)get_ph_handle(self), NUM2INT(font), &max_chars));
+  return INT2NUM(max_chars);
 }
 
 VALUE ph_lcd_clear(VALUE self) {
@@ -216,7 +218,7 @@ void Init_lcd() {
    *
    * Creates a Phidget LCD object.
    */
-  rb_define_method(ph_lcd, "initialize", ph_lcd_init, 0);
+  rb_define_method(ph_lcd, "initialize", ph_lcd_initialize, 0);
 
   /* Document-method: getBacklight
    * call-seq: getBacklight -> backlight
@@ -265,8 +267,8 @@ void Init_lcd() {
    *
    * The maximum number of characters that can fit on the frame buffer for the specified font.
    */
-  rb_define_method(ph_lcd, "getMaxCharacters", ph_lcd_get_max_characters, 0);
-  rb_define_alias(ph_lcd, "get_max_characters", "getMaxCharacters");
+  rb_define_method(ph_lcd, "getMaxCharacters", ph_lcd_get_max_characters, 1);
+  rb_define_alias(ph_lcd, "max_characters", "getMaxCharacters");
 
   /* Document-method: clear
    * call-seq: clear
@@ -325,7 +327,7 @@ void Init_lcd() {
    * When CursorBlink is true, the device will cause the cursor to periodically blink.
    */
   rb_define_method(ph_lcd, "getCursorBlink", ph_lcd_get_cursor_blink, 0);
-  rb_define_alias(ph_lcd, "cursor_blink", "getCursorBlink");
+  rb_define_alias(ph_lcd, "cursor_blink?", "getCursorBlink");
 
   /* Document-method: setCursorBlink
    * call-seq: setCursorBlink(cursor_blink)
@@ -341,7 +343,7 @@ void Init_lcd() {
    * When CursorOn is true, the device will underline to the cursor position.
    */
   rb_define_method(ph_lcd, "getCursorOn", ph_lcd_get_cursor_on, 0);
-  rb_define_alias(ph_lcd, "cursor_on", "getCursorOn");
+  rb_define_alias(ph_lcd, "cursor_on?", "getCursorOn");
 
   /* Document-method: setCursorOn
    * call-seq: setCursorOn(cursor_on)
@@ -468,7 +470,7 @@ void Init_lcd() {
    * When the device wakes up, it will return to its last known state, taking into account any changes that happened while asleep.
    */
   rb_define_method(ph_lcd, "getSleeping", ph_lcd_get_sleeping, 0);
-  rb_define_alias(ph_lcd, "sleeping", "getSleeping");
+  rb_define_alias(ph_lcd, "sleeping?", "getSleeping");
 
   /* Document-method: setSleeping
    * call-seq: setSleeping(sleeping)

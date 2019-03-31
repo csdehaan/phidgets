@@ -38,7 +38,7 @@ module Phidgets
 
     alias :on_braking_strength_change :setOnBrakingStrengthChangeHandler
     alias :on_position_change :setOnPositionChangeHandler
-    alias :on_velocity_change :setOnVelocityUpdateHandler
+    alias :on_velocity_update :setOnVelocityUpdateHandler
 
   end
 end

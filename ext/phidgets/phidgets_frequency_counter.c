@@ -106,11 +106,12 @@ VALUE ph_freq_get_time_elapsed(VALUE self) {
 
 void CCONV ph_freq_on_count_change(PhidgetFrequencyCounterHandle phid, void *userPtr, uint64_t counts, double timeChange) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = ULL2NUM(counts);
   callback_data->arg2 = DBL2NUM(timeChange);
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -121,7 +122,7 @@ VALUE ph_freq_set_on_count_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetFrequencyCounter_setOnCountChangeHandler((PhidgetFrequencyCounterHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -135,11 +136,12 @@ VALUE ph_freq_set_on_count_change_handler(VALUE self, VALUE handler) {
 
 void CCONV ph_freq_on_frequency_change(PhidgetFrequencyCounterHandle phid, void *userPtr, double frequency) {
   ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
   callback_data->arg1 = DBL2NUM(frequency);
   callback_data->arg2 = Qnil;
   callback_data->arg3 = Qnil;
   callback_data->arg4 = Qnil;
-  sem_post(&callback_data->sem);
+  sem_post(&callback_data->callback_called);
 }
 
 
@@ -150,7 +152,7 @@ VALUE ph_freq_set_on_frequency_change_handler(VALUE self, VALUE handler) {
     callback_data->callback = T_NIL;
     callback_data->exit = true;
     ph_raise(PhidgetFrequencyCounter_setOnFrequencyChangeHandler((PhidgetFrequencyCounterHandle)ph->handle, NULL, (void *)NULL));
-    sem_post(&callback_data->sem);
+    sem_post(&callback_data->callback_called);
   } else {
     callback_data->exit = false;
     callback_data->phidget = self;
@@ -166,6 +168,10 @@ void Init_frequency_counter() {
   VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
   VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
   VALUE ph_freq = rb_define_class_under(ph_module, "FrequencyCounter", ph_common);
+
+
+  rb_define_const(ph_freq, "FILTER_TYPE_ZERO_CROSSING", INT2NUM(FILTER_TYPE_ZERO_CROSSING));
+  rb_define_const(ph_freq, "FILTER_TYPE_LOGIC_LEVEL", INT2NUM(FILTER_TYPE_LOGIC_LEVEL));
 
 
   /* Document-method: new
