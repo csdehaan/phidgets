@@ -1,32 +1,153 @@
 
 #include "phidgets.h"
 
-#if 0
-VALUE ph_dictionary_allocate(VALUE klass);
-void  ph_dictionary_free(ph_data_t *ph);
-VALUE ph_dictionary_init(VALUE self);
-VALUE ph_dictionary_open_remote(VALUE self, VALUE server_id, VALUE password);
-VALUE ph_dictionary_open_remote_ip(VALUE self, VALUE address, VALUE port, VALUE password);
-VALUE ph_dictionary_close(VALUE self);
-VALUE ph_dictionary_get_key(VALUE self, VALUE key);
-VALUE ph_dictionary_add_key(VALUE self, VALUE key, VALUE value, VALUE persist);
-VALUE ph_dictionary_remove_key(VALUE self, VALUE pattern);
-VALUE ph_dictionary_get_server_id(VALUE self);
-VALUE ph_dictionary_get_server_address(VALUE self);
-VALUE ph_dictionary_get_server_status(VALUE self);
 
-VALUE ph_dictionary_set_on_key_change_handler(VALUE self, VALUE handler);
-VALUE ph_dictionary_remove_on_key_change_handler(VALUE self, VALUE listener);
-VALUE ph_dictionary_set_on_server_connect_handler(VALUE self, VALUE handler);
-VALUE ph_dictionary_set_on_server_disconnect_handler(VALUE self, VALUE handler);
-int ph_dictionary_on_server_connect(PhidgetDictionaryHandle phid, void *userPtr);
-int ph_dictionary_on_server_disconnect(PhidgetDictionaryHandle phid, void *userPtr);
+#define DICTIONARY_VALUE_LEN        512
+#define DICTIONARY_ADD_CALLBACK     0
+#define DICTIONARY_REMOVE_CALLBACK  0
+#define DICTIONARY_UPDATE_CALLBACK  0
+
+
+VALUE ph_dictionary_init(VALUE self) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_raise(PhidgetDictionary_create((PhidgetDictionaryHandle *)(&(ph->handle))));
+  return self;
+}
+
+VALUE ph_dictionary_add(VALUE self, VALUE key, VALUE value) {
+  ph_raise(PhidgetDictionary_add((PhidgetDictionaryHandle)get_ph_handle(self), StringValueCStr(key), StringValueCStr(value)));
+  return Qnil;
+}
+
+VALUE ph_dictionary_get(VALUE self, VALUE key) {
+  char value[DICTIONARY_VALUE_LEN];
+  ph_raise(PhidgetDictionary_get((PhidgetDictionaryHandle)get_ph_handle(self), StringValueCStr(key), value, DICTIONARY_VALUE_LEN));
+  return rb_str_new2(value);
+}
+
+VALUE ph_dictionary_remove(VALUE self, VALUE key) {
+  ph_raise(PhidgetDictionary_remove((PhidgetDictionaryHandle)get_ph_handle(self), StringValueCStr(key)));
+  return Qnil;
+}
+
+VALUE ph_dictionary_remove_all(VALUE self) {
+  ph_raise(PhidgetDictionary_removeAll((PhidgetDictionaryHandle)get_ph_handle(self)));
+  return Qnil;
+}
+
+VALUE ph_dictionary_scan(VALUE self, VALUE start_key) {
+  char list[DICTIONARY_VALUE_LEN * 10];
+  ph_raise(PhidgetDictionary_scan((PhidgetDictionaryHandle)get_ph_handle(self), StringValueCStr(start_key), list, DICTIONARY_VALUE_LEN * 10));
+  return rb_str_new2(list);
+}
+
+VALUE ph_dictionary_set(VALUE self, VALUE key, VALUE value) {
+  ph_raise(PhidgetDictionary_set((PhidgetDictionaryHandle)get_ph_handle(self), StringValueCStr(key), StringValueCStr(value)));
+  return Qnil;
+}
+
+VALUE ph_dictionary_update(VALUE self, VALUE key, VALUE value) {
+  ph_raise(PhidgetDictionary_update((PhidgetDictionaryHandle)get_ph_handle(self), StringValueCStr(key), StringValueCStr(value)));
+  return Qnil;
+}
+
+
+void CCONV ph_dictionary_on_add(PhidgetDictionaryHandle phid, void *userPtr, const char *key, const char *value) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
+  callback_data->arg1 = rb_str_new2(key);
+  callback_data->arg2 = rb_str_new2(value);
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->callback_called);
+}
+
+
+VALUE ph_dictionary_set_on_add_handler(VALUE self, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->dev_callbacks[DICTIONARY_ADD_CALLBACK];
+  if( TYPE(handler) == T_NIL ) {
+    callback_data->callback = T_NIL;
+    callback_data->exit = true;
+    ph_raise(PhidgetDictionary_setOnAddHandler((PhidgetDictionaryHandle)ph->handle, NULL, (void *)NULL));
+    sem_post(&callback_data->callback_called);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    ph_raise(PhidgetDictionary_setOnAddHandler((PhidgetDictionaryHandle)ph->handle, ph_dictionary_on_add, (void *)callback_data));
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
+
+
+void CCONV ph_dictionary_on_remove(PhidgetDictionaryHandle phid, void *userPtr, const char *key) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
+  callback_data->arg1 = rb_str_new2(key);
+  callback_data->arg2 = Qnil;
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->callback_called);
+}
+
+
+VALUE ph_dictionary_set_on_remove_handler(VALUE self, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->dev_callbacks[DICTIONARY_REMOVE_CALLBACK];
+  if( TYPE(handler) == T_NIL ) {
+    callback_data->callback = T_NIL;
+    callback_data->exit = true;
+    ph_raise(PhidgetDictionary_setOnRemoveHandler((PhidgetDictionaryHandle)ph->handle, NULL, (void *)NULL));
+    sem_post(&callback_data->callback_called);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    ph_raise(PhidgetDictionary_setOnRemoveHandler((PhidgetDictionaryHandle)ph->handle, ph_dictionary_on_remove, (void *)callback_data));
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
+
+
+void CCONV ph_dictionary_on_update(PhidgetDictionaryHandle phid, void *userPtr, const char *key, const char *value) {
+  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
+  while(sem_wait(&callback_data->handler_ready)!=0) {};
+  callback_data->arg1 = rb_str_new2(key);
+  callback_data->arg2 = rb_str_new2(value);
+  callback_data->arg3 = Qnil;
+  callback_data->arg4 = Qnil;
+  sem_post(&callback_data->callback_called);
+}
+
+
+VALUE ph_dictionary_set_on_update_handler(VALUE self, VALUE handler) {
+  ph_data_t *ph = get_ph_data(self);
+  ph_callback_data_t *callback_data = &ph->dev_callbacks[DICTIONARY_UPDATE_CALLBACK];
+  if( TYPE(handler) == T_NIL ) {
+    callback_data->callback = T_NIL;
+    callback_data->exit = true;
+    ph_raise(PhidgetDictionary_setOnUpdateHandler((PhidgetDictionaryHandle)ph->handle, NULL, (void *)NULL));
+    sem_post(&callback_data->callback_called);
+  } else {
+    callback_data->exit = false;
+    callback_data->phidget = self;
+    callback_data->callback = handler;
+    ph_raise(PhidgetDictionary_setOnUpdateHandler((PhidgetDictionaryHandle)ph->handle, ph_dictionary_on_update, (void *)callback_data));
+    ph_callback_thread(callback_data);
+  }
+  return Qnil;
+}
+
+
 
 
 void Init_dictionary() {
   VALUE ph_module = rb_const_get(rb_cObject, rb_intern("Phidgets"));
-  VALUE ph_dictionary = rb_define_class_under(ph_module, "Dictionary", rb_cObject);
-  rb_define_alloc_func(ph_dictionary, ph_dictionary_allocate);
+  VALUE ph_common = rb_const_get(ph_module, rb_intern("Common"));
+  VALUE ph_dictionary = rb_define_class_under(ph_module, "Dictionary", ph_common);
 
   /* Document-method: new
    * call-seq: new
@@ -35,238 +156,64 @@ void Init_dictionary() {
    */
   rb_define_method(ph_dictionary, "initialize", ph_dictionary_init, 0);
 
-  /* Document-method: openRemote
-   * call-seq: openRemote(server_id, password)
+  /* Document-method: add
+   * call-seq: add(key, value)
    *
-   * Opens a Phidget dictionary by ServerID. Note that this requires Bonjour (mDNS) to be running on both the host and the server.
+   * Adds a new key value pair to the dictionary. It is an error if the key already exits.
    */
-  rb_define_method(ph_dictionary, "openRemote", ph_dictionary_open_remote, 2);
+  rb_define_method(ph_dictionary, "add", ph_dictionary_add, 2);
 
-  /* Document-method: openRemoteIP
-   * call-seq: openRemoteIP(address, port, password)
-   *
-   * Opens a Phidget dictionary by address and port.
-   */
-  rb_define_method(ph_dictionary, "openRemoteIP", ph_dictionary_open_remote_ip, 3);
-
-  /* Document-method: close
-   * call-seq: close
-   *
-   * Closes the connection to a Phidget Dictionary.
-   */
-  rb_define_method(ph_dictionary, "close", ph_dictionary_close, 0);
-
-  /* Document-method: getKey
-   * call-seq: getKey(key) -> value
+  /* Document-method: get
+   * call-seq: get(key) -> value
    *
    * Gets a key value. If more then one key matches, only the first value is returned.
    */
-  rb_define_method(ph_dictionary, "getKey", ph_dictionary_get_key, 1);
+  rb_define_method(ph_dictionary, "get", ph_dictionary_get, 1);
 
-  /* Document-method: addKey
-   * call-seq: addKey(key, value, persistent)
+  /* Document-method: remove
+   * call-seq: remove(key)
    *
-   * Adds a key/value pair to the dictionary. Or, changes an existing key's value.
+   * Removes the key from the dictionary.
    */
-  rb_define_method(ph_dictionary, "addKey", ph_dictionary_add_key, 3);
+  rb_define_method(ph_dictionary, "remove", ph_dictionary_remove, 1);
 
-  /* Document-method: removeKey
-   * call-seq: removeKey(pattern)
+  /* Document-method: removeAll
+   * call-seq: removeAll
    *
-   * Removes a set of keys from the dictionary.
+   * Removes every key from the dictionary.
    */
-  rb_define_method(ph_dictionary, "removeKey", ph_dictionary_remove_key, 1);
+  rb_define_method(ph_dictionary, "removeAll", ph_dictionary_remove_all, 0);
+  rb_define_alias(ph_dictionary, "remove_all", "removeAll");
 
-  /* Document-method: getServerID
-   * call-seq: getServerID -> server_id
+  /* Document-method: scan
+   * call-seq: scan(start_key)
    *
-   * Gets the server ID.
+   * Scans the keys in the dictionary, indexed by start or the first key in the dictionary if start is NULL or an empty String.
+   * The result is formated as a newline seperated list of keys
+   * The list begins at the key following the start key
+   * The list might not contain all of the keys in the dictionary
+   * To continue scanning, call the method again with the last entry from the previous result
+   * When all of the keys have been scanned, a zero length string is returned
+   * Keys added during the scan may be missed, and keys deleted during the scan may be included.
    */
-  rb_define_method(ph_dictionary, "getServerID", ph_dictionary_get_server_id, 0);
+  rb_define_method(ph_dictionary, "scan", ph_dictionary_scan, 1);
 
-  /* Document-method: getServerAddress
-   * call-seq: getServerAddress -> [address, port]
+  /* Document-method: set
+   * call-seq: set(key, value)
    *
-   * Gets the address and port.
+   * Sets the value of a key, or creates the key value pair if the key does not already exist.
    */
-  rb_define_method(ph_dictionary, "getServerAddress", ph_dictionary_get_server_address, 0);
+  rb_define_method(ph_dictionary, "set", ph_dictionary_set, 2);
 
-  /* Document-method: getServerStatus
-   * call-seq: getServerStatus -> status
+  /* Document-method: update
+   * call-seq: update(key, value)
    *
-   * Gets the connected to server status.
+   * Updates a key value pair in the dictionary. It is an error if the key does not exist.
    */
-  rb_define_method(ph_dictionary, "getServerStatus", ph_dictionary_get_server_status, 0);
+  rb_define_method(ph_dictionary, "update", ph_dictionary_update, 2);
 
 
-  /* Document-method: setOnKeyChangeHandler
-   * call-seq: setOnKeyChangeHandler(proc=nil, &block)
-   *
-   * ** NOT IMPLEMENTED **
-   */
-  rb_define_method(ph_dictionary, "setOnKeyChangeHandler", ph_dictionary_set_on_key_change_handler, 1);
-
-  /* Document-method: removeOnKeyChangeHandler
-   * call-seq: removeOnKeyChangeHandler(listener)
-   *
-   * ** NOT IMPLEMENTED **
-   */
-  rb_define_method(ph_dictionary, "removeOnKeyChangeHandler", ph_dictionary_remove_on_key_change_handler, 1);
-  rb_define_private_method(ph_dictionary, "ext_setOnServerConnectHandler", ph_dictionary_set_on_server_connect_handler, 1);
-  rb_define_private_method(ph_dictionary, "ext_setOnServerDisconnectHandler", ph_dictionary_set_on_server_disconnect_handler, 1);
-  rb_define_alias(ph_dictionary, "on_key_change", "setOnKeyChangeHandler");
-  rb_define_alias(ph_dictionary, "remove_on_key_change", "removeOnKeyChangeHandler");
-
-  rb_define_alias(ph_dictionary, "open_remote", "openRemote");
-  rb_define_alias(ph_dictionary, "open_remote_ip", "openRemoteIP");
-  rb_define_alias(ph_dictionary, "server_id", "getServerID");
-  rb_define_alias(ph_dictionary, "get_key", "getKey");
-  rb_define_alias(ph_dictionary, "add_key", "addKey");
-  rb_define_alias(ph_dictionary, "remove_key", "removeKey");
-  rb_define_alias(ph_dictionary, "server_address", "getServerAddress");
-  rb_define_alias(ph_dictionary, "server_status", "getServerStatus");
+  rb_define_private_method(ph_dictionary, "ext_setOnAddHandler", ph_dictionary_set_on_add_handler, 1);
+  rb_define_private_method(ph_dictionary, "ext_setOnRemoveHandler", ph_dictionary_set_on_remove_handler, 1);
+  rb_define_private_method(ph_dictionary, "ext_setOnUpdateHandler", ph_dictionary_set_on_update_handler, 1);
 }
-
-
-
-VALUE ph_dictionary_allocate(VALUE klass) {
-  ph_data_t *ph;
-  VALUE self = Data_Make_Struct(klass, ph_data_t, 0, ph_dictionary_free, ph);
-  memset(ph, 0, sizeof(ph_data_t));
-  return self;
-}
-
-void ph_dictionary_free(ph_data_t *ph) {
-  if (ph && ph->handle) {
-    PhidgetDictionary_close((PhidgetDictionaryHandle)ph->handle);
-    PhidgetDictionary_delete((PhidgetDictionaryHandle)ph->handle);
-    ph->handle = NULL;
-  }
-  if(ph) xfree(ph);
-}
-
-VALUE ph_dictionary_init(VALUE self) {
-  ph_data_t *ph = get_ph_data(self);
-  ph_raise(PhidgetDictionary_create((PhidgetDictionaryHandle *)(&(ph->handle))));
-  return self;
-}
-
-VALUE ph_dictionary_open_remote(VALUE self, VALUE server_id, VALUE password) {
-  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
-  ph_raise(PhidgetDictionary_openRemote(handle, StringValueCStr(server_id), StringValueCStr(password)));
-  return Qnil;
-}
-
-VALUE ph_dictionary_open_remote_ip(VALUE self, VALUE address, VALUE port, VALUE password) {
-  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
-  ph_raise(PhidgetDictionary_openRemoteIP(handle, StringValueCStr(address), FIX2INT(port), StringValueCStr(password)));
-  return Qnil;
-}
-
-VALUE ph_dictionary_close(VALUE self) {
-  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
-  ph_raise(PhidgetDictionary_close(handle));
-  return Qnil;
-}
-
-VALUE ph_dictionary_get_key(VALUE self, VALUE key) {
-#define VALUE_LEN 512
-  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
-  char value[VALUE_LEN];
-  ph_raise(PhidgetDictionary_getKey(handle, StringValueCStr(key), value, VALUE_LEN));
-  return rb_str_new2(value);
-}
-
-VALUE ph_dictionary_add_key(VALUE self, VALUE key, VALUE value, VALUE persist) {
-  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
-  ph_raise(PhidgetDictionary_addKey(handle, StringValueCStr(key), StringValueCStr(value), TYPE(persist) == T_TRUE ? PTRUE : PFALSE));
-  return Qnil;
-}
-
-VALUE ph_dictionary_remove_key(VALUE self, VALUE pattern) {
-  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
-  ph_raise(PhidgetDictionary_removeKey(handle, StringValueCStr(pattern)));
-  return Qnil;
-}
-
-VALUE ph_dictionary_get_server_id(VALUE self) {
-  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
-  const char *server_id;
-  ph_raise(PhidgetDictionary_getServerID(handle, &server_id));
-  return rb_str_new2(server_id);
-}
-
-VALUE ph_dictionary_get_server_address(VALUE self) {
-  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
-  const char *address;
-  int port;
-  ph_raise(PhidgetDictionary_getServerAddress(handle, &address, &port));
-  return rb_ary_new3(2, rb_str_new2(address), INT2FIX(port));
-}
-
-VALUE ph_dictionary_get_server_status(VALUE self) {
-  PhidgetDictionaryHandle handle = (PhidgetDictionaryHandle)get_ph_handle(self);
-  int server_status;
-  ph_raise(PhidgetDictionary_getServerStatus(handle, &server_status));
-  return INT2FIX(server_status);
-}
-
-
-VALUE ph_dictionary_set_on_key_change_handler(VALUE self, VALUE handler) {
-  ph_raise(EPHIDGET_NOTIMPLEMENTED);
-  return Qnil;
-}
-
-VALUE ph_dictionary_remove_on_key_change_handler(VALUE self, VALUE listener) {
-  ph_raise(EPHIDGET_NOTIMPLEMENTED);
-  return Qnil;
-}
-
-VALUE ph_dictionary_set_on_server_connect_handler(VALUE self, VALUE handler) {
-  ph_data_t *ph = get_ph_data(self);
-  ph_callback_data_t *callback_data = &ph->server_connect_callback;
-  if( TYPE(handler) == T_NIL ) {
-    callback_data->exit = true;
-    ph_raise(PhidgetDictionary_set_OnServerConnect_Handler((PhidgetDictionaryHandle)ph->handle, NULL, (void *)NULL));
-  } else {
-    callback_data->called = false;
-    callback_data->exit = false;
-    callback_data->phidget = self;
-    callback_data->callback = handler;
-    ph_raise(PhidgetDictionary_set_OnServerConnect_Handler((PhidgetDictionaryHandle)ph->handle, ph_dictionary_on_server_connect, (void *)callback_data));
-    ph_callback_thread(callback_data);
-  }
-  return Qnil;
-}
-
-VALUE ph_dictionary_set_on_server_disconnect_handler(VALUE self, VALUE handler) {
-  ph_data_t *ph = get_ph_data(self);
-  ph_callback_data_t *callback_data = &ph->server_disconnect_callback;
-  if( TYPE(handler) == T_NIL ) {
-    callback_data->exit = true;
-    ph_raise(PhidgetDictionary_set_OnServerDisconnect_Handler((PhidgetDictionaryHandle)ph->handle, NULL, (void *)NULL));
-  } else {
-    callback_data->called = false;
-    callback_data->exit = false;
-    callback_data->phidget = self;
-    callback_data->callback = handler;
-    ph_raise(PhidgetDictionary_set_OnServerDisconnect_Handler((PhidgetDictionaryHandle)ph->handle, ph_dictionary_on_server_disconnect, (void *)callback_data));
-    ph_callback_thread(callback_data);
-  }
-  return Qnil;
-}
-
-
-int ph_dictionary_on_server_connect(PhidgetDictionaryHandle phid, void *userPtr) {
-  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
-  callback_data->called = true;
-  return EPHIDGET_OK;
-}
-
-
-int ph_dictionary_on_server_disconnect(PhidgetDictionaryHandle phid, void *userPtr) {
-  ph_callback_data_t *callback_data = ((ph_callback_data_t *)userPtr);
-  callback_data->called = true;
-  return EPHIDGET_OK;
-}
-#endif
