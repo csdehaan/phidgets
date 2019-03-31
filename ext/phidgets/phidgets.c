@@ -6,12 +6,56 @@
 #endif
 
 
-VALUE ph_get_library_version(VALUE self);
+
+VALUE ph_get_library_version(VALUE self) {
+  const char *lib_version;
+  ph_raise(Phidget_getLibraryVersion(&lib_version));
+  return rb_str_new2(lib_version);
+}
+
+VALUE ph_add_server(VALUE self, VALUE name, VALUE address, VALUE port, VALUE password, VALUE flags) {
+  ph_raise(PhidgetNet_addServer(StringValueCStr(name), StringValueCStr(address), NUM2INT(port), StringValueCStr(password), NUM2INT(flags)));
+  return Qnil;
+}
+
+VALUE ph_remove_server(VALUE self, VALUE name) {
+  ph_raise(PhidgetNet_removeServer(StringValueCStr(name)));
+  return Qnil;
+}
+
+VALUE ph_enable_server(VALUE self, VALUE name) {
+  ph_raise(PhidgetNet_enableServer(StringValueCStr(name)));
+  return Qnil;
+}
+
+VALUE ph_disable_server(VALUE self, VALUE name, VALUE flags) {
+  ph_raise(PhidgetNet_disableServer(StringValueCStr(name), NUM2INT(flags)));
+  return Qnil;
+}
+
+VALUE ph_enable_server_discovery(VALUE self, VALUE server_type) {
+  ph_raise(PhidgetNet_enableServerDiscovery(NUM2INT(server_type)));
+  return Qnil;
+}
+
+VALUE ph_disable_server_discovery(VALUE self, VALUE server_type) {
+  ph_raise(PhidgetNet_disableServerDiscovery(NUM2INT(server_type)));
+  return Qnil;
+}
+
+VALUE ph_set_server_password(VALUE self, VALUE name, VALUE password) {
+  ph_raise(PhidgetNet_setServerPassword(StringValueCStr(name), StringValueCStr(password)));
+  return Qnil;
+}
 
 
 void Init_phidgets() {
   VALUE ph_module = rb_define_module("Phidgets");
   VALUE ph_error;
+
+  rb_define_const(ph_module, "SERVER_DEVICEREMOTE", INT2NUM(PHIDGETSERVER_DEVICEREMOTE));
+  rb_define_const(ph_module, "SERVER_WWWREMOTE", INT2NUM(PHIDGETSERVER_WWWREMOTE));
+  rb_define_const(ph_module, "SERVER_SBC", INT2NUM(PHIDGETSERVER_SBC));
 
   rb_define_const(ph_module, "SERIALNUMBER_ANY", INT2NUM(PHIDGET_SERIALNUMBER_ANY));
   rb_define_const(ph_module, "HUBPORT_ANY", INT2NUM(PHIDGET_HUBPORT_ANY));
@@ -291,6 +335,90 @@ void Init_phidgets() {
   rb_define_singleton_method(ph_module, "getLibraryVersion", ph_get_library_version, 0);
   rb_define_singleton_method(ph_module, "library_version", ph_get_library_version, 0);
 
+
+  /*
+   * Document-method: addServer
+   * call-seq: addServer(server_name, address, port, password, flags)
+   *
+   * Registers a server that the client (your program) will try to connect to. The client will continually try to connect to the server, increasing the time between each attempt to a maximum interval of 16 seconds.
+   * This call is intended for use when server discovery is not enabled, or to connect to a server that is not discoverable.
+   * The server name used by this function does not have to match the name of the server running on the host machine. Only the address, port, and password need to match.
+   * This call will fail if a server with the same name has already been discovered.
+   * This call will fail if PhidgetNet_setServerPassword() has already been called with the same server name, as PhidgetNet_setServerPassword() registers the server entry anticipating the discovery of the server.
+   */
+  rb_define_singleton_method(ph_module, "addServer", ph_add_server, 5);
+  rb_define_singleton_method(ph_module, "add_server", ph_add_server, 5);
+
+
+  /*
+   * Document-method: removeServer
+   * call-seq: removeServer(server_name)
+   *
+   * Removes a registration for a server that the client (your program) is trying to connect to.If the client is currently connected to the server, the connection will be closed.
+   * If the server was discovered (not added by PhidgetNet_addServer()), the connection may be reestablished if and when the server is rediscovered. PhidgetNet_disableServer()
+   * should be used to prevent the reconnection of a discovered server.
+   */
+  rb_define_singleton_method(ph_module, "removeServer", ph_remove_server, 1);
+  rb_define_singleton_method(ph_module, "remove_server", ph_remove_server, 1);
+
+
+  /*
+   * Document-method: enableServer
+   * call-seq: enableServer(server_name)
+   *
+   * Enables attempts to connect to a discovered server, if attempts were previously disabled by PhidgetNet_disableServer(). All servers are enabled by default.
+   * This call will fail if the server was not previously added, disabled or discovered.
+   */
+  rb_define_singleton_method(ph_module, "enableServer", ph_enable_server, 1);
+  rb_define_singleton_method(ph_module, "enable_server", ph_enable_server, 1);
+
+
+  /*
+   * Document-method: disableServer
+   * call-seq: disableServer(server_name, flags)
+   *
+   * Prevents attempts to automatically connect to a server.
+   * By default the client (your program) will continually attempt to connect to added or discovered servers.This call will disable those attempts, but will not close an already established connection.
+   */
+  rb_define_singleton_method(ph_module, "disableServer", ph_disable_server, 2);
+  rb_define_singleton_method(ph_module, "disable_server", ph_disable_server, 2);
+
+
+  /*
+   * Document-method: enableServerDiscovery
+   * call-seq: enableServerDiscovery(server_type)
+   *
+   * Enables the dynamic discovery of servers that publish their identity to the network. Currently Multicast DNS is used to discover and publish Phidget servers.
+   * To connect to remote Phidgets, call this function with server type DEVICEREMOTE.
+   * PhidgetNet_enableServerDiscovery() must be called once for each server type your program requires. Multiple calls for the same server type are ignored
+   * This call will fail with the error code EPHIDGET_UNSUPPORTED if your computer does not have the required mDNS support. We recommend using Bonjour Print Services on Windows and Mac, or Avahi on Linux.
+   */
+  rb_define_singleton_method(ph_module, "enableServerDiscovery", ph_enable_server_discovery, 1);
+  rb_define_singleton_method(ph_module, "enable_server_discovery", ph_enable_server_discovery, 1);
+
+
+  /*
+   * Document-method: disableServerDiscovery
+   * call-seq: disableServerDiscovery(server_type)
+   *
+   * Disables the dynamic discovery of servers that publish their identity.
+   * PhidgetNet_disableServerDiscovery() does not disconnect already established connections.
+   */
+  rb_define_singleton_method(ph_module, "disableServerDiscovery", ph_disable_server_discovery, 1);
+  rb_define_singleton_method(ph_module, "disable_server_discovery", ph_disable_server_discovery, 1);
+
+
+  /*
+   * Document-method: setServerPassword
+   * call-seq: setServerPassword(server_name, password)
+   *
+   * Sets the password that will be used to attempt to connect to the server. If the server has not already been added or discovered, a placeholder server entry
+   * will be registered to use this password on the server once it is discovered.
+   */
+  rb_define_singleton_method(ph_module, "setServerPassword", ph_set_server_password, 2);
+  rb_define_singleton_method(ph_module, "server_password", ph_set_server_password, 2);
+
+
   Init_logging();
   Init_manager();
   Init_common();
@@ -483,12 +611,6 @@ void ph_raise(int err_code) {
         rb_raise(rb_const_get(ph_error, rb_intern("UnknownError")), "Unknown Error");
     }
   }
-}
-
-VALUE ph_get_library_version(VALUE self) {
-  const char *lib_version;
-  ph_raise(Phidget_getLibraryVersion(&lib_version));
-  return rb_str_new2(lib_version);
 }
 
 
