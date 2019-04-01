@@ -75,7 +75,7 @@ This gem provides a ruby interface to the phidgets library.
 * The development header file and library must be placed in a location where the compiler can find them.
   For Linux this should be done when running "make install" for the Phidget Library. For Windows the files
   need to be copied from the install directory (\\Program Files\\Phidgets). phidget22.h can be copied to
-  RUBY_DIR\\include\\ruby-1.9.1. phidget22.lib can be copied to RUBY_DIR\\lib.
+  RUBY_DIR\\include\\ruby-x.x.x. phidget22.lib can be copied to RUBY_DIR\\lib.
 
 == INSTALL:
 
