@@ -9,7 +9,7 @@ This gem provides a ruby interface to the phidgets library.
 
 == FEATURES/PROBLEMS:
 
-* Version 1.0 of this gem if for Phidget Lib 2.2. For the older Phidget Lib 2.1, use version 0.1.3 of the gem.
+* Version 1.0 of this gem is for Phidget Lib 2.2. For the older Phidget Lib 2.1, use version 0.1.3 of the gem.
 * This gem compiles a c extension for the phidget library, so the library must be installed and the development files must be located
   in a place that the compiler can find them. For windows the DevKit is required.
 * The gem has been tested to work on both Linux and Windows.
