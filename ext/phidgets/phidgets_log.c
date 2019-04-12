@@ -246,6 +246,7 @@ VALUE ph_log_get_sources(VALUE self) {
   const char **sources;
   uint32_t count;
   VALUE ary = rb_ary_new();
+  uint32_t i;
 
   ph_raise(PhidgetLog_getSources(NULL, &count));
   sources = malloc(sizeof(const char *) * count);
@@ -256,7 +257,7 @@ VALUE ph_log_get_sources(VALUE self) {
     ph_raise(rc);
   }
 
-  for(uint32_t i=0; i<count; i++) rb_ary_push(ary, rb_str_new2(sources[i]));
+  for(i=0; i<count; i++) rb_ary_push(ary, rb_str_new2(sources[i]));
   free(sources);
   return ary;
 }
