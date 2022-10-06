@@ -144,6 +144,7 @@ void Init_phidgets() {
   rb_define_const(ph_module, "CHSUBCLASS_ENCODER_MODE_SETTABLE", INT2NUM(PHIDCHSUBCLASS_ENCODER_MODE_SETTABLE));
 
   rb_define_const(ph_module, "ID_NOTHING", INT2NUM(PHIDID_NOTHING));
+  rb_define_const(ph_module, "ID_UNKNOWN", INT2NUM(PHIDID_UNKNOWN));
   rb_define_const(ph_module, "ID_INTERFACEKIT_4_8_8", INT2NUM(PHIDID_INTERFACEKIT_4_8_8));
   rb_define_const(ph_module, "ID_1000", INT2NUM(PHIDID_1000));
   rb_define_const(ph_module, "ID_1001", INT2NUM(PHIDID_1001));
@@ -193,7 +194,6 @@ void Init_phidgets() {
   rb_define_const(ph_module, "ID_1215__1218", INT2NUM(PHIDID_1215__1218));
   rb_define_const(ph_module, "ID_1219__1222", INT2NUM(PHIDID_1219__1222));
   rb_define_const(ph_module, "ID_ADP1000", INT2NUM(PHIDID_ADP1000));
-  rb_define_const(ph_module, "ID_ADP1001", INT2NUM(PHIDID_ADP1001));
   rb_define_const(ph_module, "ID_DAQ1000", INT2NUM(PHIDID_DAQ1000));
   rb_define_const(ph_module, "ID_DAQ1200", INT2NUM(PHIDID_DAQ1200));
   rb_define_const(ph_module, "ID_DAQ1300", INT2NUM(PHIDID_DAQ1300));
@@ -209,9 +209,7 @@ void Init_phidgets() {
   rb_define_const(ph_module, "ID_HIN1100", INT2NUM(PHIDID_HIN1100));
   rb_define_const(ph_module, "ID_HUB0000", INT2NUM(PHIDID_HUB0000));
   rb_define_const(ph_module, "ID_HUB0001", INT2NUM(PHIDID_HUB0001));
-  rb_define_const(ph_module, "ID_HUB0002", INT2NUM(PHIDID_HUB0002));
   rb_define_const(ph_module, "ID_HUB0004", INT2NUM(PHIDID_HUB0004));
-  rb_define_const(ph_module, "ID_HUB0005", INT2NUM(PHIDID_HUB0005));
   rb_define_const(ph_module, "ID_HUM1000", INT2NUM(PHIDID_HUM1000));
   rb_define_const(ph_module, "ID_LCD1100", INT2NUM(PHIDID_LCD1100));
   rb_define_const(ph_module, "ID_LED1000", INT2NUM(PHIDID_LED1000));
@@ -234,7 +232,6 @@ void Init_phidgets() {
   rb_define_const(ph_module, "ID_TMP1100", INT2NUM(PHIDID_TMP1100));
   rb_define_const(ph_module, "ID_TMP1101", INT2NUM(PHIDID_TMP1101));
   rb_define_const(ph_module, "ID_TMP1200", INT2NUM(PHIDID_TMP1200));
-  rb_define_const(ph_module, "ID_TMP1300", INT2NUM(PHIDID_TMP1300));
   rb_define_const(ph_module, "ID_VCP1000", INT2NUM(PHIDID_VCP1000));
   rb_define_const(ph_module, "ID_VCP1001", INT2NUM(PHIDID_VCP1001));
   rb_define_const(ph_module, "ID_VCP1002", INT2NUM(PHIDID_VCP1002));
@@ -242,10 +239,10 @@ void Init_phidgets() {
   rb_define_const(ph_module, "ID_DIGITALOUTPUT_PORT", INT2NUM(PHIDID_DIGITALOUTPUT_PORT));
   rb_define_const(ph_module, "ID_VOLTAGEINPUT_PORT", INT2NUM(PHIDID_VOLTAGEINPUT_PORT));
   rb_define_const(ph_module, "ID_VOLTAGERATIOINPUT_PORT", INT2NUM(PHIDID_VOLTAGERATIOINPUT_PORT));
-  rb_define_const(ph_module, "ID_GENERICUSB", INT2NUM(PHIDID_GENERICUSB));
-  rb_define_const(ph_module, "ID_GENERICVINT", INT2NUM(PHIDID_GENERICVINT));
   rb_define_const(ph_module, "ID_FIRMWARE_UPGRADE_USB", INT2NUM(PHIDID_FIRMWARE_UPGRADE_USB));
   rb_define_const(ph_module, "ID_FIRMWARE_UPGRADE_STM32F0", INT2NUM(PHIDID_FIRMWARE_UPGRADE_STM32F0));
+  rb_define_const(ph_module, "ID_FIRMWARE_UPGRADE_STM32F3", INT2NUM(PHIDID_FIRMWARE_UPGRADE_STM32F3));
+  rb_define_const(ph_module, "ID_FIRMWARE_UPGRADE_STM32G0", INT2NUM(PHIDID_FIRMWARE_UPGRADE_STM32G0));
   rb_define_const(ph_module, "ID_FIRMWARE_UPGRADE_STM8S", INT2NUM(PHIDID_FIRMWARE_UPGRADE_STM8S));
   rb_define_const(ph_module, "ID_FIRMWARE_UPGRADE_SPI", INT2NUM(PHIDID_FIRMWARE_UPGRADE_SPI));
   rb_define_const(ph_module, "ID_VCP1100", INT2NUM(PHIDID_VCP1100));
@@ -254,15 +251,20 @@ void Init_phidgets() {
   rb_define_const(ph_module, "ID_DCC1001", INT2NUM(PHIDID_DCC1001));
   rb_define_const(ph_module, "ID_DICTIONARY", INT2NUM(PHIDID_DICTIONARY));
   rb_define_const(ph_module, "ID_STC1001", INT2NUM(PHIDID_STC1001));
-  rb_define_const(ph_module, "ID_USBSWITCH", INT2NUM(PHIDID_USBSWITCH));
   rb_define_const(ph_module, "ID_DCC1002", INT2NUM(PHIDID_DCC1002));
   rb_define_const(ph_module, "ID_STC1002", INT2NUM(PHIDID_STC1002));
   rb_define_const(ph_module, "ID_STC1003", INT2NUM(PHIDID_STC1003));
   rb_define_const(ph_module, "ID_DCC1003", INT2NUM(PHIDID_DCC1003));
   rb_define_const(ph_module, "ID_DST1001", INT2NUM(PHIDID_DST1001));
-  rb_define_const(ph_module, "ID_CURLOOP", INT2NUM(PHIDID_CURLOOP));
   rb_define_const(ph_module, "ID_HUB5000", INT2NUM(PHIDID_HUB5000));
   rb_define_const(ph_module, "ID_RCC0004", INT2NUM(PHIDID_RCC0004));
+  rb_define_const(ph_module, "ID_DST1002", INT2NUM(PHIDID_DST1002));
+  rb_define_const(ph_module, "ID_HUM1001", INT2NUM(PHIDID_HUM1001));
+  rb_define_const(ph_module, "ID_HUM1100", INT2NUM(PHIDID_HUM1100));
+  rb_define_const(ph_module, "ID_MOT0100", INT2NUM(PHIDID_MOT0100));
+  rb_define_const(ph_module, "ID_MOT0109", INT2NUM(PHIDID_MOT0109));
+  rb_define_const(ph_module, "ID_MOT0110", INT2NUM(PHIDID_MOT0110));
+  rb_define_const(ph_module, "ID_MOT1102", INT2NUM(PHIDID_MOT1102));
 
   rb_define_const(ph_module, "INPUT_MODE_NPN", INT2NUM(INPUT_MODE_NPN));
   rb_define_const(ph_module, "INPUT_MODE_PNP", INT2NUM(INPUT_MODE_PNP));
@@ -325,6 +327,9 @@ void Init_phidgets() {
   rb_define_class_under(ph_error, "EndOfFile", ph_error);
   rb_define_class_under(ph_error, "NotImplemented", ph_error);
   rb_define_class_under(ph_error, "UnknownError", ph_error);
+  rb_define_class_under(ph_error, "FailSafe", ph_error);
+  rb_define_class_under(ph_error, "InvalidValueHigh", ph_error);
+  rb_define_class_under(ph_error, "InvalidValueLow", ph_error);
 
   /*
    * Document-method: getLibraryVersion
@@ -603,6 +608,15 @@ void ph_raise(int err_code) {
         break;
       case EPHIDGET_EOF:
         rb_raise(rb_const_get(ph_error, rb_intern("EndOfFile")), "End of File");
+        break;
+      case EPHIDGET_FAILSAFE:
+        rb_raise(rb_const_get(ph_error, rb_intern("FailSafe")), "Failsafe condition detected");
+        break;
+      case EPHIDGET_UNKNOWNVALHIGH:
+        rb_raise(rb_const_get(ph_error, rb_intern("InvalidValueHigh")), "The value has been measured to be higher than the valid range of the sensor");
+        break;
+      case EPHIDGET_UNKNOWNVALLOW:
+        rb_raise(rb_const_get(ph_error, rb_intern("InvalidValueLow")), "The value has been measured to be lower than the valid range of the sensor");
         break;
       case EPHIDGET_NOTIMPLEMENTED:
         rb_raise(rb_const_get(ph_error, rb_intern("NotImplemented")), "This functionality has not been implemented yet");

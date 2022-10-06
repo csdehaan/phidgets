@@ -22,9 +22,9 @@ begin
   sleep 0.5
   $stdout.puts "----------------------------------------------------------------------------\n"
   manager.close
-  
+
 rescue SystemExit
-rescue Exception => e
+rescue StandardError => e
   $stdout.puts "#{e}\n#{e.backtrace.join("\n")}\n"
 end
 
